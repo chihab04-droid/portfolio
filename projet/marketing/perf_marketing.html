@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Marketing - Dashboard</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Styles personnalisés inspirés de l'image mobile moderne */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-modern {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .mobile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-scheduled { background: #e0f2fe; color: #0277bd; }
+        .status-published { background: #e8f5e8; color: #2e7d32; }
+        .status-draft { background: #fff3e0; color: #f57c00; }
+        .status-failed { background: #ffebee; color: #c62828; }
+        
+        .priority-high { border-left: 4px solid #f44336; }
+        .priority-medium { border-left: 4px solid #ff9800; }
+        .priority-low { border-left: 4px solid #4caf50; }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .floating-action {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-action:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: -20px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+        
+        .search-bar {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* Styles pour les modales */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Styles pour les assets */
+        .asset-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .asset-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .asset-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        /* Styles pour les créations */
+        .creation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .validation-pending { background: #fff3cd; color: #856404; }
+        .validation-approved { background: #d4edda; color: #155724; }
+        .validation-rejected { background: #f8d7da; color: #721c24; }
+        .validation-revision { background: #d1ecf1; color: #0c5460; }
+        
+        /* Animation pour les notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .creation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .floating-action {
+                bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar inspirée du design mobile moderne -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-rocket text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold">Performance Marketing</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('automatisation')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-robot mr-2"></i>Automatisation
+                    </button>
+                    <button onclick="showPage('veille')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-eye mr-2"></i>Veille
+                    </button>
+                    <button onclick="showPage('assets')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-box mr-2"></i>Assets
+                    </button>
+                    <button onclick="showPage('creations')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-palette mr-2"></i>Créations
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('automatisation')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-robot mr-2"></i>Automatisation
+                </button>
+                <button onclick="showPage('veille')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-eye mr-2"></i>Veille
+                </button>
+                <button onclick="showPage('assets')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-box mr-2"></i>Assets
+                </button>
+                <button onclick="showPage('creations')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-palette mr-2"></i>Créations
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Automatisation -->
+        <div id="automatisation-page" class="page-content">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-robot text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Automatisation des Posts</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Planifiez et automatisez vos publications sur les réseaux sociaux pour maximiser votre portée et engagement.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Formulaire de planification -->
+                <div class="lg:col-span-1">
+                    <div class="card-modern">
+                        <div class="card-header">
+                            <h3 class="text-xl font-semibold flex items-center">
+                                <i class="fas fa-plus-circle mr-3"></i>
+                                Nouveau Post
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <form onsubmit="addPost(event)">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Réseau Social</label>
+                                    <select id="post-network" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Sélectionner...</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="instagram">Instagram</option>
+                                        <option value="twitter">Twitter</option>
+                                        <option value="linkedin">LinkedIn</option>
+                                        <option value="tiktok">TikTok</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Contenu</label>
+                                    <textarea id="post-content" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Rédigez votre post..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date de publication</label>
+                                    <input type="datetime-local" id="post-date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Hashtags</label>
+                                    <input type="text" id="post-hashtags" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="#marketing #digital">
+                                </div>
+                                <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-semibold">
+                                    <i class="fas fa-clock mr-2"></i>Programmer le Post
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Liste des posts programmés -->
+                <div class="lg:col-span-2">
+                    <div class="card-modern">
+                        <div class="card-header">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-semibold flex items-center">
+                                    <i class="fas fa-calendar-alt mr-3"></i>
+                                    Posts Programmés
+                                </h3>
+                                <div class="flex space-x-2">
+                                    <button onclick="filterPosts('all')" class="filter-btn px-3 py-1 rounded-full text-sm bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
+                                        Tous
+                                    </button>
+                                    <button onclick="filterPosts('scheduled')" class="filter-btn px-3 py-1 rounded-full text-sm bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
+                                        Programmés
+                                    </button>
+                                    <button onclick="filterPosts('published')" class="filter-btn px-3 py-1 rounded-full text-sm bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
+                                        Publiés
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div id="posts-list" class="space-y-4">
+                                <!-- Les posts seront ajoutés ici dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Veille -->
+        <div id="veille-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-eye text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Veille Concurrentielle</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Surveillez vos concurrents et analysez leurs stratégies pour rester compétitif sur votre marché.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-4 gap-6 mb-8">
+                <!-- Statistiques de veille -->
+                <div class="mobile-card p-6 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-competitors">0</div>
+                    <div class="text-sm text-gray-600">Concurrents</div>
+                </div>
+                <div class="mobile-card p-6 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-activities">0</div>
+                    <div class="text-sm text-gray-600">Activités</div>
+                </div>
+                <div class="mobile-card p-6 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-bell text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-alerts">0</div>
+                    <div class="text-sm text-gray-600">Alertes</div>
+                </div>
+                <div class="mobile-card p-6 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-star text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-opportunities">0</div>
+                    <div class="text-sm text-gray-600">Opportunités</div>
+                </div>
+            </div>
+
+            <div class="card-modern">
+                <div class="card-header">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-search mr-3"></i>
+                            Analyse Concurrentielle
+                        </h3>
+                        <button onclick="showAddCompetitorForm()" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-plus mr-2"></i>Ajouter Concurrent
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <!-- Barre de recherche -->
+                    <div class="mb-6">
+                        <input type="text" id="competitor-search" placeholder="Rechercher un concurrent..." 
+                               class="search-bar w-full" onkeyup="filterCompetitors()">
+                    </div>
+                    
+                    <!-- Liste des concurrents -->
+                    <div id="competitors-list" class="space-y-4">
+                        <!-- Les concurrents seront ajoutés ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Assets -->
+        <div id="assets-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-orange-400 to-red-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-box text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Gestion des Assets</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Gérez vos PLV, goodies et autres assets marketing pour optimiser vos campagnes et événements.
+                </p>
+            </div>
+
+            <!-- Filtres et actions -->
+            <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
+                <div class="flex space-x-2">
+                    <button onclick="filterAssets('all')" class="asset-filter px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-all">
+                        Tous
+                    </button>
+                    <button onclick="filterAssets('plv')" class="asset-filter px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                        PLV
+                    </button>
+                    <button onclick="filterAssets('goodies')" class="asset-filter px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                        Goodies
+                    </button>
+                    <button onclick="filterAssets('supports')" class="asset-filter px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                        Supports
+                    </button>
+                </div>
+                <button onclick="showAddAssetForm()" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-2 rounded-lg transition-all">
+                    <i class="fas fa-plus mr-2"></i>Nouvel Asset
+                </button>
+            </div>
+
+            <!-- Grille des assets -->
+            <div id="assets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Les assets seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Créations -->
+        <div id="creations-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-palette text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Gestion des Créations</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Gérez vos créations graphiques, briefs et processus de validation pour des campagnes impactantes.
+                </p>
+            </div>
+
+            <!-- Onglets -->
+            <div class="flex space-x-1 mb-8 bg-gray-100 p-1 rounded-lg">
+                <button onclick="showCreationTab('creations')" id="tab-creations" class="tab-btn flex-1 py-3 px-4 rounded-lg font-medium transition-all tab-active">
+                    <i class="fas fa-images mr-2"></i>Créations
+                </button>
+                <button onclick="showCreationTab('briefs')" id="tab-briefs" class="tab-btn flex-1 py-3 px-4 rounded-lg font-medium transition-all text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-file-alt mr-2"></i>Briefs
+                </button>
+                <button onclick="showCreationTab('validations')" id="tab-validations" class="tab-btn flex-1 py-3 px-4 rounded-lg font-medium transition-all text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-check-circle mr-2"></i>Validations
+                </button>
+            </div>
+
+            <!-- Contenu des onglets -->
+            <div id="creations-tab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-900">Mes Créations</h3>
+                    <button onclick="showAddCreationForm()" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-plus mr-2"></i>Nouvelle Création
+                    </button>
+                </div>
+                <div id="creations-grid" class="creation-grid">
+                    <!-- Les créations seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+
+            <div id="briefs-tab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-900">Briefs Créatifs</h3>
+                    <button onclick="showAddBriefForm()" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-plus mr-2"></i>Nouveau Brief
+                    </button>
+                </div>
+                <div id="briefs-list" class="space-y-4">
+                    <!-- Les briefs seront ajoutés ici dynamiquement -->
+                </div>
+            </div>
+
+            <div id="validations-tab" class="tab-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-4">Processus de Validation</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                            <div class="text-2xl font-bold text-yellow-600" id="validation-pending">0</div>
+                            <div class="text-sm text-gray-600">En attente</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600" id="validation-approved">0</div>
+                            <div class="text-sm text-gray-600">Approuvées</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-lg">
+                            <div class="text-2xl font-bold text-red-600" id="validation-rejected">0</div>
+                            <div class="text-sm text-gray-600">Refusées</div>
+                        </div>
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600" id="validation-revision">0</div>
+                            <div class="text-sm text-gray-600">À réviser</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="validations-list" class="space-y-4">
+                    <!-- Les validations seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bouton d'action flottant -->
+    <button class="floating-action" onclick="showQuickActions()" title="Actions rapides">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <!-- Modales -->
+    <!-- Modal Concurrent -->
+    <div id="competitor-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
+        <div class="modal-content w-full max-w-md">
+            <div class="card-header">
+                <h3 class="text-xl font-semibold">Ajouter un Concurrent</h3>
+            </div>
+            <div class="p-6">
+                <form onsubmit="addCompetitor(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom de l'entreprise</label>
+                        <input type="text" id="competitor-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Secteur d'activité</label>
+                        <input type="text" id="competitor-sector" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Site web</label>
+                        <input type="url" id="competitor-website" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea id="competitor-notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideCompetitorModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Asset -->
+    <div id="asset-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
+        <div class="modal-content w-full max-w-md">
+            <div class="card-header">
+                <h3 class="text-xl font-semibold">Nouvel Asset</h3>
+            </div>
+            <div class="p-6">
+                <form onsubmit="addAsset(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom de l'asset</label>
+                        <input type="text" id="asset-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                        <select id="asset-type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="plv">PLV</option>
+                            <option value="goodies">Goodies</option>
+                            <option value="supports">Supports</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantité</label>
+                        <input type="number" id="asset-quantity" required min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prix unitaire (€)</label>
+                        <input type="number" id="asset-price" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="asset-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAssetModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Création -->
+    <div id="creation-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
+        <div class="modal-content w-full max-w-md">
+            <div class="card-header">
+                <h3 class="text-xl font-semibold">Nouvelle Création</h3>
+            </div>
+            <div class="p-6">
+                <form onsubmit="addCreation(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="creation-title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                        <select id="creation-type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="logo">Logo</option>
+                            <option value="affiche">Affiche</option>
+                            <option value="banniere">Bannière Web</option>
+                            <option value="brochure">Brochure</option>
+                            <option value="video">Vidéo</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Client/Projet</label>
+                        <input type="text" id="creation-client" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="creation-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideCreationModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Brief -->
+    <div id="brief-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4">
+        <div class="modal-content w-full max-w-lg">
+            <div class="card-header">
+                <h3 class="text-xl font-semibold">Nouveau Brief Créatif</h3>
+            </div>
+            <div class="p-6">
+                <form onsubmit="addBrief(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre du projet</label>
+                        <input type="text" id="brief-title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Client</label>
+                        <input type="text" id="brief-client" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date limite</label>
+                        <input type="date" id="brief-deadline" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                        <select id="brief-priority" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="low">Faible</option>
+                            <option value="medium">Moyenne</option>
+                            <option value="high">Élevée</option>
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Objectifs et contraintes</label>
+                        <textarea id="brief-objectives" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Créer le Brief
+                        </button>
+                        <button type="button" onclick="hideBriefModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'automatisation';
+        let currentCreationTab = 'creations';
+        
+        // Mock data initial
+        const mockData = {
+            posts: [
+                {
+                    id: 1,
+                    network: 'facebook',
+                    content: 'Découvrez notre nouvelle campagne marketing ! 🚀',
+                    date: '2024-01-20T14:30:00',
+                    hashtags: '#marketing #digital #innovation',
+                    status: 'scheduled'
+                },
+                {
+                    id: 2,
+                    network: 'instagram',
+                    content: 'Behind the scenes de notre équipe créative ✨',
+                    date: '2024-01-18T10:00:00',
+                    hashtags: '#behindthescenes #team #creativity',
+                    status: 'published'
+                },
+                {
+                    id: 3,
+                    network: 'linkedin',
+                    content: 'Les tendances marketing 2024 à ne pas manquer',
+                    date: '2024-01-22T09:00:00',
+                    hashtags: '#trends2024 #marketing #business',
+                    status: 'scheduled'
+                }
+            ],
+            competitors: [
+                {
+                    id: 1,
+                    name: 'TechCorp Solutions',
+                    sector: 'Technologie',
+                    website: 'https://techcorp.com',
+                    notes: 'Concurrent principal sur le marché B2B',
+                    lastActivity: '2024-01-15',
+                    alertLevel: 'high'
+                },
+                {
+                    id: 2,
+                    name: 'Digital Innovators',
+                    sector: 'Marketing Digital',
+                    website: 'https://digitalinnovators.com',
+                    notes: 'Spécialisé dans les campagnes créatives',
+                    lastActivity: '2024-01-12',
+                    alertLevel: 'medium'
+                },
+                {
+                    id: 3,
+                    name: 'Creative Agency Plus',
+                    sector: 'Agence Créative',
+                    website: 'https://creativeplus.com',
+                    notes: 'Forte présence sur les réseaux sociaux',
+                    lastActivity: '2024-01-10',
+                    alertLevel: 'low'
+                }
+            ],
+            assets: [
+                {
+                    id: 1,
+                    name: 'Roll-up Premium',
+                    type: 'plv',
+                    quantity: 15,
+                    price: 89.99,
+                    description: 'Roll-up haute qualité pour événements',
+                    image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=200&fit=crop'
+                },
+                {
+                    id: 2,
+                    name: 'Stylos personnalisés',
+                    type: 'goodies',
+                    quantity: 500,
+                    price: 1.50,
+                    description: 'Stylos avec logo entreprise',
+                    image: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=300&h=200&fit=crop'
+                },
+                {
+                    id: 3,
+                    name: 'Brochures A4',
+                    type: 'supports',
+                    quantity: 1000,
+                    price: 0.25,
+                    description: 'Brochures commerciales couleur',
+                    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop'
+                }
+            ],
+            creations: [
+                {
+                    id: 1,
+                    title: 'Logo Startup Tech',
+                    type: 'logo',
+                    client: 'InnovateTech',
+                    description: 'Logo moderne pour startup technologique',
+                    status: 'approved',
+                    date: '2024-01-15',
+                    image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop'
+                },
+                {
+                    id: 2,
+                    title: 'Campagne Été 2024',
+                    type: 'affiche',
+                    client: 'Fashion Brand',
+                    description: 'Affiche pour campagne estivale',
+                    status: 'pending',
+                    date: '2024-01-18',
+                    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop'
+                },
+                {
+                    id: 3,
+                    title: 'Bannière Web Promo',
+                    type: 'banniere',
+                    client: 'E-commerce Plus',
+                    description: 'Bannière promotionnelle pour site web',
+                    status: 'revision',
+                    date: '2024-01-20',
+                    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop'
+                }
+            ],
+            briefs: [
+                {
+                    id: 1,
+                    title: 'Refonte identité visuelle',
+                    client: 'Restaurant Le Gourmet',
+                    deadline: '2024-02-15',
+                    priority: 'high',
+                    objectives: 'Moderniser l\'identité visuelle du restaurant, créer un logo élégant et des supports de communication cohérents.',
+                    status: 'active'
+                },
+                {
+                    id: 2,
+                    title: 'Campagne publicitaire digitale',
+                    client: 'Fitness Center Pro',
+                    deadline: '2024-02-28',
+                    priority: 'medium',
+                    objectives: 'Créer une campagne complète pour promouvoir les nouveaux cours de fitness, incluant visuels web et réseaux sociaux.',
+                    status: 'active'
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('automatisation');
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-white', 'bg-opacity-20'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'automatisation':
+                    loadPosts();
+                    break;
+                case 'veille':
+                    loadCompetitors();
+                    updateVeilleStats();
+                    break;
+                case 'assets':
+                    loadAssets();
+                    break;
+                case 'creations':
+                    loadCreations();
+                    loadBriefs();
+                    updateValidationStats();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('marketingPerformanceData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('marketingPerformanceData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // AUTOMATISATION DES POSTS
+        function loadPosts() {
+            const container = document.getElementById('posts-list');
+            container.innerHTML = '';
+            
+            mockData.posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            mockData.posts.forEach(post => {
+                const networkIcons = {
+                    'facebook': 'fab fa-facebook-f',
+                    'instagram': 'fab fa-instagram',
+                    'twitter': 'fab fa-twitter',
+                    'linkedin': 'fab fa-linkedin-in',
+                    'tiktok': 'fab fa-tiktok'
+                };
+                
+                const networkColors = {
+                    'facebook': 'bg-blue-600',
+                    'instagram': 'bg-pink-600',
+                    'twitter': 'bg-blue-400',
+                    'linkedin': 'bg-blue-700',
+                    'tiktok': 'bg-black'
+                };
+                
+                const postDiv = document.createElement('div');
+                postDiv.className = 'mobile-card p-4';
+                postDiv.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 ${networkColors[post.network]} rounded-full flex items-center justify-center mr-3">
+                                <i class="${networkIcons[post.network]} text-white"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-900 capitalize">${post.network}</div>
+                                <div class="text-sm text-gray-500">${new Date(post.date).toLocaleString('fr-FR')}</div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-${post.status}">
+                            ${post.status === 'scheduled' ? 'Programmé' : post.status === 'published' ? 'Publié' : post.status === 'draft' ? 'Brouillon' : 'Échec'}
+                        </span>
+                    </div>
+                    <p class="text-gray-700 mb-3">${post.content}</p>
+                    <div class="text-sm text-blue-600 mb-3">${post.hashtags}</div>
+                    <div class="flex justify-end space-x-2">
+                        <button onclick="editPost(${post.id})" class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition-all">
+                            <i class="fas fa-edit mr-1"></i>Modifier
+                        </button>
+                        <button onclick="deletePost(${post.id})" class="text-red-600 hover:text-red-800 px-3 py-1 rounded-md hover:bg-red-50 transition-all">
+                            <i class="fas fa-trash mr-1"></i>Supprimer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(postDiv);
+            });
+        }
+
+        function addPost(event) {
+            event.preventDefault();
+            
+            const network = document.getElementById('post-network').value;
+            const content = document.getElementById('post-content').value;
+            const date = document.getElementById('post-date').value;
+            const hashtags = document.getElementById('post-hashtags').value;
+            
+            const newPost = {
+                id: Date.now(),
+                network: network,
+                content: content,
+                date: date,
+                hashtags: hashtags,
+                status: 'scheduled'
+            };
+            
+            mockData.posts.push(newPost);
+            saveDataToStorage();
+            loadPosts();
+            
+            // Reset form
+            event.target.reset();
+            
+            showNotification('Post programmé avec succès !', 'success');
+        }
+
+        function filterPosts(status) {
+            const posts = document.querySelectorAll('#posts-list .mobile-card');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            // Mettre à jour les boutons actifs
+            filterBtns.forEach(btn => btn.classList.remove('bg-white', 'bg-opacity-30'));
+            event.target.classList.add('bg-white', 'bg-opacity-30');
+            
+            posts.forEach(post => {
+                if (status === 'all') {
+                    post.style.display = 'block';
+                } else {
+                    const postStatus = post.querySelector('.status-badge').classList.contains(`status-${status}`);
+                    post.style.display = postStatus ? 'block' : 'none';
+                }
+            });
+        }
+
+        function deletePost(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce post ?')) {
+                mockData.posts = mockData.posts.filter(p => p.id !== id);
+                saveDataToStorage();
+                loadPosts();
+                showNotification('Post supprimé', 'info');
+            }
+        }
+
+        // VEILLE CONCURRENTIELLE
+        function loadCompetitors() {
+            const container = document.getElementById('competitors-list');
+            container.innerHTML = '';
+            
+            mockData.competitors.forEach(competitor => {
+                const alertColors = {
+                    'high': 'bg-red-100 text-red-800',
+                    'medium': 'bg-yellow-100 text-yellow-800',
+                    'low': 'bg-green-100 text-green-800'
+                };
+                
+                const competitorDiv = document.createElement('div');
+                competitorDiv.className = 'mobile-card p-4';
+                competitorDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900">${competitor.name}</h4>
+                            <p class="text-sm text-gray-600">${competitor.sector}</p>
+                        </div>
+                        <span class="status-badge ${alertColors[competitor.alertLevel]}">
+                            ${competitor.alertLevel === 'high' ? 'Critique' : competitor.alertLevel === 'medium' ? 'Moyen' : 'Faible'}
+                        </span>
+                    </div>
+                    <p class="text-gray-700 mb-3">${competitor.notes}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                        <span>Dernière activité : ${new Date(competitor.lastActivity).toLocaleDateString('fr-FR')}</span>
+                        ${competitor.website ? `<a href="${competitor.website}" target="_blank" class="text-blue-600 hover:underline">
+                            <i class="fas fa-external-link-alt mr-1"></i>Site web
+                        </a>` : ''}
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button onclick="analyzeCompetitor(${competitor.id})" class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition-all">
+                            <i class="fas fa-chart-line mr-1"></i>Analyser
+                        </button>
+                        <button onclick="deleteCompetitor(${competitor.id})" class="text-red-600 hover:text-red-800 px-3 py-1 rounded-md hover:bg-red-50 transition-all">
+                            <i class="fas fa-trash mr-1"></i>Supprimer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(competitorDiv);
+            });
+        }
+
+        function updateVeilleStats() {
+            document.getElementById('stat-competitors').textContent = mockData.competitors.length;
+            document.getElementById('stat-activities').textContent = mockData.competitors.reduce((sum, c) => sum + Math.floor(Math.random() * 10) + 1, 0);
+            document.getElementById('stat-alerts').textContent = mockData.competitors.filter(c => c.alertLevel === 'high').length;
+            document.getElementById('stat-opportunities').textContent = Math.floor(Math.random() * 5) + 1;
+        }
+
+        function filterCompetitors() {
+            const searchTerm = document.getElementById('competitor-search').value.toLowerCase();
+            const competitors = document.querySelectorAll('#competitors-list .mobile-card');
+            
+            competitors.forEach(competitor => {
+                const text = competitor.textContent.toLowerCase();
+                competitor.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        function showAddCompetitorForm() {
+            document.getElementById('competitor-modal').classList.remove('hidden');
+            document.getElementById('competitor-name').focus();
+        }
+
+        function hideCompetitorModal() {
+            document.getElementById('competitor-modal').classList.add('hidden');
+            document.getElementById('competitor-modal').querySelector('form').reset();
+        }
+
+        function addCompetitor(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('competitor-name').value;
+            const sector = document.getElementById('competitor-sector').value;
+            const website = document.getElementById('competitor-website').value;
+            const notes = document.getElementById('competitor-notes').value;
+            
+            const newCompetitor = {
+                id: Date.now(),
+                name: name,
+                sector: sector,
+                website: website,
+                notes: notes,
+                lastActivity: new Date().toISOString().split('T')[0],
+                alertLevel: 'low'
+            };
+            
+            mockData.competitors.push(newCompetitor);
+            saveDataToStorage();
+            loadCompetitors();
+            updateVeilleStats();
+            hideCompetitorModal();
+            
+            showNotification('Concurrent ajouté avec succès !', 'success');
+        }
+
+        function deleteCompetitor(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce concurrent ?')) {
+                mockData.competitors = mockData.competitors.filter(c => c.id !== id);
+                saveDataToStorage();
+                loadCompetitors();
+                updateVeilleStats();
+                showNotification('Concurrent supprimé', 'info');
+            }
+        }
+
+        // GESTION DES ASSETS
+        function loadAssets() {
+            const container = document.getElementById('assets-grid');
+            container.innerHTML = '';
+            
+            mockData.assets.forEach(asset => {
+                const typeIcons = {
+                    'plv': 'fas fa-sign',
+                    'goodies': 'fas fa-gift',
+                    'supports': 'fas fa-file-alt'
+                };
+                
+                const typeColors = {
+                    'plv': 'bg-blue-100 text-blue-800',
+                    'goodies': 'bg-green-100 text-green-800',
+                    'supports': 'bg-purple-100 text-purple-800'
+                };
+                
+                const assetDiv = document.createElement('div');
+                assetDiv.className = 'asset-card';
+                assetDiv.innerHTML = `
+                    <div class="asset-image bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <i class="${typeIcons[asset.type]} text-4xl text-gray-600"></i>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">${asset.name}</h4>
+                            <span class="status-badge ${typeColors[asset.type]}">
+                                ${asset.type.toUpperCase()}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${asset.description}</p>
+                        <div class="flex justify-between items-center text-sm mb-3">
+                            <span class="text-gray-700">Qté: <strong>${asset.quantity}</strong></span>
+                            <span class="text-green-600 font-semibold">${asset.price.toFixed(2)}€</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editAsset(${asset.id})" class="flex-1 text-blue-600 hover:text-blue-800 px-3 py-2 rounded-md hover:bg-blue-50 transition-all text-sm">
+                                <i class="fas fa-edit mr-1"></i>Modifier
+                            </button>
+                            <button onclick="deleteAsset(${asset.id})" class="flex-1 text-red-600 hover:text-red-800 px-3 py-2 rounded-md hover:bg-red-50 transition-all text-sm">
+                                <i class="fas fa-trash mr-1"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(assetDiv);
+            });
+        }
+
+        function filterAssets(type) {
+            const assets = document.querySelectorAll('.asset-card');
+            const filterBtns = document.querySelectorAll('.asset-filter');
+            
+            // Mettre à jour les boutons actifs
+            filterBtns.forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'text-blue-700');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-100', 'text-gray-700');
+            event.target.classList.add('bg-blue-100', 'text-blue-700');
+            
+            assets.forEach(asset => {
+                if (type === 'all') {
+                    asset.style.display = 'block';
+                } else {
+                    const assetType = asset.querySelector('.status-badge').textContent.toLowerCase();
+                    asset.style.display = assetType === type.toUpperCase() ? 'block' : 'none';
+                }
+            });
+        }
+
+        function showAddAssetForm() {
+            document.getElementById('asset-modal').classList.remove('hidden');
+            document.getElementById('asset-name').focus();
+        }
+
+        function hideAssetModal() {
+            document.getElementById('asset-modal').classList.add('hidden');
+            document.getElementById('asset-modal').querySelector('form').reset();
+        }
+
+        function addAsset(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('asset-name').value;
+            const type = document.getElementById('asset-type').value;
+            const quantity = parseInt(document.getElementById('asset-quantity').value);
+            const price = parseFloat(document.getElementById('asset-price').value);
+            const description = document.getElementById('asset-description').value;
+            
+            const newAsset = {
+                id: Date.now(),
+                name: name,
+                type: type,
+                quantity: quantity,
+                price: price,
+                description: description,
+                image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=200&fit=crop'
+            };
+            
+            mockData.assets.push(newAsset);
+            saveDataToStorage();
+            loadAssets();
+            hideAssetModal();
+            
+            showNotification('Asset ajouté avec succès !', 'success');
+        }
+
+        function deleteAsset(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet asset ?')) {
+                mockData.assets = mockData.assets.filter(a => a.id !== id);
+                saveDataToStorage();
+                loadAssets();
+                showNotification('Asset supprimé', 'info');
+            }
+        }
+
+        // GESTION DES CRÉATIONS
+        function showCreationTab(tabId) {
+            // Masquer tous les onglets
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.add('hidden'));
+            
+            // Afficher l'onglet sélectionné
+            document.getElementById(tabId + '-tab').classList.remove('hidden');
+            
+            // Mettre à jour les boutons d'onglets
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-gray-600', 'hover:text-gray-900');
+            });
+            
+            document.getElementById('tab-' + tabId).classList.add('tab-active');
+            document.getElementById('tab-' + tabId).classList.remove('text-gray-600', 'hover:text-gray-900');
+            
+            currentCreationTab = tabId;
+        }
+
+        function loadCreations() {
+            const container = document.getElementById('creations-grid');
+            container.innerHTML = '';
+            
+            mockData.creations.forEach(creation => {
+                const statusColors = {
+                    'pending': 'validation-pending',
+                    'approved': 'validation-approved',
+                    'rejected': 'validation-rejected',
+                    'revision': 'validation-revision'
+                };
+                
+                const statusLabels = {
+                    'pending': 'En attente',
+                    'approved': 'Approuvé',
+                    'rejected': 'Refusé',
+                    'revision': 'À réviser'
+                };
+                
+                const creationDiv = document.createElement('div');
+                creationDiv.className = 'mobile-card overflow-hidden';
+                creationDiv.innerHTML = `
+                    <div class="h-48 bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center">
+                        <i class="fas fa-image text-4xl text-gray-600"></i>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-gray-900">${creation.title}</h4>
+                            <span class="status-badge ${statusColors[creation.status]}">
+                                ${statusLabels[creation.status]}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${creation.type} • ${creation.client}</p>
+                        <p class="text-sm text-gray-700 mb-3">${creation.description}</p>
+                        <div class="text-xs text-gray-500 mb-3">${new Date(creation.date).toLocaleDateString('fr-FR')}</div>
+                        <div class="flex space-x-2">
+                            <button onclick="viewCreation(${creation.id})" class="flex-1 text-blue-600 hover:text-blue-800 px-3 py-2 rounded-md hover:bg-blue-50 transition-all text-sm">
+                                <i class="fas fa-eye mr-1"></i>Voir
+                            </button>
+                            <button onclick="deleteCreation(${creation.id})" class="flex-1 text-red-600 hover:text-red-800 px-3 py-2 rounded-md hover:bg-red-50 transition-all text-sm">
+                                <i class="fas fa-trash mr-1"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(creationDiv);
+            });
+        }
+
+        function loadBriefs() {
+            const container = document.getElementById('briefs-list');
+            container.innerHTML = '';
+            
+            mockData.briefs.forEach(brief => {
+                const priorityColors = {
+                    'low': 'priority-low',
+                    'medium': 'priority-medium',
+                    'high': 'priority-high'
+                };
+                
+                const priorityLabels = {
+                    'low': 'Faible',
+                    'medium': 'Moyenne',
+                    'high': 'Élevée'
+                };
+                
+                const briefDiv = document.createElement('div');
+                briefDiv.className = `mobile-card p-4 ${priorityColors[brief.priority]}`;
+                briefDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900">${brief.title}</h4>
+                            <p class="text-sm text-gray-600">${brief.client}</p>
+                        </div>
+                        <span class="status-badge ${brief.priority === 'high' ? 'bg-red-100 text-red-800' : brief.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                            ${priorityLabels[brief.priority]}
+                        </span>
+                    </div>
+                    <p class="text-gray-700 mb-3">${brief.objectives}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                        <span>Échéance : ${new Date(brief.deadline).toLocaleDateString('fr-FR')}</span>
+                        <span class="status-badge status-${brief.status === 'active' ? 'scheduled' : 'published'}">
+                            ${brief.status === 'active' ? 'Actif' : 'Terminé'}
+                        </span>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button onclick="startBrief(${brief.id})" class="text-green-600 hover:text-green-800 px-3 py-1 rounded-md hover:bg-green-50 transition-all">
+                            <i class="fas fa-play mr-1"></i>Commencer
+                        </button>
+                        <button onclick="deleteBrief(${brief.id})" class="text-red-600 hover:text-red-800 px-3 py-1 rounded-md hover:bg-red-50 transition-all">
+                            <i class="fas fa-trash mr-1"></i>Supprimer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(briefDiv);
+            });
+        }
+
+        function updateValidationStats() {
+            const pending = mockData.creations.filter(c => c.status === 'pending').length;
+            const approved = mockData.creations.filter(c => c.status === 'approved').length;
+            const rejected = mockData.creations.filter(c => c.status === 'rejected').length;
+            const revision = mockData.creations.filter(c => c.status === 'revision').length;
+            
+            document.getElementById('validation-pending').textContent = pending;
+            document.getElementById('validation-approved').textContent = approved;
+            document.getElementById('validation-rejected').textContent = rejected;
+            document.getElementById('validation-revision').textContent = revision;
+            
+            // Charger la liste des validations
+            const container = document.getElementById('validations-list');
+            container.innerHTML = '';
+            
+            mockData.creations.forEach(creation => {
+                const statusColors = {
+                    'pending': 'validation-pending',
+                    'approved': 'validation-approved',
+                    'rejected': 'validation-rejected',
+                    'revision': 'validation-revision'
+                };
+                
+                const statusLabels = {
+                    'pending': 'En attente de validation',
+                    'approved': 'Validé et approuvé',
+                    'rejected': 'Refusé - Modifications requises',
+                    'revision': 'En révision - Corrections demandées'
+                };
+                
+                const validationDiv = document.createElement('div');
+                validationDiv.className = 'mobile-card p-4';
+                validationDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${creation.title}</h4>
+                            <p class="text-sm text-gray-600">${creation.client} • ${creation.type}</p>
+                        </div>
+                        <span class="status-badge ${statusColors[creation.status]}">
+                            ${statusLabels[creation.status]}
+                        </span>
+                    </div>
+                    <p class="text-gray-700 mb-3">${creation.description}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${new Date(creation.date).toLocaleDateString('fr-FR')}</span>
+                        <div class="flex space-x-2">
+                            ${creation.status === 'pending' ? `
+                                <button onclick="validateCreation(${creation.id}, 'approved')" class="text-green-600 hover:text-green-800 px-3 py-1 rounded-md hover:bg-green-50 transition-all text-sm">
+                                    <i class="fas fa-check mr-1"></i>Approuver
+                                </button>
+                                <button onclick="validateCreation(${creation.id}, 'rejected')" class="text-red-600 hover:text-red-800 px-3 py-1 rounded-md hover:bg-red-50 transition-all text-sm">
+                                    <i class="fas fa-times mr-1"></i>Refuser
+                                </button>
+                            ` : `
+                                <button onclick="resetValidation(${creation.id})" class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition-all text-sm">
+                                    <i class="fas fa-redo mr-1"></i>Revalider
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(validationDiv);
+            });
+        }
+
+        function showAddCreationForm() {
+            document.getElementById('creation-modal').classList.remove('hidden');
+            document.getElementById('creation-title').focus();
+        }
+
+        function hideCreationModal() {
+            document.getElementById('creation-modal').classList.add('hidden');
+            document.getElementById('creation-modal').querySelector('form').reset();
+        }
+
+        function addCreation(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('creation-title').value;
+            const type = document.getElementById('creation-type').value;
+            const client = document.getElementById('creation-client').value;
+            const description = document.getElementById('creation-description').value;
+            
+            const newCreation = {
+                id: Date.now(),
+                title: title,
+                type: type,
+                client: client,
+                description: description,
+                status: 'pending',
+                date: new Date().toISOString().split('T')[0],
+                image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop'
+            };
+            
+            mockData.creations.push(newCreation);
+            saveDataToStorage();
+            loadCreations();
+            updateValidationStats();
+            hideCreationModal();
+            
+            showNotification('Création ajoutée avec succès !', 'success');
+        }
+
+        function showAddBriefForm() {
+            document.getElementById('brief-modal').classList.remove('hidden');
+            document.getElementById('brief-title').focus();
+        }
+
+        function hideBriefModal() {
+            document.getElementById('brief-modal').classList.add('hidden');
+            document.getElementById('brief-modal').querySelector('form').reset();
+        }
+
+        function addBrief(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('brief-title').value;
+            const client = document.getElementById('brief-client').value;
+            const deadline = document.getElementById('brief-deadline').value;
+            const priority = document.getElementById('brief-priority').value;
+            const objectives = document.getElementById('brief-objectives').value;
+            
+            const newBrief = {
+                id: Date.now(),
+                title: title,
+                client: client,
+                deadline: deadline,
+                priority: priority,
+                objectives: objectives,
+                status: 'active'
+            };
+            
+            mockData.briefs.push(newBrief);
+            saveDataToStorage();
+            loadBriefs();
+            hideBriefModal();
+            
+            showNotification('Brief créé avec succès !', 'success');
+        }
+
+        function validateCreation(id, status) {
+            const creation = mockData.creations.find(c => c.id === id);
+            if (creation) {
+                creation.status = status;
+                saveDataToStorage();
+                updateValidationStats();
+                showNotification(`Création ${status === 'approved' ? 'approuvée' : 'refusée'}`, 'success');
+            }
+        }
+
+        function deleteCreation(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette création ?')) {
+                mockData.creations = mockData.creations.filter(c => c.id !== id);
+                saveDataToStorage();
+                loadCreations();
+                updateValidationStats();
+                showNotification('Création supprimée', 'info');
+            }
+        }
+
+        function deleteBrief(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce brief ?')) {
+                mockData.briefs = mockData.briefs.filter(b => b.id !== id);
+                saveDataToStorage();
+                loadBriefs();
+                showNotification('Brief supprimé', 'info');
+            }
+        }
+
+        // FONCTIONS UTILITAIRES
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type === 'success' ? 'border-l-4 border-green-500' : type === 'error' ? 'border-l-4 border-red-500' : 'border-l-4 border-blue-500'}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle text-green-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-blue-500'} mr-3"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Afficher la notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Masquer et supprimer la notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function showQuickActions() {
+            const actions = [
+                { text: 'Nouveau Post', action: () => showPage('automatisation') },
+                { text: 'Ajouter Concurrent', action: showAddCompetitorForm },
+                { text: 'Nouvel Asset', action: showAddAssetForm },
+                { text: 'Nouvelle Création', action: showAddCreationForm }
+            ];
+            
+            // Créer un menu contextuel simple
+            const menu = document.createElement('div');
+            menu.className = 'fixed bottom-20 right-5 bg-white rounded-lg shadow-xl p-2 z-50';
+            menu.innerHTML = actions.map(action => 
+                `<button onclick="${action.action.name}(); document.body.removeChild(this.parentElement)" class="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded-md transition-all">
+                    ${action.text}
+                </button>`
+            ).join('');
+            
+            document.body.appendChild(menu);
+            
+            // Supprimer le menu après 5 secondes
+            setTimeout(() => {
+                if (document.body.contains(menu)) {
+                    document.body.removeChild(menu);
+                }
+            }, 5000);
+        }
+
+        // Fermer les modales en cliquant à l'extérieur
+        document.addEventListener('click', function(event) {
+            const modals = ['competitor-modal', 'asset-modal', 'creation-modal', 'brief-modal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && !modal.classList.contains('hidden') && event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+
+        // Fermer les modales avec la touche Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = ['competitor-modal', 'asset-modal', 'creation-modal', 'brief-modal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (modal && !modal.classList.contains('hidden')) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
