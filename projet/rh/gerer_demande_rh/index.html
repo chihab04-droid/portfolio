@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion RH - Application</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useContext, createContext } = React;
+
+        // Context pour gérer les données
+        const DataContext = createContext();
+
+        // Données mock initiales
+        const initialData = {
+            conges: [
+                {
+                    id: 1,
+                    employe: "Marie Dupont",
+                    type: "Congés payés",
+                    dateDebut: "2024-02-15",
+                    dateFin: "2024-02-25",
+                    commentaire: "Vacances d'hiver",
+                    statut: "En attente",
+                    dateCreation: "2024-01-15"
+                },
+                {
+                    id: 2,
+                    employe: "Jean Martin",
+                    type: "Congé maladie",
+                    dateDebut: "2024-01-20",
+                    dateFin: "2024-01-22",
+                    commentaire: "Grippe",
+                    statut: "Approuvé",
+                    dateCreation: "2024-01-18"
+                }
+            ],
+            recrutements: [
+                {
+                    id: 1,
+                    contrat: "CDI",
+                    role: "Développeur React",
+                    dateDebut: "2024-03-01",
+                    commentaire: "Poste urgent pour équipe frontend",
+                    statut: "En cours",
+                    dateCreation: "2024-01-10"
+                }
+            ]
+        };
+
+        // Provider pour les données
+        function DataProvider({ children }) {
+            const [data, setData] = useState(initialData);
+
+            const ajouterConge = (conge) => {
+                const nouveauConge = {
+                    ...conge,
+                    id: Date.now(),
+                    statut: "En attente",
+                    dateCreation: new Date().toISOString().split('T')[0]
+                };
+                setData(prev => ({
+                    ...prev,
+                    conges: [...prev.conges, nouveauConge]
+                }));
+            };
+
+            const ajouterRecrutement = (recrutement) => {
+                const nouveauRecrutement = {
+                    ...recrutement,
+                    id: Date.now(),
+                    statut: "En cours",
+                    dateCreation: new Date().toISOString().split('T')[0]
+                };
+                setData(prev => ({
+                    ...prev,
+                    recrutements: [...prev.recrutements, nouveauRecrutement]
+                }));
+            };
+
+            const modifierStatutConge = (id, nouveauStatut) => {
+                setData(prev => ({
+                    ...prev,
+                    conges: prev.conges.map(conge => 
+                        conge.id === id ? { ...conge, statut: nouveauStatut } : conge
+                    )
+                }));
+            };
+
+            return (
+                <DataContext.Provider value={{
+                    data,
+                    ajouterConge,
+                    ajouterRecrutement,
+                    modifierStatutConge
+                }}>
+                    {children}
+                </DataContext.Provider>
+            );
+        }
+
+        // Hook pour utiliser le context
+        function useData() {
+            const context = useContext(DataContext);
+            if (!context) {
+                throw new Error('useData doit être utilisé dans un DataProvider');
+            }
+            return context;
+        }
+
+        // Composant Navbar
+        function Navbar({ currentPage, setCurrentPage }) {
+            const pages = [
+                { id: 'conges', label: 'Congés', icon: '🏖️' },
+                { id: 'recrutement', label: 'Recrutement', icon: '👥' },
+                { id: 'manager', label: 'Vue Manager', icon: '👔' },
+                { id: 'historique', label: 'Historique', icon: '📊' }
+            ];
+
+            return (
+                <nav className="gradient-bg text-white shadow-lg">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex justify-between items-center py-4">
+                            <div className="flex items-center space-x-2">
+                                <span className="text-2xl">🏢</span>
+                                <h1 className="text-xl font-bold">Gestion RH</h1>
+                            </div>
+                            
+                            {/* Navigation Desktop */}
+                            <div className="hidden md:flex space-x-1">
+                                {pages.map(page => (
+                                    <button
+                                        key={page.id}
+                                        onClick={() => setCurrentPage(page.id)}
+                                        className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                                            currentPage === page.id 
+                                                ? 'bg-white text-purple-600 shadow-md' 
+                                                : 'hover:bg-white hover:bg-opacity-20'
+                                        }`}
+                                    >
+                                        <span>{page.icon}</span>
+                                        <span>{page.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Navigation Mobile */}
+                            <div className="md:hidden">
+                                <select 
+                                    value={currentPage}
+                                    onChange={(e) => setCurrentPage(e.target.value)}
+                                    className="bg-white text-purple-600 px-3 py-2 rounded-lg"
+                                >
+                                    {pages.map(page => (
+                                        <option key={page.id} value={page.id}>
+                                            {page.icon} {page.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            );
+        }
+
+        // Page Congés
+        function PageConges() {
+            const { data, ajouterConge } = useData();
+            const [formData, setFormData] = useState({
+                employe: '',
+                type: 'Congés payés',
+                dateDebut: '',
+                dateFin: '',
+                commentaire: ''
+            });
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (formData.employe && formData.dateDebut && formData.dateFin) {
+                    ajouterConge(formData);
+                    setFormData({
+                        employe: '',
+                        type: 'Congés payés',
+                        dateDebut: '',
+                        dateFin: '',
+                        commentaire: ''
+                    });
+                    alert('Demande de congé ajoutée avec succès !');
+                }
+            };
+
+            const calculerDuree = (debut, fin) => {
+                const dateDebut = new Date(debut);
+                const dateFin = new Date(fin);
+                const diffTime = Math.abs(dateFin - dateDebut);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                return diffDays;
+            };
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Gestion des Congés</h2>
+                        <p className="text-gray-600">Gérez vos demandes de congés et consultez leur statut</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Formulaire */}
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Nouvelle demande de congé</h3>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Nom de l'employé
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.employe}
+                                        onChange={(e) => setFormData({...formData, employe: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="Entrez le nom complet"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Type de congé
+                                    </label>
+                                    <select
+                                        value={formData.type}
+                                        onChange={(e) => setFormData({...formData, type: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    >
+                                        <option value="Congés payés">Congés payés</option>
+                                        <option value="Congé maladie">Congé maladie</option>
+                                        <option value="Congé maternité">Congé maternité</option>
+                                        <option value="Congé sans solde">Congé sans solde</option>
+                                        <option value="RTT">RTT</option>
+                                    </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Date de début
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={formData.dateDebut}
+                                            onChange={(e) => setFormData({...formData, dateDebut: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Date de fin
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={formData.dateFin}
+                                            onChange={(e) => setFormData({...formData, dateFin: e.target.value})}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Commentaire
+                                    </label>
+                                    <textarea
+                                        value={formData.commentaire}
+                                        onChange={(e) => setFormData({...formData, commentaire: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        rows="3"
+                                        placeholder="Motif ou commentaire (optionnel)"
+                                    ></textarea>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium"
+                                >
+                                    Soumettre la demande
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Statistiques */}
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Statistiques</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                                    <span className="text-blue-800 font-medium">Total demandes</span>
+                                    <span className="text-2xl font-bold text-blue-600">{data.conges.length}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                                    <span className="text-green-800 font-medium">Approuvées</span>
+                                    <span className="text-2xl font-bold text-green-600">
+                                        {data.conges.filter(c => c.statut === 'Approuvé').length}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-lg">
+                                    <span className="text-yellow-800 font-medium">En attente</span>
+                                    <span className="text-2xl font-bold text-yellow-600">
+                                        {data.conges.filter(c => c.statut === 'En attente').length}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg">
+                                    <span className="text-red-800 font-medium">Refusées</span>
+                                    <span className="text-2xl font-bold text-red-600">
+                                        {data.conges.filter(c => c.statut === 'Refusé').length}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tableau des demandes */}
+                    <div className="mt-8 bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-xl font-semibold text-gray-800">Mes demandes de congés</h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {data.conges.map((conge) => (
+                                        <tr key={conge.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">{conge.employe}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{conge.type}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {conge.dateDebut} → {conge.dateFin}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {calculerDuree(conge.dateDebut, conge.dateFin)} jour(s)
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                    conge.statut === 'Approuvé' ? 'bg-green-100 text-green-800' :
+                                                    conge.statut === 'Refusé' ? 'bg-red-100 text-red-800' :
+                                                    'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                    {conge.statut}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900 max-w-xs truncate">
+                                                    {conge.commentaire || '-'}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Page Recrutement
+        function PageRecrutement() {
+            const { data, ajouterRecrutement } = useData();
+            const [formData, setFormData] = useState({
+                contrat: 'CDI',
+                role: '',
+                dateDebut: '',
+                commentaire: ''
+            });
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (formData.role && formData.dateDebut) {
+                    ajouterRecrutement(formData);
+                    setFormData({
+                        contrat: 'CDI',
+                        role: '',
+                        dateDebut: '',
+                        commentaire: ''
+                    });
+                    alert('Demande de recrutement ajoutée avec succès !');
+                }
+            };
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Gestion du Recrutement</h2>
+                        <p className="text-gray-600">Gérez vos demandes de recrutement et suivez leur progression</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Formulaire */}
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Nouvelle demande de recrutement</h3>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Type de contrat
+                                    </label>
+                                    <select
+                                        value={formData.contrat}
+                                        onChange={(e) => setFormData({...formData, contrat: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    >
+                                        <option value="CDI">CDI</option>
+                                        <option value="CDD">CDD</option>
+                                        <option value="Stage">Stage</option>
+                                        <option value="Freelance">Freelance</option>
+                                        <option value="Alternance">Alternance</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Poste à pourvoir
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({...formData, role: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="Ex: Développeur Full Stack, Designer UX..."
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Date de début souhaitée
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={formData.dateDebut}
+                                        onChange={(e) => setFormData({...formData, dateDebut: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Description du besoin
+                                    </label>
+                                    <textarea
+                                        value={formData.commentaire}
+                                        onChange={(e) => setFormData({...formData, commentaire: e.target.value})}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        rows="4"
+                                        placeholder="Décrivez le profil recherché, les compétences requises..."
+                                    ></textarea>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium"
+                                >
+                                    Soumettre la demande
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Statistiques */}
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Statistiques Recrutement</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                                    <span className="text-blue-800 font-medium">Demandes actives</span>
+                                    <span className="text-2xl font-bold text-blue-600">{data.recrutements.length}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
+                                    <span className="text-purple-800 font-medium">CDI</span>
+                                    <span className="text-2xl font-bold text-purple-600">
+                                        {data.recrutements.filter(r => r.contrat === 'CDI').length}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-indigo-50 rounded-lg">
+                                    <span className="text-indigo-800 font-medium">CDD</span>
+                                    <span className="text-2xl font-bold text-indigo-600">
+                                        {data.recrutements.filter(r => r.contrat === 'CDD').length}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                                    <span className="text-green-800 font-medium">Stages</span>
+                                    <span className="text-2xl font-bold text-green-600">
+                                        {data.recrutements.filter(r => r.contrat === 'Stage').length}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tableau des demandes */}
+                    <div className="mt-8 bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-xl font-semibold text-gray-800">Demandes de recrutement</h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contrat</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poste</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date début</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {data.recrutements.map((recrutement) => (
+                                        <tr key={recrutement.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                    recrutement.contrat === 'CDI' ? 'bg-green-100 text-green-800' :
+                                                    recrutement.contrat === 'CDD' ? 'bg-blue-100 text-blue-800' :
+                                                    recrutement.contrat === 'Stage' ? 'bg-purple-100 text-purple-800' :
+                                                    'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                    {recrutement.contrat}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">{recrutement.role}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{recrutement.dateDebut}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    {recrutement.statut}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900 max-w-xs truncate">
+                                                    {recrutement.commentaire || '-'}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Page Vue Manager
+        function PageVueManager() {
+            const { data, modifierStatutConge } = useData();
+            const [filtreStatut, setFiltreStatut] = useState('tous');
+
+            const congesFiltres = filtreStatut === 'tous' 
+                ? data.conges 
+                : data.conges.filter(conge => conge.statut === filtreStatut);
+
+            const handleApprouver = (id) => {
+                modifierStatutConge(id, 'Approuvé');
+            };
+
+            const handleRefuser = (id) => {
+                modifierStatutConge(id, 'Refusé');
+            };
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Vue Manager</h2>
+                        <p className="text-gray-600">Gérez et validez les demandes de congés de votre équipe</p>
+                    </div>
+
+                    {/* Filtres */}
+                    <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
+                        <div className="flex flex-wrap items-center gap-4">
+                            <label className="text-sm font-medium text-gray-700">Filtrer par statut :</label>
+                            <select
+                                value={filtreStatut}
+                                onChange={(e) => setFiltreStatut(e.target.value)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            >
+                                <option value="tous">Tous les statuts</option>
+                                <option value="En attente">En attente</option>
+                                <option value="Approuvé">Approuvé</option>
+                                <option value="Refusé">Refusé</option>
+                            </select>
+                            <div className="ml-auto text-sm text-gray-600">
+                                {congesFiltres.length} demande(s) affichée(s)
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tableau des demandes */}
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-xl font-semibold text-gray-800">Demandes de congés à traiter</h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {congesFiltres.map((conge) => {
+                                        const duree = Math.ceil((new Date(conge.dateFin) - new Date(conge.dateDebut)) / (1000 * 60 * 60 * 24)) + 1;
+                                        
+                                        return (
+                                            <tr key={conge.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                                            <span className="text-purple-600 font-medium text-sm">
+                                                                {conge.employe.split(' ').map(n => n[0]).join('')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-sm font-medium text-gray-900">{conge.employe}</div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{conge.type}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {conge.dateDebut} → {conge.dateFin}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{duree} jour(s)</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                        conge.statut === 'Approuvé' ? 'bg-green-100 text-green-800' :
+                                                        conge.statut === 'Refusé' ? 'bg-red-100 text-red-800' :
+                                                        'bg-yellow-100 text-yellow-800'
+                                                    }`}>
+                                                        {conge.statut}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    {conge.statut === 'En attente' ? (
+                                                        <div className="flex space-x-2">
+                                                            <button
+                                                                onClick={() => handleApprouver(conge.id)}
+                                                                className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors duration-200"
+                                                            >
+                                                                ✓ Approuver
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRefuser(conge.id)}
+                                                                className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors duration-200"
+                                                            >
+                                                                ✗ Refuser
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-gray-400">Traité</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Statistiques rapides */}
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-blue-600 mb-2">{data.conges.length}</div>
+                            <div className="text-gray-600">Total demandes</div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-yellow-600 mb-2">
+                                {data.conges.filter(c => c.statut === 'En attente').length}
+                            </div>
+                            <div className="text-gray-600">En attente</div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-green-600 mb-2">
+                                {data.conges.filter(c => c.statut === 'Approuvé').length}
+                            </div>
+                            <div className="text-gray-600">Approuvées</div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-red-600 mb-2">
+                                {data.conges.filter(c => c.statut === 'Refusé').length}
+                            </div>
+                            <div className="text-gray-600">Refusées</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Page Historique
+        function PageHistorique() {
+            const { data } = useData();
+            const [filtreType, setFiltreType] = useState('tous');
+            const [recherche, setRecherche] = useState('');
+
+            // Combiner congés et recrutements
+            const toutesLesDemandes = [
+                ...data.conges.map(conge => ({
+                    ...conge,
+                    typeCategorie: 'Congé',
+                    titre: `${conge.type} - ${conge.employe}`,
+                    periode: `${conge.dateDebut} → ${conge.dateFin}`
+                })),
+                ...data.recrutements.map(recrutement => ({
+                    ...recrutement,
+                    typeCategorie: 'Recrutement',
+                    titre: `${recrutement.role} (${recrutement.contrat})`,
+                    periode: `Début: ${recrutement.dateDebut}`,
+                    statut: recrutement.statut
+                }))
+            ].sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation));
+
+            // Filtrer les données
+            const demandesFiltrees = toutesLesDemandes.filter(demande => {
+                const matchType = filtreType === 'tous' || demande.typeCategorie === filtreType;
+                const matchRecherche = recherche === '' || 
+                    demande.titre.toLowerCase().includes(recherche.toLowerCase()) ||
+                    (demande.employe && demande.employe.toLowerCase().includes(recherche.toLowerCase()));
+                return matchType && matchRecherche;
+            });
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Historique</h2>
+                        <p className="text-gray-600">Consultez l'historique complet de toutes les demandes</p>
+                    </div>
+
+                    {/* Filtres et recherche */}
+                    <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Type de demande</label>
+                                <select
+                                    value={filtreType}
+                                    onChange={(e) => setFiltreType(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                >
+                                    <option value="tous">Toutes les demandes</option>
+                                    <option value="Congé">Congés uniquement</option>
+                                    <option value="Recrutement">Recrutements uniquement</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+                                <input
+                                    type="text"
+                                    value={recherche}
+                                    onChange={(e) => setRecherche(e.target.value)}
+                                    placeholder="Rechercher par nom, poste..."
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                />
+                            </div>
+                            <div className="flex items-end">
+                                <div className="text-sm text-gray-600">
+                                    {demandesFiltrees.length} résultat(s) sur {toutesLesDemandes.length}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Statistiques globales */}
+                    <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-purple-600 mb-2">{toutesLesDemandes.length}</div>
+                            <div className="text-gray-600">Total demandes</div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-blue-600 mb-2">{data.conges.length}</div>
+                            <div className="text-gray-600">Demandes de congés</div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                            <div className="text-3xl font-bold text-green-600 mb-2">{data.recrutements.length}</div>
+                            <div className="text-gray-600">Demandes de recrutement</div>
+                        </div>
+                    </div>
+
+                    {/* Tableau historique */}
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-xl font-semibold text-gray-800">Historique complet</h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demande</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {demandesFiltrees.map((demande, index) => (
+                                        <tr key={`${demande.typeCategorie}-${demande.id}`} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{demande.dateCreation}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                    demande.typeCategorie === 'Congé' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                                                }`}>
+                                                    {demande.typeCategorie}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm font-medium text-gray-900">{demande.titre}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{demande.periode}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                    demande.statut === 'Approuvé' ? 'bg-green-100 text-green-800' :
+                                                    demande.statut === 'Refusé' ? 'bg-red-100 text-red-800' :
+                                                    demande.statut === 'En cours' ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                    {demande.statut}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900 max-w-xs truncate">
+                                                    {demande.commentaire || '-'}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Composant principal App
+        function App() {
+            const [currentPage, setCurrentPage] = useState('conges');
+
+            const renderPage = () => {
+                switch(currentPage) {
+                    case 'conges':
+                        return <PageConges />;
+                    case 'recrutement':
+                        return <PageRecrutement />;
+                    case 'manager':
+                        return <PageVueManager />;
+                    case 'historique':
+                        return <PageHistorique />;
+                    default:
+                        return <PageConges />;
+                }
+            };
+
+            return (
+                <DataProvider>
+                    <div className="min-h-screen bg-gray-50">
+                        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+                        <main>
+                            {renderPage()}
+                        </main>
+                    </div>
+                </DataProvider>
+            );
+        }
+
+        // Rendu de l'application
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
