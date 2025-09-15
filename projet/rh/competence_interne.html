@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Compétences - Entreprise</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Styles personnalisés pour les animations et interactions */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .skill-badge {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .skill-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .accordion-content.active {
+            max-height: 500px;
+        }
+        
+        .filter-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .timeline-item {
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 12px;
+            top: 24px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #e5e7eb;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Styles pour les graphiques */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        /* Animation pour les cartes d'employés */
+        .employee-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .employee-card:hover {
+            border-left-color: #667eea;
+            background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        }
+        
+        /* Styles pour les niveaux de compétence */
+        .skill-level-1 { background: #fef3c7; color: #92400e; }
+        .skill-level-2 { background: #ddd6fe; color: #5b21b6; }
+        .skill-level-3 { background: #d1fae5; color: #065f46; }
+        .skill-level-4 { background: #fecaca; color: #991b1b; }
+        .skill-level-5 { background: #bfdbfe; color: #1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-brain text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Gestion des Compétences</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('competences')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-user-graduate mr-2"></i>Suivi Compétences
+                    </button>
+                    <button onclick="showPage('formations')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>Plans de Formation
+                    </button>
+                    <button onclick="showPage('sessions')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-calendar-alt mr-2"></i>Sessions & Certifications
+                    </button>
+                    <button onclick="showPage('rapports')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-chart-bar mr-2"></i>Rapports
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('competences')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-user-graduate mr-2"></i>Suivi Compétences
+                </button>
+                <button onclick="showPage('formations')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i>Plans de Formation
+                </button>
+                <button onclick="showPage('sessions')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-calendar-alt mr-2"></i>Sessions & Certifications
+                </button>
+                <button onclick="showPage('rapports')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-chart-bar mr-2"></i>Rapports
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Suivi Compétences -->
+        <div id="competences-page" class="page-content">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-user-graduate text-blue-600 mr-3"></i>Suivi des Compétences
+                </h2>
+                <button onclick="showAddEmployeeForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Ajouter Employé
+                </button>
+            </div>
+            
+            <!-- Filtres et Recherche -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher un employé</label>
+                        <input type="text" id="employee-search" placeholder="Nom, prénom ou poste..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               onkeyup="filterEmployees()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrer par compétence</label>
+                        <select id="skill-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="filterEmployees()">
+                            <option value="">Toutes les compétences</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrer par équipe</label>
+                        <select id="team-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="filterEmployees()">
+                            <option value="">Toutes les équipes</option>
+                            <option value="Développement">Développement</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="RH">RH</option>
+                            <option value="Commercial">Commercial</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire d'ajout d'employé -->
+            <div id="add-employee-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter un nouvel employé</h3>
+                <form onsubmit="addEmployee(event)">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                            <input type="text" id="employee-prenom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                            <input type="text" id="employee-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Poste</label>
+                            <input type="text" id="employee-poste" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Équipe</label>
+                            <select id="employee-equipe" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="Développement">Développement</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="RH">RH</option>
+                                <option value="Commercial">Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddEmployeeForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des employés -->
+            <div id="employees-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les employés seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Plans de Formation -->
+        <div id="formations-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-chalkboard-teacher text-green-600 mr-3"></i>Plans de Formation
+                </h2>
+                <button onclick="showAddFormationForm()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouveau Plan
+                </button>
+            </div>
+            
+            <!-- Filtres pour les formations -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="filterFormations('all')" class="filter-btn filter-active px-4 py-2 rounded-full text-sm font-medium transition-all duration-200">
+                        Toutes
+                    </button>
+                    <button onclick="filterFormations('prioritaire')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 hover:bg-gray-300 transition-all duration-200">
+                        Prioritaires
+                    </button>
+                    <button onclick="filterFormations('recommandee')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 hover:bg-gray-300 transition-all duration-200">
+                        Recommandées
+                    </button>
+                    <button onclick="filterFormations('technique')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 hover:bg-gray-300 transition-all duration-200">
+                        Techniques
+                    </button>
+                    <button onclick="filterFormations('soft-skills')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 hover:bg-gray-300 transition-all duration-200">
+                        Soft Skills
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Formulaire d'ajout de formation -->
+            <div id="add-formation-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Créer un nouveau plan de formation</h3>
+                <form onsubmit="addFormation(event)">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                            <input type="text" id="formation-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                            <select id="formation-categorie" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="technique">Technique</option>
+                                <option value="soft-skills">Soft Skills</option>
+                                <option value="management">Management</option>
+                                <option value="securite">Sécurité</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Durée (heures)</label>
+                            <input type="number" id="formation-duree" required min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                            <select id="formation-priorite" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="normale">Normale</option>
+                                <option value="recommandee">Recommandée</option>
+                                <option value="prioritaire">Prioritaire</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="formation-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Créer
+                        </button>
+                        <button type="button" onclick="hideAddFormationForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des formations -->
+            <div id="formations-list" class="space-y-4">
+                <!-- Les formations seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Sessions & Certifications -->
+        <div id="sessions-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-calendar-alt text-purple-600 mr-3"></i>Sessions & Certifications
+                </h2>
+                <button onclick="showAddSessionForm()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Session
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de session -->
+            <div id="add-session-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Organiser une nouvelle session</h3>
+                <form onsubmit="addSession(event)">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                            <input type="text" id="session-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                            <select id="session-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="formation">Formation</option>
+                                <option value="certification">Certification</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="conference">Conférence</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                            <input type="date" id="session-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Heure</label>
+                            <input type="time" id="session-heure" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Durée (heures)</label>
+                            <input type="number" id="session-duree" required min="0.5" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Formateur</label>
+                            <input type="text" id="session-formateur" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lieu</label>
+                            <input type="text" id="session-lieu" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="session-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Organiser
+                        </button>
+                        <button type="button" onclick="hideAddSessionForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Timeline des sessions -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-6">Prochaines Sessions</h3>
+                <div id="sessions-timeline" class="space-y-6">
+                    <!-- Les sessions seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Rapports -->
+        <div id="rapports-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-chart-bar text-orange-600 mr-3"></i>Rapports de Compétences
+                </h2>
+                <button onclick="generateReport()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                </button>
+            </div>
+            
+            <!-- Sélecteurs de rapports -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type de rapport</label>
+                        <select id="report-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                onchange="generateReport()">
+                            <option value="competences">Répartition des compétences</option>
+                            <option value="equipes">Compétences par équipe</option>
+                            <option value="formations">Formations suivies</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Période</label>
+                        <select id="report-period" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                onchange="generateReport()">
+                            <option value="all">Toute la période</option>
+                            <option value="month">Ce mois</option>
+                            <option value="quarter">Ce trimestre</option>
+                            <option value="year">Cette année</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                        <select id="report-format" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="chart">Graphique</option>
+                            <option value="table">Tableau</option>
+                            <option value="both">Les deux</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistiques rapides -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2" id="total-employees">0</div>
+                    <div class="text-gray-600">Employés</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2" id="total-skills">0</div>
+                    <div class="text-gray-600">Compétences</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2" id="total-formations">0</div>
+                    <div class="text-gray-600">Formations</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2" id="total-sessions">0</div>
+                    <div class="text-gray-600">Sessions</div>
+                </div>
+            </div>
+            
+            <!-- Zone des graphiques -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-4">Répartition des Compétences</h3>
+                    <div class="chart-container">
+                        <canvas id="skills-chart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-4">Compétences par Équipe</h3>
+                    <div class="chart-container">
+                        <canvas id="teams-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tableau détaillé -->
+            <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                <h3 class="text-lg font-semibold mb-4">Détail des Compétences</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Équipe</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compétences</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Niveau Moyen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table" class="bg-white divide-y divide-gray-200">
+                            <!-- Les données seront ajoutées ici dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'competences';
+        let skillsChart = null;
+        let teamsChart = null;
+        
+        // Données mock initiales
+        const mockData = {
+            employees: [
+                {
+                    id: 1,
+                    prenom: "Marie",
+                    nom: "Dupont",
+                    poste: "Développeuse Senior",
+                    equipe: "Développement",
+                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                    skills: [
+                        { name: "JavaScript", level: 5 },
+                        { name: "React", level: 4 },
+                        { name: "Node.js", level: 3 },
+                        { name: "Leadership", level: 4 }
+                    ]
+                },
+                {
+                    id: 2,
+                    prenom: "Thomas",
+                    nom: "Martin",
+                    poste: "Chef de Projet",
+                    equipe: "Marketing",
+                    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                    skills: [
+                        { name: "Gestion de projet", level: 5 },
+                        { name: "Communication", level: 4 },
+                        { name: "Marketing digital", level: 3 },
+                        { name: "Analytics", level: 4 }
+                    ]
+                },
+                {
+                    id: 3,
+                    prenom: "Sophie",
+                    nom: "Leroy",
+                    poste: "Responsable RH",
+                    equipe: "RH",
+                    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+                    skills: [
+                        { name: "Recrutement", level: 5 },
+                        { name: "Formation", level: 4 },
+                        { name: "Droit social", level: 3 },
+                        { name: "Communication", level: 4 }
+                    ]
+                }
+            ],
+            formations: [
+                {
+                    id: 1,
+                    titre: "Formation React Avancé",
+                    categorie: "technique",
+                    duree: 40,
+                    priorite: "prioritaire",
+                    description: "Formation approfondie sur React avec hooks, context et optimisations.",
+                    participants: 12,
+                    dateCreation: "2024-01-15"
+                },
+                {
+                    id: 2,
+                    titre: "Leadership et Management",
+                    categorie: "soft-skills",
+                    duree: 24,
+                    priorite: "recommandee",
+                    description: "Développer ses compétences en leadership et management d'équipe.",
+                    participants: 8,
+                    dateCreation: "2024-01-10"
+                },
+                {
+                    id: 3,
+                    titre: "Cybersécurité - Niveau 1",
+                    categorie: "securite",
+                    duree: 16,
+                    priorite: "prioritaire",
+                    description: "Bases de la cybersécurité pour tous les employés.",
+                    participants: 25,
+                    dateCreation: "2024-01-08"
+                }
+            ],
+            sessions: [
+                {
+                    id: 1,
+                    titre: "Workshop Design Thinking",
+                    type: "workshop",
+                    date: "2024-02-15",
+                    heure: "09:00",
+                    duree: 4,
+                    formateur: "Jean Dubois",
+                    lieu: "Salle de conférence A",
+                    description: "Atelier pratique sur les méthodes de design thinking.",
+                    participants: 15
+                },
+                {
+                    id: 2,
+                    titre: "Certification Scrum Master",
+                    type: "certification",
+                    date: "2024-02-20",
+                    heure: "14:00",
+                    duree: 8,
+                    formateur: "Claire Moreau",
+                    lieu: "Formation en ligne",
+                    description: "Préparation et passage de la certification Scrum Master.",
+                    participants: 6
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('competences');
+            populateSkillFilter();
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'competences':
+                    loadEmployees();
+                    break;
+                case 'formations':
+                    loadFormations();
+                    break;
+                case 'sessions':
+                    loadSessions();
+                    break;
+                case 'rapports':
+                    generateReport();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('competenceData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('competenceData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // GESTION DES EMPLOYÉS ET COMPÉTENCES
+        function loadEmployees() {
+            const container = document.getElementById('employees-list');
+            container.innerHTML = '';
+            
+            const filteredEmployees = getFilteredEmployees();
+            
+            filteredEmployees.forEach(employee => {
+                const card = document.createElement('div');
+                card.className = 'employee-card bg-white p-6 rounded-lg shadow-md card-hover';
+                
+                const skillsHtml = employee.skills.map(skill => {
+                    const levelClass = `skill-level-${skill.level}`;
+                    return `<span class="skill-badge ${levelClass} px-2 py-1 rounded-full text-xs font-medium mr-2 mb-2 inline-block">
+                        ${skill.name} (${skill.level}/5)
+                    </span>`;
+                }).join('');
+                
+                card.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <img src="${employee.avatar}" alt="${employee.prenom} ${employee.nom}" 
+                             class="w-16 h-16 rounded-full mr-4 object-cover">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">${employee.prenom} ${employee.nom}</h3>
+                            <p class="text-gray-600">${employee.poste}</p>
+                            <p class="text-sm text-gray-500">${employee.equipe}</p>
+                        </div>
+                        <div class="ml-auto">
+                            <button onclick="editEmployee(${employee.id})" class="text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteEmployee(${employee.id})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Compétences :</h4>
+                        <div class="flex flex-wrap">
+                            ${skillsHtml}
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>${employee.skills.length} compétences</span>
+                        <span>Niveau moyen: ${(employee.skills.reduce((sum, skill) => sum + skill.level, 0) / employee.skills.length).toFixed(1)}/5</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function getFilteredEmployees() {
+            const searchTerm = document.getElementById('employee-search')?.value.toLowerCase() || '';
+            const skillFilter = document.getElementById('skill-filter')?.value || '';
+            const teamFilter = document.getElementById('team-filter')?.value || '';
+            
+            return mockData.employees.filter(employee => {
+                const matchesSearch = !searchTerm || 
+                    employee.prenom.toLowerCase().includes(searchTerm) ||
+                    employee.nom.toLowerCase().includes(searchTerm) ||
+                    employee.poste.toLowerCase().includes(searchTerm);
+                
+                const matchesSkill = !skillFilter || 
+                    employee.skills.some(skill => skill.name === skillFilter);
+                
+                const matchesTeam = !teamFilter || employee.equipe === teamFilter;
+                
+                return matchesSearch && matchesSkill && matchesTeam;
+            });
+        }
+
+        function filterEmployees() {
+            loadEmployees();
+        }
+
+        function populateSkillFilter() {
+            const skillFilter = document.getElementById('skill-filter');
+            if (!skillFilter) return;
+            
+            const allSkills = new Set();
+            mockData.employees.forEach(employee => {
+                employee.skills.forEach(skill => allSkills.add(skill.name));
+            });
+            
+            skillFilter.innerHTML = '<option value="">Toutes les compétences</option>';
+            Array.from(allSkills).sort().forEach(skill => {
+                const option = document.createElement('option');
+                option.value = skill;
+                option.textContent = skill;
+                skillFilter.appendChild(option);
+            });
+        }
+
+        function showAddEmployeeForm() {
+            document.getElementById('add-employee-form').classList.remove('hidden');
+        }
+
+        function hideAddEmployeeForm() {
+            document.getElementById('add-employee-form').classList.add('hidden');
+            document.getElementById('add-employee-form').querySelector('form').reset();
+        }
+
+        function addEmployee(event) {
+            event.preventDefault();
+            
+            const prenom = document.getElementById('employee-prenom').value;
+            const nom = document.getElementById('employee-nom').value;
+            const poste = document.getElementById('employee-poste').value;
+            const equipe = document.getElementById('employee-equipe').value;
+            
+            const newEmployee = {
+                id: Date.now(),
+                prenom: prenom,
+                nom: nom,
+                poste: poste,
+                equipe: equipe,
+                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                skills: []
+            };
+            
+            mockData.employees.push(newEmployee);
+            saveDataToStorage();
+            loadEmployees();
+            populateSkillFilter();
+            hideAddEmployeeForm();
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
+                mockData.employees = mockData.employees.filter(e => e.id !== id);
+                saveDataToStorage();
+                loadEmployees();
+                populateSkillFilter();
+            }
+        }
+
+        // GESTION DES FORMATIONS
+        function loadFormations() {
+            const container = document.getElementById('formations-list');
+            container.innerHTML = '';
+            
+            const filteredFormations = getFilteredFormations();
+            
+            filteredFormations.forEach(formation => {
+                const prioriteColors = {
+                    'normale': 'bg-gray-100 text-gray-800',
+                    'recommandee': 'bg-blue-100 text-blue-800',
+                    'prioritaire': 'bg-red-100 text-red-800'
+                };
+                
+                const categorieIcons = {
+                    'technique': 'fas fa-code',
+                    'soft-skills': 'fas fa-users',
+                    'management': 'fas fa-user-tie',
+                    'securite': 'fas fa-shield-alt'
+                };
+                
+                const accordion = document.createElement('div');
+                accordion.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                accordion.innerHTML = `
+                    <div class="p-6 cursor-pointer hover:bg-gray-50" onclick="toggleAccordion(${formation.id})">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <i class="${categorieIcons[formation.categorie]} text-green-600 mr-2"></i>
+                                    <h3 class="text-lg font-semibold text-gray-900">${formation.titre}</h3>
+                                    <span class="ml-3 px-2 py-1 rounded-full text-xs font-medium ${prioriteColors[formation.priorite]}">
+                                        ${formation.priorite.charAt(0).toUpperCase() + formation.priorite.slice(1)}
+                                    </span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 space-x-4">
+                                    <span><i class="fas fa-clock mr-1"></i>${formation.duree}h</span>
+                                    <span><i class="fas fa-users mr-1"></i>${formation.participants} participants</span>
+                                    <span><i class="fas fa-tag mr-1"></i>${formation.categorie}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="editFormation(${formation.id}); event.stopPropagation();" class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteFormation(${formation.id}); event.stopPropagation();" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <i class="fas fa-chevron-down text-gray-400 accordion-icon-${formation.id} transition-transform duration-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="accordion-content-${formation.id}" class="accordion-content">
+                        <div class="px-6 pb-6">
+                            <p class="text-gray-700 mb-4">${formation.description}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Créé le ${new Date(formation.dateCreation).toLocaleDateString('fr-FR')}</span>
+                                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">
+                                    <i class="fas fa-play mr-2"></i>Démarrer la formation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(accordion);
+            });
+        }
+
+        function getFilteredFormations() {
+            const activeFilter = document.querySelector('.filter-btn.filter-active')?.textContent.toLowerCase() || 'toutes';
+            
+            if (activeFilter === 'toutes') {
+                return mockData.formations;
+            }
+            
+            return mockData.formations.filter(formation => {
+                switch(activeFilter) {
+                    case 'prioritaires':
+                        return formation.priorite === 'prioritaire';
+                    case 'recommandées':
+                        return formation.priorite === 'recommandee';
+                    case 'techniques':
+                        return formation.categorie === 'technique';
+                    case 'soft skills':
+                        return formation.categorie === 'soft-skills';
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        function filterFormations(filter) {
+            // Mettre à jour les boutons de filtre
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('filter-active');
+                btn.classList.add('bg-gray-200', 'hover:bg-gray-300');
+            });
+            
+            event.target.classList.add('filter-active');
+            event.target.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+            
+            loadFormations();
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(`accordion-content-${id}`);
+            const icon = document.querySelector(`.accordion-icon-${id}`);
+            
+            content.classList.toggle('active');
+            icon.classList.toggle('rotate-180');
+        }
+
+        function showAddFormationForm() {
+            document.getElementById('add-formation-form').classList.remove('hidden');
+        }
+
+        function hideAddFormationForm() {
+            document.getElementById('add-formation-form').classList.add('hidden');
+            document.getElementById('add-formation-form').querySelector('form').reset();
+        }
+
+        function addFormation(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('formation-titre').value;
+            const categorie = document.getElementById('formation-categorie').value;
+            const duree = parseInt(document.getElementById('formation-duree').value);
+            const priorite = document.getElementById('formation-priorite').value;
+            const description = document.getElementById('formation-description').value;
+            
+            const newFormation = {
+                id: Date.now(),
+                titre: titre,
+                categorie: categorie,
+                duree: duree,
+                priorite: priorite,
+                description: description,
+                participants: 0,
+                dateCreation: new Date().toISOString().split('T')[0]
+            };
+            
+            mockData.formations.push(newFormation);
+            saveDataToStorage();
+            loadFormations();
+            hideAddFormationForm();
+        }
+
+        function deleteFormation(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette formation ?')) {
+                mockData.formations = mockData.formations.filter(f => f.id !== id);
+                saveDataToStorage();
+                loadFormations();
+            }
+        }
+
+        // GESTION DES SESSIONS
+        function loadSessions() {
+            const container = document.getElementById('sessions-timeline');
+            container.innerHTML = '';
+            
+            const sortedSessions = mockData.sessions
+                .sort((a, b) => new Date(a.date + ' ' + a.heure) - new Date(b.date + ' ' + b.heure));
+            
+            sortedSessions.forEach(session => {
+                const typeColors = {
+                    'formation': 'bg-blue-100 text-blue-800',
+                    'certification': 'bg-green-100 text-green-800',
+                    'workshop': 'bg-purple-100 text-purple-800',
+                    'conference': 'bg-orange-100 text-orange-800'
+                };
+                
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'timeline-item pl-12 pb-6 relative';
+                sessionDiv.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-900 mb-2">${session.titre}</h4>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${typeColors[session.type]}">
+                                    ${session.type.charAt(0).toUpperCase() + session.type.slice(1)}
+                                </span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="editSession(${session.id})" class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteSession(${session.id})" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <div><i class="fas fa-calendar mr-2"></i>${new Date(session.date).toLocaleDateString('fr-FR')}</div>
+                                <div><i class="fas fa-clock mr-2"></i>${session.heure} (${session.duree}h)</div>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <div><i class="fas fa-user mr-2"></i>${session.formateur}</div>
+                                <div><i class="fas fa-map-marker-alt mr-2"></i>${session.lieu}</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4">${session.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${session.participants} participants inscrits</span>
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm">
+                                <i class="fas fa-user-plus mr-2"></i>S'inscrire
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(sessionDiv);
+            });
+        }
+
+        function showAddSessionForm() {
+            document.getElementById('add-session-form').classList.remove('hidden');
+        }
+
+        function hideAddSessionForm() {
+            document.getElementById('add-session-form').classList.add('hidden');
+            document.getElementById('add-session-form').querySelector('form').reset();
+        }
+
+        function addSession(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('session-titre').value;
+            const type = document.getElementById('session-type').value;
+            const date = document.getElementById('session-date').value;
+            const heure = document.getElementById('session-heure').value;
+            const duree = parseFloat(document.getElementById('session-duree').value);
+            const formateur = document.getElementById('session-formateur').value;
+            const lieu = document.getElementById('session-lieu').value;
+            const description = document.getElementById('session-description').value;
+            
+            const newSession = {
+                id: Date.now(),
+                titre: titre,
+                type: type,
+                date: date,
+                heure: heure,
+                duree: duree,
+                formateur: formateur,
+                lieu: lieu,
+                description: description,
+                participants: 0
+            };
+            
+            mockData.sessions.push(newSession);
+            saveDataToStorage();
+            loadSessions();
+            hideAddSessionForm();
+        }
+
+        function deleteSession(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette session ?')) {
+                mockData.sessions = mockData.sessions.filter(s => s.id !== id);
+                saveDataToStorage();
+                loadSessions();
+            }
+        }
+
+        // GESTION DES RAPPORTS
+        function generateReport() {
+            updateStatistics();
+            generateCharts();
+            generateTable();
+        }
+
+        function updateStatistics() {
+            document.getElementById('total-employees').textContent = mockData.employees.length;
+            
+            const allSkills = new Set();
+            mockData.employees.forEach(employee => {
+                employee.skills.forEach(skill => allSkills.add(skill.name));
+            });
+            document.getElementById('total-skills').textContent = allSkills.size;
+            
+            document.getElementById('total-formations').textContent = mockData.formations.length;
+            document.getElementById('total-sessions').textContent = mockData.sessions.length;
+        }
+
+        function generateCharts() {
+            generateSkillsChart();
+            generateTeamsChart();
+        }
+
+        function generateSkillsChart() {
+            const ctx = document.getElementById('skills-chart').getContext('2d');
+            
+            if (skillsChart) {
+                skillsChart.destroy();
+            }
+            
+            // Compter les compétences
+            const skillCounts = {};
+            mockData.employees.forEach(employee => {
+                employee.skills.forEach(skill => {
+                    skillCounts[skill.name] = (skillCounts[skill.name] || 0) + 1;
+                });
+            });
+            
+            const labels = Object.keys(skillCounts);
+            const data = Object.values(skillCounts);
+            
+            skillsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                            '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTeamsChart() {
+            const ctx = document.getElementById('teams-chart').getContext('2d');
+            
+            if (teamsChart) {
+                teamsChart.destroy();
+            }
+            
+            // Compter les employés par équipe
+            const teamCounts = {};
+            mockData.employees.forEach(employee => {
+                teamCounts[employee.equipe] = (teamCounts[employee.equipe] || 0) + 1;
+            });
+            
+            const labels = Object.keys(teamCounts);
+            const data = Object.values(teamCounts);
+            
+            teamsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'employés',
+                        data: data,
+                        backgroundColor: '#667eea',
+                        borderColor: '#764ba2',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTable() {
+            const tbody = document.getElementById('report-table');
+            tbody.innerHTML = '';
+            
+            mockData.employees.forEach(employee => {
+                const avgLevel = employee.skills.length > 0 
+                    ? (employee.skills.reduce((sum, skill) => sum + skill.level, 0) / employee.skills.length).toFixed(1)
+                    : '0';
+                
+                const skillsText = employee.skills.map(skill => `${skill.name} (${skill.level}/5)`).join(', ');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img src="${employee.avatar}" alt="${employee.prenom} ${employee.nom}" class="w-8 h-8 rounded-full mr-3">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">${employee.prenom} ${employee.nom}</div>
+                                <div class="text-sm text-gray-500">${employee.poste}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${employee.equipe}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${skillsText || 'Aucune compétence'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${avgLevel}/5</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
