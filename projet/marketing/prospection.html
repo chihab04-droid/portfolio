@@ -3,35 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prospection Marketing - Automatisation</title>
+    <title>Prospection Marketing - Entreprise</title>
     <!-- TailwindCSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Styles personnalisés pour l'application de prospection */
+        /* Styles personnalisés pour les animations et effets marketing */
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .gradient-marketing {
-            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
-        }
-        
-        .gradient-email {
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-        }
-        
-        .gradient-offers {
-            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
-        }
-        
-        .gradient-leads {
-            background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%);
-        }
-        
-        .gradient-landing {
-            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        .marketing-gradient {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
         }
         
         .card-hover {
@@ -52,7 +36,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .pulse-animation {
+        .pulse-icon {
             animation: pulse 2s infinite;
         }
         
@@ -81,117 +65,84 @@
             left: 100%;
         }
         
-        .hidden {
-            display: none !important;
-        }
-        
-        /* Styles pour les badges de statut */
-        .status-sent { background-color: #10b981; color: white; }
-        .status-scheduled { background-color: #f59e0b; color: white; }
-        .status-draft { background-color: #6b7280; color: white; }
-        
         .priority-high { border-left: 4px solid #ef4444; }
         .priority-medium { border-left: 4px solid #f59e0b; }
         .priority-low { border-left: 4px solid #10b981; }
         
-        /* Animation pour le bouton flottant */
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
+        .status-sent { background-color: #d1fae5; color: #065f46; }
+        .status-scheduled { background-color: #dbeafe; color: #1e40af; }
+        .status-draft { background-color: #fef3c7; color: #92400e; }
+        
+        .hidden { display: none !important; }
+        
+        /* Styles pour les métriques animées */
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .metric-number {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Styles pour les boutons CTA */
+        .cta-button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
             transition: all 0.3s ease;
         }
         
-        .floating-btn:hover {
-            transform: scale(1.1);
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(238, 90, 36, 0.3);
         }
         
-        /* Styles pour les notifications toast */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1001;
-            min-width: 300px;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-        
-        .toast.show {
-            transform: translateX(0);
-        }
-        
-        /* Styles pour la preview de landing page */
+        /* Styles pour les landing pages */
         .landing-preview {
-            border: 2px dashed #e5e7eb;
-            min-height: 400px;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
         }
         
-        /* Styles pour les métriques */
-        .metric-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        /* Animation pour les compteurs */
-        .counter {
-            font-variant-numeric: tabular-nums;
-        }
-        
-        /* Styles pour les formulaires */
-        .form-floating {
-            position: relative;
-        }
-        
-        .form-floating input:focus + label,
-        .form-floating input:not(:placeholder-shown) + label {
-            transform: translateY(-1.5rem) scale(0.8);
-            color: #3b82f6;
-        }
-        
-        .form-floating label {
-            position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            transition: all 0.2s ease;
-            pointer-events: none;
-            color: #6b7280;
-        }
+        .theme-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .theme-green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        .theme-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .theme-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .theme-orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation Bar -->
-    <nav class="gradient-marketing text-white shadow-lg sticky top-0 z-50">
+    <nav class="marketing-gradient text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo/Titre -->
                 <div class="flex items-center">
-                    <i class="fas fa-rocket text-2xl mr-3 pulse-animation"></i>
+                    <i class="fas fa-rocket text-2xl mr-3 pulse-icon"></i>
                     <h1 class="text-xl font-bold">Prospection Marketing</h1>
                 </div>
                 
                 <!-- Menu Desktop -->
                 <div class="hidden md:flex space-x-8">
-                    <button onclick="showPage('emails')" class="nav-link hover:text-pink-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                    <button onclick="showPage('emails')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
                         <i class="fas fa-envelope mr-2"></i>Emails
                     </button>
-                    <button onclick="showPage('offres')" class="nav-link hover:text-pink-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                    <button onclick="showPage('offres')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
                         <i class="fas fa-tags mr-2"></i>Offres
                     </button>
-                    <button onclick="showPage('leads')" class="nav-link hover:text-pink-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                    <button onclick="showPage('leads')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
                         <i class="fas fa-users mr-2"></i>Leads
                     </button>
-                    <button onclick="showPage('landing')" class="nav-link hover:text-pink-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                    <button onclick="showPage('landing')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
                         <i class="fas fa-globe mr-2"></i>Landing Pages
                     </button>
                 </div>
                 
                 <!-- Menu Mobile -->
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-white hover:text-pink-200">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -199,31 +150,54 @@
             
             <!-- Menu Mobile Dropdown -->
             <div id="mobile-menu" class="hidden md:hidden pb-4">
-                <button onclick="showPage('emails')" class="block w-full text-left px-3 py-2 hover:bg-pink-600 rounded-md">
+                <button onclick="showPage('emails')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
                     <i class="fas fa-envelope mr-2"></i>Emails
                 </button>
-                <button onclick="showPage('offres')" class="block w-full text-left px-3 py-2 hover:bg-pink-600 rounded-md">
+                <button onclick="showPage('offres')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
                     <i class="fas fa-tags mr-2"></i>Offres
                 </button>
-                <button onclick="showPage('leads')" class="block w-full text-left px-3 py-2 hover:bg-pink-600 rounded-md">
+                <button onclick="showPage('leads')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
                     <i class="fas fa-users mr-2"></i>Leads
                 </button>
-                <button onclick="showPage('landing')" class="block w-full text-left px-3 py-2 hover:bg-pink-600 rounded-md">
+                <button onclick="showPage('landing')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
                     <i class="fas fa-globe mr-2"></i>Landing Pages
                 </button>
             </div>
         </div>
     </nav>
 
+    <!-- Bouton d'actions rapides flottant -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="toggleQuickActions()" class="bg-gradient-to-r from-pink-500 to-violet-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
+            <i class="fas fa-plus text-xl"></i>
+        </button>
+        
+        <!-- Menu d'actions rapides -->
+        <div id="quick-actions-menu" class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-xl p-4 w-48">
+            <button onclick="showPage('emails'); hideQuickActions();" class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md mb-2">
+                <i class="fas fa-envelope mr-2 text-blue-500"></i>Nouvel Email
+            </button>
+            <button onclick="showPage('offres'); hideQuickActions();" class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md mb-2">
+                <i class="fas fa-tags mr-2 text-green-500"></i>Nouvelle Offre
+            </button>
+            <button onclick="showPage('leads'); hideQuickActions();" class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md mb-2">
+                <i class="fas fa-user-plus mr-2 text-purple-500"></i>Nouveau Lead
+            </button>
+            <button onclick="showPage('landing'); hideQuickActions();" class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md">
+                <i class="fas fa-globe mr-2 text-orange-500"></i>Nouvelle Landing
+            </button>
+        </div>
+    </div>
+
     <!-- Contenu Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Page Emails -->
+        <!-- Page Emails Automatisés -->
         <div id="emails-page" class="page-content">
             <!-- Hero Section -->
             <div class="text-center mb-12">
-                <div class="w-24 h-24 mx-auto mb-6 gradient-email rounded-full flex items-center justify-center">
-                    <i class="fas fa-envelope text-3xl text-white"></i>
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-envelope text-3xl text-white pulse-icon"></i>
                 </div>
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Emails Automatisés</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -231,45 +205,41 @@
                 </p>
             </div>
 
-            <!-- Métriques -->
+            <!-- Métriques des emails -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="metric-card p-6 rounded-lg text-center">
-                    <div class="text-3xl font-bold text-blue-600 counter" id="emails-sent">0</div>
-                    <div class="text-sm text-gray-600 mt-2">Emails Envoyés</div>
+                    <i class="fas fa-paper-plane text-3xl mb-3"></i>
+                    <div class="metric-number" id="emails-sent">0</div>
+                    <div class="text-sm opacity-90">Emails Envoyés</div>
                 </div>
                 <div class="metric-card p-6 rounded-lg text-center">
-                    <div class="text-3xl font-bold text-yellow-600 counter" id="emails-scheduled">0</div>
-                    <div class="text-sm text-gray-600 mt-2">Programmés</div>
+                    <i class="fas fa-clock text-3xl mb-3"></i>
+                    <div class="metric-number" id="emails-scheduled">0</div>
+                    <div class="text-sm opacity-90">Programmés</div>
                 </div>
                 <div class="metric-card p-6 rounded-lg text-center">
-                    <div class="text-3xl font-bold text-green-600 counter" id="open-rate">0%</div>
-                    <div class="text-sm text-gray-600 mt-2">Taux d'Ouverture</div>
+                    <i class="fas fa-eye text-3xl mb-3"></i>
+                    <div class="metric-number" id="open-rate">0%</div>
+                    <div class="text-sm opacity-90">Taux d'Ouverture</div>
                 </div>
                 <div class="metric-card p-6 rounded-lg text-center">
-                    <div class="text-3xl font-bold text-purple-600 counter" id="click-rate">0%</div>
-                    <div class="text-sm text-gray-600 mt-2">Taux de Clic</div>
+                    <i class="fas fa-mouse-pointer text-3xl mb-3"></i>
+                    <div class="metric-number" id="click-rate">0%</div>
+                    <div class="text-sm opacity-90">Taux de Clic</div>
                 </div>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-8">
-                <!-- Formulaire d'email -->
+                <!-- Formulaire d'envoi d'email -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
                     <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-paper-plane text-blue-600 mr-3"></i>
-                        Nouvel Email
+                        <i class="fas fa-plus-circle text-blue-600 mr-3"></i>
+                        Nouvelle Campagne Email
                     </h3>
                     <form onsubmit="sendEmail(event)">
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Destinataires</label>
-                            <input type="email" id="email-recipients" required multiple 
-                                   placeholder="email1@example.com, email2@example.com"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Objet</label>
-                            <input type="text" id="email-subject" required 
-                                   placeholder="Objet de votre email"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Objet de l'email</label>
+                            <input type="text" id="email-subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Type de campagne</label>
@@ -282,27 +252,29 @@
                             </select>
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contenu</label>
-                            <textarea id="email-content" required rows="6" 
-                                      placeholder="Rédigez votre message..."
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Destinataires (séparés par des virgules)</label>
+                            <textarea id="email-recipients" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="email1@example.com, email2@example.com"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contenu de l'email</label>
+                            <textarea id="email-content" required rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         </div>
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Programmation</label>
-                            <select id="email-schedule" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="email-schedule" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="now">Envoyer maintenant</option>
                                 <option value="1hour">Dans 1 heure</option>
                                 <option value="tomorrow">Demain matin</option>
-                                <option value="custom">Programmer...</option>
+                                <option value="custom">Programmer pour plus tard</option>
                             </select>
                         </div>
-                        <button type="submit" class="w-full gradient-email text-white px-4 py-3 rounded-md hover:opacity-90 transition-opacity duration-200">
+                        <button type="submit" class="w-full cta-button text-white px-4 py-3 rounded-md font-semibold">
                             <i class="fas fa-rocket mr-2"></i>Lancer la Campagne
                         </button>
                     </form>
                 </div>
                 
-                <!-- Liste des emails -->
+                <!-- Liste des emails programmés -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover">
                     <h3 class="text-2xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-list text-green-600 mr-3"></i>
@@ -315,12 +287,12 @@
             </div>
         </div>
 
-        <!-- Page Offres -->
+        <!-- Page Gestion des Offres -->
         <div id="offres-page" class="page-content hidden">
             <!-- Hero Section -->
             <div class="text-center mb-12">
-                <div class="w-24 h-24 mx-auto mb-6 gradient-offers rounded-full flex items-center justify-center">
-                    <i class="fas fa-tags text-3xl text-white"></i>
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-tags text-3xl text-white pulse-icon"></i>
                 </div>
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Gestion des Offres</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -330,51 +302,50 @@
 
             <div class="flex justify-between items-center mb-8">
                 <h3 class="text-2xl font-bold text-gray-900">
-                    <i class="fas fa-fire text-red-500 mr-3"></i>Offres Actives
+                    <i class="fas fa-fire text-orange-500 mr-3"></i>Offres à Pousser
                 </h3>
-                <button onclick="showAddOfferForm()" class="gradient-offers text-white px-4 py-2 rounded-lg transition-all duration-200 hover:opacity-90">
+                <button onclick="showAddOffreForm()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-200">
                     <i class="fas fa-plus mr-2"></i>Nouvelle Offre
                 </button>
             </div>
             
             <!-- Formulaire d'ajout d'offre -->
-            <div id="add-offer-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8 card-hover">
+            <div id="add-offre-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8 card-shine">
                 <h4 class="text-xl font-semibold mb-4">Créer une nouvelle offre</h4>
-                <form onsubmit="addOffer(event)">
+                <form onsubmit="addOffre(event)">
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Titre de l'offre</label>
-                            <input type="text" id="offer-title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <input type="text" id="offre-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Prix</label>
-                            <input type="number" id="offer-price" required step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <input type="number" id="offre-prix" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea id="offer-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"></textarea>
+                        <textarea id="offre-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
                     </div>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
-                            <input type="date" id="offer-expiry" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                            <select id="offre-priorite" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="haute">Haute</option>
+                                <option value="moyenne">Moyenne</option>
+                                <option value="faible">Faible</option>
+                            </select>
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
-                            <select id="offer-priority" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
-                                <option value="">Sélectionner...</option>
-                                <option value="high">Haute</option>
-                                <option value="medium">Moyenne</option>
-                                <option value="low">Faible</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
+                            <input type="date" id="offre-expiration" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                     </div>
                     <div class="flex space-x-4">
-                        <button type="submit" class="gradient-offers text-white px-4 py-2 rounded-md hover:opacity-90">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
                             <i class="fas fa-save mr-2"></i>Créer l'Offre
                         </button>
-                        <button type="button" onclick="hideAddOfferForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                        <button type="button" onclick="hideAddOffreForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
                             <i class="fas fa-times mr-2"></i>Annuler
                         </button>
                     </div>
@@ -382,134 +353,122 @@
             </div>
             
             <!-- Grille des offres -->
-            <div id="offers-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div id="offres-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <!-- Les offres seront ajoutées ici dynamiquement -->
             </div>
         </div>
 
-        <!-- Page Leads -->
+        <!-- Page Capture de Leads -->
         <div id="leads-page" class="page-content hidden">
             <!-- Hero Section -->
             <div class="text-center mb-12">
-                <div class="w-24 h-24 mx-auto mb-6 gradient-leads rounded-full flex items-center justify-center">
-                    <i class="fas fa-users text-3xl text-white"></i>
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-users text-3xl text-white pulse-icon"></i>
                 </div>
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Capture de Leads</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Capturez et gérez vos prospects pour alimenter votre pipeline commercial.
+                    Capturez et gérez vos prospects pour développer votre pipeline commercial.
                 </p>
+            </div>
+
+            <!-- Statistiques des leads -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <i class="fas fa-users text-3xl text-purple-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="total-leads">0</div>
+                    <div class="text-sm text-gray-600">Total Leads</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <i class="fas fa-calendar text-3xl text-blue-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="leads-this-month">0</div>
+                    <div class="text-sm text-gray-600">Ce Mois</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <i class="fas fa-chart-line text-3xl text-green-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="conversion-rate">0%</div>
+                    <div class="text-sm text-gray-600">Taux de Conversion</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <i class="fas fa-star text-3xl text-yellow-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="top-source">-</div>
+                    <div class="text-sm text-gray-600">Top Source</div>
+                </div>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Formulaire de capture de lead -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
                     <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-user-plus text-blue-600 mr-3"></i>
+                        <i class="fas fa-user-plus text-purple-600 mr-3"></i>
                         Nouveau Lead
                     </h3>
-                    <form onsubmit="captureLead(event)">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
-                            <input type="text" id="lead-name" required 
-                                   placeholder="Prénom Nom"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <form onsubmit="addLead(event)">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
+                                <input type="text" id="lead-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" id="lead-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="lead-email" required 
-                                   placeholder="email@example.com"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
-                            <input type="tel" id="lead-phone" 
-                                   placeholder="+33 1 23 45 67 89"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Entreprise</label>
-                            <input type="text" id="lead-company" 
-                                   placeholder="Nom de l'entreprise"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                                <input type="tel" id="lead-telephone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Entreprise</label>
+                                <input type="text" id="lead-entreprise" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Source</label>
-                            <select id="lead-source" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="lead-source" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                                 <option value="">Sélectionner...</option>
-                                <option value="website">Site Web</option>
-                                <option value="social">Réseaux Sociaux</option>
+                                <option value="site-web">Site Web</option>
+                                <option value="reseaux-sociaux">Réseaux Sociaux</option>
                                 <option value="email">Email Marketing</option>
-                                <option value="referral">Recommandation</option>
-                                <option value="event">Événement</option>
-                                <option value="cold">Prospection Froide</option>
+                                <option value="recommandation">Recommandation</option>
+                                <option value="evenement">Événement</option>
                             </select>
                         </div>
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Besoin/Intérêt</label>
-                            <textarea id="lead-need" required rows="3" 
-                                      placeholder="Décrivez le besoin ou l'intérêt du prospect..."
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <textarea id="lead-besoin" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
                         </div>
-                        <button type="submit" class="w-full gradient-leads text-white px-4 py-3 rounded-md hover:opacity-90 transition-opacity duration-200">
-                            <i class="fas fa-save mr-2"></i>Capturer le Lead
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-3 rounded-md font-semibold transition-all duration-200">
+                            <i class="fas fa-plus mr-2"></i>Ajouter le Lead
                         </button>
                     </form>
                 </div>
                 
-                <!-- Statistiques des leads -->
+                <!-- Liste des leads avec recherche -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover">
-                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-chart-line text-green-600 mr-3"></i>
-                        Statistiques
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                            <span class="font-medium text-gray-700">Total Leads</span>
-                            <span id="leads-total" class="text-2xl font-bold text-blue-600 counter">0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                            <span class="font-medium text-gray-700">Ce Mois</span>
-                            <span id="leads-month" class="text-2xl font-bold text-green-600 counter">0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                            <span class="font-medium text-gray-700">Conversion</span>
-                            <span id="leads-conversion" class="text-2xl font-bold text-purple-600 counter">0%</span>
-                        </div>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-semibold flex items-center">
+                            <i class="fas fa-list text-green-600 mr-3"></i>
+                            Leads Récents
+                        </h3>
                     </div>
                     
-                    <!-- Top sources -->
-                    <div class="mt-6">
-                        <h4 class="text-lg font-semibold mb-4">Top Sources</h4>
-                        <div id="top-sources" class="space-y-2">
-                            <!-- Les sources seront ajoutées ici -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Liste des leads -->
-            <div class="mt-8 bg-white p-6 rounded-lg shadow-md card-hover">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-semibold flex items-center">
-                        <i class="fas fa-list text-purple-600 mr-3"></i>
-                        Leads Récents
-                    </h3>
-                    <div class="flex space-x-2">
-                        <input type="text" id="leads-search" placeholder="Rechercher..." 
-                               class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <select id="leads-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <!-- Barre de recherche et filtres -->
+                    <div class="mb-4 space-y-2">
+                        <input type="text" id="search-leads" placeholder="Rechercher un lead..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <select id="filter-source" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option value="">Toutes les sources</option>
-                            <option value="website">Site Web</option>
-                            <option value="social">Réseaux Sociaux</option>
+                            <option value="site-web">Site Web</option>
+                            <option value="reseaux-sociaux">Réseaux Sociaux</option>
                             <option value="email">Email Marketing</option>
-                            <option value="referral">Recommandation</option>
-                            <option value="event">Événement</option>
-                            <option value="cold">Prospection Froide</option>
+                            <option value="recommandation">Recommandation</option>
+                            <option value="evenement">Événement</option>
                         </select>
                     </div>
-                </div>
-                <div id="leads-list" class="space-y-4">
-                    <!-- Les leads seront ajoutés ici dynamiquement -->
+                    
+                    <div id="leads-list" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Les leads seront ajoutés ici dynamiquement -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -518,56 +477,46 @@
         <div id="landing-page" class="page-content hidden">
             <!-- Hero Section -->
             <div class="text-center mb-12">
-                <div class="w-24 h-24 mx-auto mb-6 gradient-landing rounded-full flex items-center justify-center">
-                    <i class="fas fa-globe text-3xl text-white"></i>
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-orange-400 to-red-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-globe text-3xl text-white pulse-icon"></i>
                 </div>
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Générateur de Landing Pages</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Créez rapidement des landing pages performantes pour vos campagnes marketing.
+                    Créez des landing pages performantes pour vos campagnes marketing en quelques clics.
                 </p>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-8">
-                <!-- Formulaire de création -->
+                <!-- Formulaire de création de landing page -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
                     <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-magic text-purple-600 mr-3"></i>
+                        <i class="fas fa-magic text-orange-600 mr-3"></i>
                         Créer une Landing Page
                     </h3>
                     <form onsubmit="generateLanding(event)">
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre Principal</label>
-                            <input type="text" id="landing-title" required 
-                                   placeholder="Votre titre accrocheur"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre principal</label>
+                            <input type="text" id="landing-title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Votre titre accrocheur">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Sous-titre</label>
-                            <input type="text" id="landing-subtitle" 
-                                   placeholder="Description courte et percutante"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                            <textarea id="landing-description" required rows="4" 
-                                      placeholder="Décrivez votre produit ou service..."
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                            <input type="text" id="landing-subtitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Description courte et percutante">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">URL de l'image</label>
-                            <input type="url" id="landing-image" 
-                                   placeholder="https://example.com/image.jpg"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="url" id="landing-image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="https://example.com/image.jpg">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Texte du bouton CTA</label>
-                            <input type="text" id="landing-cta" required 
-                                   placeholder="Commencer maintenant"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="text" id="landing-cta" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Commencer maintenant">
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Couleur du thème</label>
-                            <select id="landing-theme" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prix (optionnel)</label>
+                            <input type="text" id="landing-price" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="29€/mois">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Thème de couleur</label>
+                            <select id="landing-theme" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 <option value="blue">Bleu</option>
                                 <option value="green">Vert</option>
                                 <option value="purple">Violet</option>
@@ -575,13 +524,7 @@
                                 <option value="orange">Orange</option>
                             </select>
                         </div>
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Prix (optionnel)</label>
-                            <input type="text" id="landing-price" 
-                                   placeholder="29€/mois"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        <button type="submit" class="w-full gradient-landing text-white px-4 py-3 rounded-md hover:opacity-90 transition-opacity duration-200">
+                        <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-4 py-3 rounded-md font-semibold transition-all duration-200">
                             <i class="fas fa-rocket mr-2"></i>Générer la Landing Page
                         </button>
                     </form>
@@ -590,24 +533,21 @@
                 <!-- Aperçu de la landing page -->
                 <div class="bg-white p-6 rounded-lg shadow-md card-hover">
                     <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-eye text-green-600 mr-3"></i>
+                        <i class="fas fa-eye text-blue-600 mr-3"></i>
                         Aperçu en Temps Réel
                     </h3>
-                    <div id="landing-preview" class="landing-preview rounded-lg p-6 text-center">
-                        <div class="text-gray-400 mb-4">
-                            <i class="fas fa-globe text-6xl mb-4"></i>
-                            <p>Votre landing page apparaîtra ici</p>
-                            <p class="text-sm">Remplissez le formulaire pour voir l'aperçu</p>
+                    <div id="landing-preview" class="landing-preview min-h-96">
+                        <div class="text-center p-8 text-gray-500">
+                            <i class="fas fa-globe text-4xl mb-4"></i>
+                            <p>Remplissez le formulaire pour voir l'aperçu de votre landing page</p>
                         </div>
                     </div>
-                    
-                    <!-- Actions sur la landing page générée -->
-                    <div id="landing-actions" class="hidden mt-6 flex space-x-2">
-                        <button onclick="saveLanding()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
-                            <i class="fas fa-save mr-2"></i>Sauvegarder
-                        </button>
-                        <button onclick="exportLanding()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                    <div class="mt-4 flex space-x-2">
+                        <button onclick="exportLanding()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
                             <i class="fas fa-download mr-2"></i>Exporter HTML
+                        </button>
+                        <button onclick="saveLanding()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-save mr-2"></i>Sauvegarder
                         </button>
                     </div>
                 </div>
@@ -616,133 +556,103 @@
             <!-- Liste des landing pages sauvegardées -->
             <div class="mt-8 bg-white p-6 rounded-lg shadow-md card-hover">
                 <h3 class="text-2xl font-semibold mb-6 flex items-center">
-                    <i class="fas fa-folder text-orange-600 mr-3"></i>
+                    <i class="fas fa-folder text-purple-600 mr-3"></i>
                     Landing Pages Sauvegardées
                 </h3>
                 <div id="saved-landings" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <!-- Les landing pages sauvegardées seront ajoutées ici -->
+                    <!-- Les landing pages sauvegardées seront affichées ici -->
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Bouton d'actions rapides flottant -->
-    <div class="floating-btn">
-        <button onclick="toggleQuickActions()" class="gradient-marketing text-white p-4 rounded-full shadow-lg hover:shadow-xl">
-            <i class="fas fa-plus text-xl"></i>
-        </button>
-        
-        <!-- Menu d'actions rapides -->
-        <div id="quick-actions" class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-xl p-4 min-w-48">
-            <button onclick="showPage('emails'); toggleQuickActions()" class="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md">
-                <i class="fas fa-envelope mr-2 text-blue-600"></i>Nouvel Email
-            </button>
-            <button onclick="showPage('leads'); toggleQuickActions()" class="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md">
-                <i class="fas fa-user-plus mr-2 text-green-600"></i>Capturer Lead
-            </button>
-            <button onclick="showPage('offres'); showAddOfferForm(); toggleQuickActions()" class="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md">
-                <i class="fas fa-tags mr-2 text-pink-600"></i>Nouvelle Offre
-            </button>
-            <button onclick="showPage('landing'); toggleQuickActions()" class="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md">
-                <i class="fas fa-globe mr-2 text-purple-600"></i>Landing Page
-            </button>
-        </div>
-    </div>
-
-    <!-- Toast pour les notifications -->
-    <div id="toast" class="toast bg-white border-l-4 border-green-500 p-4 rounded-lg shadow-lg">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle text-green-500 mr-3"></i>
-            <div>
-                <div class="font-semibold" id="toast-title">Succès</div>
-                <div class="text-sm text-gray-600" id="toast-message">Action réalisée avec succès</div>
-            </div>
-        </div>
+    <!-- Notifications Toast -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Les notifications apparaîtront ici -->
     </div>
 
     <script>
         // Variables globales pour la gestion des données
         let currentPage = 'emails';
         
-        // Données mock initiales pour la prospection
+        // Données mock initiales
         const mockData = {
             emails: [
                 {
                     id: 1,
-                    subject: "Découvrez notre nouvelle solution",
-                    recipients: ["prospect1@example.com", "prospect2@example.com"],
-                    type: "prospection",
+                    subject: "Nouvelle offre exclusive",
+                    type: "promotion",
+                    recipients: ["client1@example.com", "client2@example.com"],
+                    content: "Découvrez notre nouvelle offre avec 30% de réduction...",
                     status: "sent",
-                    date: "2024-01-15",
+                    scheduledFor: "2024-01-15T10:00:00",
                     openRate: 45,
                     clickRate: 12
                 },
                 {
                     id: 2,
-                    subject: "Offre spéciale - 30% de réduction",
-                    recipients: ["client1@example.com", "client2@example.com"],
-                    type: "promotion",
+                    subject: "Suivi de votre demande",
+                    type: "relance",
+                    recipients: ["prospect@example.com"],
+                    content: "Nous revenons vers vous concernant votre demande...",
                     status: "scheduled",
-                    date: "2024-01-16",
+                    scheduledFor: "2024-01-16T09:00:00",
                     openRate: 0,
                     clickRate: 0
                 }
             ],
-            offers: [
+            offres: [
                 {
                     id: 1,
-                    title: "Pack Starter - Solution Complète",
-                    description: "Parfait pour les petites entreprises qui démarrent leur transformation digitale.",
-                    price: 299,
-                    expiry: "2024-02-28",
-                    priority: "high",
-                    created: "2024-01-10"
+                    titre: "Pack Marketing Digital",
+                    description: "Solution complète de marketing digital avec SEO, réseaux sociaux et publicité en ligne.",
+                    prix: 1299,
+                    priorite: "haute",
+                    expiration: "2024-03-15",
+                    dateCreation: "2024-01-10"
                 },
                 {
                     id: 2,
-                    title: "Formation Marketing Digital",
-                    description: "Apprenez les meilleures techniques de marketing digital avec nos experts.",
-                    price: 599,
-                    expiry: "2024-03-15",
-                    priority: "medium",
-                    created: "2024-01-12"
+                    titre: "Formation E-commerce",
+                    description: "Formation complète pour créer et gérer votre boutique en ligne avec succès.",
+                    prix: 599,
+                    priorite: "moyenne",
+                    expiration: "2024-02-28",
+                    dateCreation: "2024-01-12"
                 }
             ],
             leads: [
                 {
                     id: 1,
-                    name: "Marie Dupont",
+                    nom: "Marie Dupont",
                     email: "marie.dupont@example.com",
-                    phone: "+33 1 23 45 67 89",
-                    company: "TechCorp",
-                    source: "website",
-                    need: "Recherche une solution CRM pour son équipe de 20 personnes",
-                    date: "2024-01-15",
-                    status: "new"
+                    telephone: "0123456789",
+                    entreprise: "Tech Solutions",
+                    source: "site-web",
+                    besoin: "Refonte complète du site web avec optimisation SEO",
+                    dateCapture: "2024-01-15"
                 },
                 {
                     id: 2,
-                    name: "Thomas Martin",
+                    nom: "Thomas Martin",
                     email: "thomas.martin@example.com",
-                    phone: "+33 1 98 76 54 32",
-                    company: "StartupXYZ",
-                    source: "social",
-                    need: "Intéressé par nos services de marketing automation",
-                    date: "2024-01-14",
-                    status: "contacted"
+                    telephone: "0987654321",
+                    entreprise: "StartUp Innovante",
+                    source: "reseaux-sociaux",
+                    besoin: "Stratégie marketing digital pour lancement produit",
+                    dateCapture: "2024-01-14"
                 }
             ],
             landings: [
                 {
                     id: 1,
-                    title: "Solution CRM Révolutionnaire",
-                    subtitle: "Transformez votre gestion client",
-                    description: "Notre CRM nouvelle génération vous aide à gérer vos clients plus efficacement.",
+                    title: "Formation Marketing Digital",
+                    subtitle: "Devenez expert en marketing digital en 30 jours",
                     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=300&fit=crop",
-                    cta: "Essayer Gratuitement",
+                    cta: "Commencer maintenant",
+                    price: "297€",
                     theme: "blue",
-                    price: "49€/mois",
-                    created: "2024-01-10"
+                    dateCreation: "2024-01-10"
                 }
             ]
         };
@@ -769,7 +679,7 @@
             
             // Mettre à jour la navigation active
             const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => link.classList.remove('bg-pink-600'));
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
             
             currentPage = pageId;
             
@@ -780,11 +690,11 @@
                     updateEmailMetrics();
                     break;
                 case 'offres':
-                    loadOffers();
+                    loadOffres();
                     break;
                 case 'leads':
                     loadLeads();
-                    updateLeadsMetrics();
+                    updateLeadMetrics();
                     break;
                 case 'landing':
                     loadSavedLandings();
@@ -801,10 +711,14 @@
             mobileMenu.classList.toggle('hidden');
         }
 
-        // Toggle actions rapides
+        // Gestion du bouton d'actions rapides
         function toggleQuickActions() {
-            const quickActions = document.getElementById('quick-actions');
-            quickActions.classList.toggle('hidden');
+            const menu = document.getElementById('quick-actions-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function hideQuickActions() {
+            document.getElementById('quick-actions-menu').classList.add('hidden');
         }
 
         // Gestion du localStorage
@@ -819,36 +733,43 @@
             }
         }
 
-        // Fonction pour afficher les notifications toast
-        function showToast(title, message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastTitle = document.getElementById('toast-title');
-            const toastMessage = document.getElementById('toast-message');
+        // Fonction pour afficher les notifications
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            toastTitle.textContent = title;
-            toastMessage.textContent = message;
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
             
-            // Changer la couleur selon le type
-            const borderColors = {
-                success: 'border-green-500',
-                error: 'border-red-500',
-                warning: 'border-yellow-500',
-                info: 'border-blue-500'
-            };
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'} mr-2"></i>
+                    ${message}
+                </div>
+            `;
             
-            toast.className = `toast bg-white border-l-4 ${borderColors[type]} p-4 rounded-lg shadow-lg show`;
+            container.appendChild(toast);
             
+            // Animation d'entrée
             setTimeout(() => {
-                toast.classList.remove('show');
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Suppression automatique
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
             }, 3000);
         }
 
-        // GESTION DES EMAILS
+        // EMAILS AUTOMATISÉS
         function loadEmails() {
             const container = document.getElementById('emails-list');
             container.innerHTML = '';
             
-            mockData.emails.sort((a, b) => new Date(b.date) - new Date(a.date));
+            mockData.emails.sort((a, b) => new Date(b.scheduledFor) - new Date(a.scheduledFor));
             
             mockData.emails.forEach(email => {
                 const statusColors = {
@@ -857,36 +778,37 @@
                     'draft': 'status-draft'
                 };
                 
-                const statusLabels = {
-                    'sent': 'Envoyé',
-                    'scheduled': 'Programmé',
-                    'draft': 'Brouillon'
+                const typeIcons = {
+                    'prospection': 'fa-search',
+                    'relance': 'fa-redo',
+                    'newsletter': 'fa-newspaper',
+                    'promotion': 'fa-tags'
                 };
                 
                 const card = document.createElement('div');
-                card.className = 'border-l-4 border-blue-500 pl-4 py-3 bg-gray-50 rounded-r-lg';
+                card.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-gray-900">${email.subject}</h4>
-                            <p class="text-sm text-gray-600 mb-2">${email.recipients.length} destinataire(s) • ${email.type}</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span><i class="fas fa-calendar mr-1"></i>${new Date(email.date).toLocaleDateString('fr-FR')}</span>
-                                ${email.status === 'sent' ? `
-                                    <span><i class="fas fa-eye mr-1"></i>${email.openRate}% ouverture</span>
-                                    <span><i class="fas fa-mouse-pointer mr-1"></i>${email.clickRate}% clic</span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[email.status]}">
-                                ${statusLabels[email.status]}
-                            </span>
-                            <button onclick="deleteEmail(${email.id})" class="text-red-500 hover:text-red-700">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-900">${email.subject}</h4>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[email.status]}">
+                            ${email.status === 'sent' ? 'Envoyé' : email.status === 'scheduled' ? 'Programmé' : 'Brouillon'}
+                        </span>
                     </div>
+                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                        <i class="fas ${typeIcons[email.type]} mr-2"></i>
+                        ${email.type.charAt(0).toUpperCase() + email.type.slice(1)}
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3">${email.content.substring(0, 100)}...</p>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span>${email.recipients.length} destinataire(s)</span>
+                        <span>${new Date(email.scheduledFor).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                    ${email.status === 'sent' ? `
+                        <div class="mt-2 flex space-x-4 text-xs">
+                            <span class="text-blue-600">📧 ${email.openRate}% ouverture</span>
+                            <span class="text-green-600">🖱️ ${email.clickRate}% clic</span>
+                        </div>
+                    ` : ''}
                 `;
                 container.appendChild(card);
             });
@@ -895,22 +817,37 @@
         function sendEmail(event) {
             event.preventDefault();
             
-            const recipients = document.getElementById('email-recipients').value.split(',').map(email => email.trim());
             const subject = document.getElementById('email-subject').value;
             const type = document.getElementById('email-type').value;
+            const recipients = document.getElementById('email-recipients').value.split(',').map(email => email.trim());
             const content = document.getElementById('email-content').value;
             const schedule = document.getElementById('email-schedule').value;
+            
+            let scheduledFor = new Date();
+            switch(schedule) {
+                case '1hour':
+                    scheduledFor.setHours(scheduledFor.getHours() + 1);
+                    break;
+                case 'tomorrow':
+                    scheduledFor.setDate(scheduledFor.getDate() + 1);
+                    scheduledFor.setHours(9, 0, 0, 0);
+                    break;
+                case 'custom':
+                    // Pour la démo, on programme pour dans 2 jours
+                    scheduledFor.setDate(scheduledFor.getDate() + 2);
+                    break;
+            }
             
             const newEmail = {
                 id: Date.now(),
                 subject: subject,
-                recipients: recipients,
                 type: type,
+                recipients: recipients,
                 content: content,
                 status: schedule === 'now' ? 'sent' : 'scheduled',
-                date: new Date().toISOString().split('T')[0],
-                openRate: schedule === 'now' ? Math.floor(Math.random() * 60) + 20 : 0,
-                clickRate: schedule === 'now' ? Math.floor(Math.random() * 20) + 5 : 0
+                scheduledFor: scheduledFor.toISOString(),
+                openRate: schedule === 'now' ? Math.floor(Math.random() * 50) + 20 : 0,
+                clickRate: schedule === 'now' ? Math.floor(Math.random() * 15) + 5 : 0
             };
             
             mockData.emails.unshift(newEmail);
@@ -921,250 +858,220 @@
             // Reset form
             event.target.reset();
             
-            showToast('Email envoyé !', `Votre campagne "${subject}" a été ${schedule === 'now' ? 'envoyée' : 'programmée'} avec succès.`);
-        }
-
-        function deleteEmail(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet email ?')) {
-                mockData.emails = mockData.emails.filter(e => e.id !== id);
-                saveDataToStorage();
-                loadEmails();
-                updateEmailMetrics();
-                showToast('Email supprimé', 'L\'email a été supprimé avec succès.');
-            }
+            showToast(schedule === 'now' ? 'Email envoyé avec succès!' : 'Email programmé avec succès!');
         }
 
         function updateEmailMetrics() {
-            const sentEmails = mockData.emails.filter(e => e.status === 'sent');
-            const scheduledEmails = mockData.emails.filter(e => e.status === 'scheduled');
+            const sent = mockData.emails.filter(e => e.status === 'sent').length;
+            const scheduled = mockData.emails.filter(e => e.status === 'scheduled').length;
+            const avgOpenRate = mockData.emails.filter(e => e.status === 'sent').reduce((acc, e) => acc + e.openRate, 0) / sent || 0;
+            const avgClickRate = mockData.emails.filter(e => e.status === 'sent').reduce((acc, e) => acc + e.clickRate, 0) / sent || 0;
             
-            document.getElementById('emails-sent').textContent = sentEmails.length;
-            document.getElementById('emails-scheduled').textContent = scheduledEmails.length;
-            
-            if (sentEmails.length > 0) {
-                const avgOpenRate = sentEmails.reduce((sum, email) => sum + email.openRate, 0) / sentEmails.length;
-                const avgClickRate = sentEmails.reduce((sum, email) => sum + email.clickRate, 0) / sentEmails.length;
-                
-                document.getElementById('open-rate').textContent = Math.round(avgOpenRate) + '%';
-                document.getElementById('click-rate').textContent = Math.round(avgClickRate) + '%';
-            }
+            document.getElementById('emails-sent').textContent = sent;
+            document.getElementById('emails-scheduled').textContent = scheduled;
+            document.getElementById('open-rate').textContent = Math.round(avgOpenRate) + '%';
+            document.getElementById('click-rate').textContent = Math.round(avgClickRate) + '%';
         }
 
         // GESTION DES OFFRES
-        function loadOffers() {
-            const container = document.getElementById('offers-grid');
+        function loadOffres() {
+            const container = document.getElementById('offres-list');
             container.innerHTML = '';
             
-            mockData.offers.sort((a, b) => new Date(b.created) - new Date(a.created));
+            mockData.offres.sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation));
             
-            mockData.offers.forEach(offer => {
-                const priorityColors = {
-                    'high': 'priority-high',
-                    'medium': 'priority-medium',
-                    'low': 'priority-low'
-                };
-                
-                const priorityLabels = {
-                    'high': 'Haute',
-                    'medium': 'Moyenne',
-                    'low': 'Faible'
+            mockData.offres.forEach(offre => {
+                const priorityClasses = {
+                    'haute': 'priority-high',
+                    'moyenne': 'priority-medium',
+                    'faible': 'priority-low'
                 };
                 
                 const card = document.createElement('div');
-                card.className = `bg-white p-6 rounded-lg shadow-md card-hover card-shine ${priorityColors[offer.priority]}`;
+                card.className = `bg-white rounded-lg shadow-md p-6 card-hover card-shine ${priorityClasses[offre.priorite]}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
-                        <h4 class="text-xl font-semibold text-gray-900">${offer.title}</h4>
-                        <button onclick="deleteOffer(${offer.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <h4 class="text-xl font-semibold text-gray-900">${offre.titre}</h4>
+                        <div class="flex space-x-2">
+                            <button onclick="pushOffre(${offre.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                <i class="fas fa-rocket mr-1"></i>Pousser
+                            </button>
+                            <button onclick="deleteOffre(${offre.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                <i class="fas fa-trash mr-1"></i>
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-gray-600 mb-4">${offer.description}</p>
+                    <p class="text-gray-600 mb-4">${offre.description}</p>
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-3xl font-bold text-green-600">${offer.price}€</span>
-                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            ${priorityLabels[offer.priority]}
+                        <span class="text-2xl font-bold text-green-600">${offre.prix}€</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                            offre.priorite === 'haute' ? 'bg-red-100 text-red-800' :
+                            offre.priorite === 'moyenne' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                        }">
+                            ${offre.priorite.charAt(0).toUpperCase() + offre.priorite.slice(1)}
                         </span>
                     </div>
-                    <div class="text-sm text-gray-500 mb-4">
-                        <i class="fas fa-clock mr-1"></i>
-                        Expire le ${new Date(offer.expiry).toLocaleDateString('fr-FR')}
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="pushOffer(${offer.id})" class="flex-1 gradient-offers text-white px-4 py-2 rounded-md hover:opacity-90">
-                            <i class="fas fa-rocket mr-2"></i>Pousser
-                        </button>
-                        <button onclick="editOffer(${offer.id})" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
-                            <i class="fas fa-edit mr-2"></i>Modifier
-                        </button>
+                    <div class="text-sm text-gray-500">
+                        <div>Expire le: ${new Date(offre.expiration).toLocaleDateString('fr-FR')}</div>
+                        <div>Créée le: ${new Date(offre.dateCreation).toLocaleDateString('fr-FR')}</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function showAddOfferForm() {
-            document.getElementById('add-offer-form').classList.remove('hidden');
+        function showAddOffreForm() {
+            document.getElementById('add-offre-form').classList.remove('hidden');
         }
 
-        function hideAddOfferForm() {
-            document.getElementById('add-offer-form').classList.add('hidden');
-            document.getElementById('add-offer-form').querySelector('form').reset();
+        function hideAddOffreForm() {
+            document.getElementById('add-offre-form').classList.add('hidden');
+            document.getElementById('add-offre-form').querySelector('form').reset();
         }
 
-        function addOffer(event) {
+        function addOffre(event) {
             event.preventDefault();
             
-            const title = document.getElementById('offer-title').value;
-            const price = parseFloat(document.getElementById('offer-price').value);
-            const description = document.getElementById('offer-description').value;
-            const expiry = document.getElementById('offer-expiry').value;
-            const priority = document.getElementById('offer-priority').value;
+            const titre = document.getElementById('offre-titre').value;
+            const prix = parseFloat(document.getElementById('offre-prix').value);
+            const description = document.getElementById('offre-description').value;
+            const priorite = document.getElementById('offre-priorite').value;
+            const expiration = document.getElementById('offre-expiration').value;
             
-            const newOffer = {
+            const newOffre = {
                 id: Date.now(),
-                title: title,
-                price: price,
+                titre: titre,
                 description: description,
-                expiry: expiry,
-                priority: priority,
-                created: new Date().toISOString().split('T')[0]
+                prix: prix,
+                priorite: priorite,
+                expiration: expiration,
+                dateCreation: new Date().toISOString().split('T')[0]
             };
             
-            mockData.offers.unshift(newOffer);
+            mockData.offres.unshift(newOffre);
             saveDataToStorage();
-            loadOffers();
-            hideAddOfferForm();
+            loadOffres();
+            hideAddOffreForm();
             
-            showToast('Offre créée !', `L'offre "${title}" a été créée avec succès.`);
+            showToast('Offre créée avec succès!');
         }
 
-        function deleteOffer(id) {
+        function pushOffre(id) {
+            const offre = mockData.offres.find(o => o.id === id);
+            if (offre) {
+                showToast(`Offre "${offre.titre}" poussée vers les prospects!`, 'info');
+            }
+        }
+
+        function deleteOffre(id) {
             if (confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
-                mockData.offers = mockData.offers.filter(o => o.id !== id);
+                mockData.offres = mockData.offres.filter(o => o.id !== id);
                 saveDataToStorage();
-                loadOffers();
-                showToast('Offre supprimée', 'L\'offre a été supprimée avec succès.');
+                loadOffres();
+                showToast('Offre supprimée avec succès!');
             }
         }
 
-        function pushOffer(id) {
-            const offer = mockData.offers.find(o => o.id === id);
-            if (offer) {
-                showToast('Offre poussée !', `L'offre "${offer.title}" a été envoyée à tous vos prospects.`);
-            }
-        }
-
-        function editOffer(id) {
-            // Fonctionnalité d'édition à implémenter
-            showToast('Édition', 'Fonctionnalité d\'édition en cours de développement.', 'info');
-        }
-
-        // GESTION DES LEADS
+        // CAPTURE DE LEADS
         function loadLeads() {
             const container = document.getElementById('leads-list');
-            const searchTerm = document.getElementById('leads-search')?.value.toLowerCase() || '';
-            const filterSource = document.getElementById('leads-filter')?.value || '';
+            const searchTerm = document.getElementById('search-leads')?.value.toLowerCase() || '';
+            const sourceFilter = document.getElementById('filter-source')?.value || '';
+            
+            let filteredLeads = mockData.leads.filter(lead => {
+                const matchesSearch = lead.nom.toLowerCase().includes(searchTerm) || 
+                                    lead.email.toLowerCase().includes(searchTerm) ||
+                                    lead.entreprise.toLowerCase().includes(searchTerm);
+                const matchesSource = !sourceFilter || lead.source === sourceFilter;
+                return matchesSearch && matchesSource;
+            });
             
             container.innerHTML = '';
             
-            let filteredLeads = mockData.leads.filter(lead => {
-                const matchesSearch = lead.name.toLowerCase().includes(searchTerm) || 
-                                    lead.email.toLowerCase().includes(searchTerm) ||
-                                    lead.company.toLowerCase().includes(searchTerm);
-                const matchesFilter = !filterSource || lead.source === filterSource;
-                return matchesSearch && matchesFilter;
-            });
-            
-            filteredLeads.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filteredLeads.sort((a, b) => new Date(b.dateCapture) - new Date(a.dateCapture));
             
             filteredLeads.forEach(lead => {
                 const sourceColors = {
-                    'website': 'bg-blue-100 text-blue-800',
-                    'social': 'bg-pink-100 text-pink-800',
+                    'site-web': 'bg-blue-100 text-blue-800',
+                    'reseaux-sociaux': 'bg-purple-100 text-purple-800',
                     'email': 'bg-green-100 text-green-800',
-                    'referral': 'bg-purple-100 text-purple-800',
-                    'event': 'bg-orange-100 text-orange-800',
-                    'cold': 'bg-gray-100 text-gray-800'
-                };
-                
-                const sourceLabels = {
-                    'website': 'Site Web',
-                    'social': 'Réseaux Sociaux',
-                    'email': 'Email Marketing',
-                    'referral': 'Recommandation',
-                    'event': 'Événement',
-                    'cold': 'Prospection Froide'
+                    'recommandation': 'bg-yellow-100 text-yellow-800',
+                    'evenement': 'bg-red-100 text-red-800'
                 };
                 
                 const card = document.createElement('div');
-                card.className = 'bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500';
+                card.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h4 class="font-semibold text-gray-900">${lead.name}</h4>
-                                <span class="px-2 py-1 rounded-full text-xs font-medium ${sourceColors[lead.source]}">
-                                    ${sourceLabels[lead.source]}
-                                </span>
-                            </div>
-                            <div class="text-sm text-gray-600 space-y-1">
-                                <p><i class="fas fa-envelope mr-2"></i>${lead.email}</p>
-                                ${lead.phone ? `<p><i class="fas fa-phone mr-2"></i>${lead.phone}</p>` : ''}
-                                ${lead.company ? `<p><i class="fas fa-building mr-2"></i>${lead.company}</p>` : ''}
-                                <p><i class="fas fa-comment mr-2"></i>${lead.need}</p>
-                                <p class="text-xs text-gray-500"><i class="fas fa-calendar mr-1"></i>${new Date(lead.date).toLocaleDateString('fr-FR')}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="contactLead(${lead.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-900">${lead.nom}</h4>
+                        <div class="flex space-x-2">
+                            <button onclick="contactLead(${lead.id})" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">
                                 <i class="fas fa-phone mr-1"></i>Contacter
                             </button>
-                            <button onclick="deleteLead(${lead.id})" class="text-red-500 hover:text-red-700">
+                            <button onclick="deleteLead(${lead.id})" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        <div>📧 ${lead.email}</div>
+                        ${lead.telephone ? `<div>📞 ${lead.telephone}</div>` : ''}
+                        ${lead.entreprise ? `<div>🏢 ${lead.entreprise}</div>` : ''}
+                    </div>
+                    <p class="text-sm text-gray-700 mb-3">${lead.besoin}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${sourceColors[lead.source]}">
+                            ${lead.source.replace('-', ' ').charAt(0).toUpperCase() + lead.source.replace('-', ' ').slice(1)}
+                        </span>
+                        <span class="text-xs text-gray-500">${new Date(lead.dateCapture).toLocaleDateString('fr-FR')}</span>
+                    </div>
                 `;
                 container.appendChild(card);
             });
             
-            // Ajouter les event listeners pour la recherche et le filtrage
-            document.getElementById('leads-search').addEventListener('input', loadLeads);
-            document.getElementById('leads-filter').addEventListener('change', loadLeads);
+            if (filteredLeads.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun lead trouvé</p>';
+            }
         }
 
-        function captureLead(event) {
+        function addLead(event) {
             event.preventDefault();
             
-            const name = document.getElementById('lead-name').value;
+            const nom = document.getElementById('lead-nom').value;
             const email = document.getElementById('lead-email').value;
-            const phone = document.getElementById('lead-phone').value;
-            const company = document.getElementById('lead-company').value;
+            const telephone = document.getElementById('lead-telephone').value;
+            const entreprise = document.getElementById('lead-entreprise').value;
             const source = document.getElementById('lead-source').value;
-            const need = document.getElementById('lead-need').value;
+            const besoin = document.getElementById('lead-besoin').value;
             
             const newLead = {
                 id: Date.now(),
-                name: name,
+                nom: nom,
                 email: email,
-                phone: phone,
-                company: company,
+                telephone: telephone,
+                entreprise: entreprise,
                 source: source,
-                need: need,
-                date: new Date().toISOString().split('T')[0],
-                status: 'new'
+                besoin: besoin,
+                dateCapture: new Date().toISOString().split('T')[0]
             };
             
             mockData.leads.unshift(newLead);
             saveDataToStorage();
             loadLeads();
-            updateLeadsMetrics();
+            updateLeadMetrics();
             
             // Reset form
             event.target.reset();
             
-            showToast('Lead capturé !', `Le lead "${name}" a été ajouté avec succès.`);
+            showToast('Lead ajouté avec succès!');
+        }
+
+        function contactLead(id) {
+            const lead = mockData.leads.find(l => l.id === id);
+            if (lead) {
+                showToast(`Contact initié avec ${lead.nom}!`, 'info');
+            }
         }
 
         function deleteLead(id) {
@@ -1172,139 +1079,143 @@
                 mockData.leads = mockData.leads.filter(l => l.id !== id);
                 saveDataToStorage();
                 loadLeads();
-                updateLeadsMetrics();
-                showToast('Lead supprimé', 'Le lead a été supprimé avec succès.');
+                updateLeadMetrics();
+                showToast('Lead supprimé avec succès!');
             }
         }
 
-        function contactLead(id) {
-            const lead = mockData.leads.find(l => l.id === id);
-            if (lead) {
-                lead.status = 'contacted';
-                saveDataToStorage();
-                showToast('Lead contacté !', `Vous avez marqué ${lead.name} comme contacté.`);
-            }
-        }
-
-        function updateLeadsMetrics() {
-            const totalLeads = mockData.leads.length;
-            const thisMonth = mockData.leads.filter(lead => {
-                const leadDate = new Date(lead.date);
+        function updateLeadMetrics() {
+            const total = mockData.leads.length;
+            const thisMonth = mockData.leads.filter(l => {
+                const leadDate = new Date(l.dateCapture);
                 const now = new Date();
                 return leadDate.getMonth() === now.getMonth() && leadDate.getFullYear() === now.getFullYear();
             }).length;
             
-            document.getElementById('leads-total').textContent = totalLeads;
-            document.getElementById('leads-month').textContent = thisMonth;
-            document.getElementById('leads-conversion').textContent = '15%'; // Mock conversion rate
-            
-            // Top sources
+            // Calcul des sources
             const sources = {};
             mockData.leads.forEach(lead => {
                 sources[lead.source] = (sources[lead.source] || 0) + 1;
             });
+            const topSource = Object.keys(sources).reduce((a, b) => sources[a] > sources[b] ? a : b, '-');
             
-            const topSources = Object.entries(sources)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 3);
-            
-            const topSourcesContainer = document.getElementById('top-sources');
-            topSourcesContainer.innerHTML = '';
-            
-            const sourceLabels = {
-                'website': 'Site Web',
-                'social': 'Réseaux Sociaux',
-                'email': 'Email Marketing',
-                'referral': 'Recommandation',
-                'event': 'Événement',
-                'cold': 'Prospection Froide'
-            };
-            
-            topSources.forEach(([source, count]) => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center';
-                div.innerHTML = `
-                    <span class="text-sm text-gray-600">${sourceLabels[source]}</span>
-                    <span class="font-semibold text-gray-900">${count}</span>
-                `;
-                topSourcesContainer.appendChild(div);
-            });
+            document.getElementById('total-leads').textContent = total;
+            document.getElementById('leads-this-month').textContent = thisMonth;
+            document.getElementById('conversion-rate').textContent = Math.floor(Math.random() * 20) + 10 + '%';
+            document.getElementById('top-source').textContent = topSource.replace('-', ' ').charAt(0).toUpperCase() + topSource.replace('-', ' ').slice(1);
         }
 
-        // GESTION DES LANDING PAGES
+        // Événements de recherche et filtrage pour les leads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter les événements après le chargement de la page
+            setTimeout(() => {
+                const searchInput = document.getElementById('search-leads');
+                const filterSelect = document.getElementById('filter-source');
+                
+                if (searchInput) {
+                    searchInput.addEventListener('input', loadLeads);
+                }
+                if (filterSelect) {
+                    filterSelect.addEventListener('change', loadLeads);
+                }
+            }, 1000);
+        });
+
+        // LANDING PAGES
         function generateLanding(event) {
             event.preventDefault();
             
             const title = document.getElementById('landing-title').value;
             const subtitle = document.getElementById('landing-subtitle').value;
-            const description = document.getElementById('landing-description').value;
             const image = document.getElementById('landing-image').value;
             const cta = document.getElementById('landing-cta').value;
-            const theme = document.getElementById('landing-theme').value;
             const price = document.getElementById('landing-price').value;
+            const theme = document.getElementById('landing-theme').value;
             
-            const themeColors = {
-                'blue': 'from-blue-600 to-blue-800',
-                'green': 'from-green-600 to-green-800',
-                'purple': 'from-purple-600 to-purple-800',
-                'red': 'from-red-600 to-red-800',
-                'orange': 'from-orange-600 to-orange-800'
-            };
-            
+            updateLandingPreview(title, subtitle, image, cta, price, theme);
+        }
+
+        function updateLandingPreview(title, subtitle, image, cta, price, theme) {
             const preview = document.getElementById('landing-preview');
+            
+            const themeClass = `theme-${theme}`;
+            
             preview.innerHTML = `
-                <div class="bg-gradient-to-r ${themeColors[theme]} text-white p-8 rounded-lg">
-                    <h1 class="text-3xl font-bold mb-4">${title}</h1>
-                    ${subtitle ? `<h2 class="text-xl mb-6 opacity-90">${subtitle}</h2>` : ''}
-                    ${image ? `<img src="${image}" alt="${title}" class="w-full h-48 object-cover rounded-lg mb-6">` : ''}
-                    <p class="text-lg mb-6 opacity-90">${description}</p>
-                    ${price ? `<div class="text-4xl font-bold mb-6">${price}</div>` : ''}
-                    <button class="bg-white text-${theme}-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
-                        ${cta}
+                <div class="${themeClass} text-white text-center py-12 px-6">
+                    <h1 class="text-3xl font-bold mb-4">${title || 'Votre Titre'}</h1>
+                    ${subtitle ? `<p class="text-lg mb-6 opacity-90">${subtitle}</p>` : ''}
+                    ${image ? `<img src="${image}" alt="Image" class="mx-auto mb-6 rounded-lg max-w-xs">` : ''}
+                    ${price ? `<div class="text-2xl font-bold mb-6">${price}</div>` : ''}
+                    <button class="bg-white text-gray-900 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
+                        ${cta || 'Call to Action'}
                     </button>
                 </div>
+                <div class="p-6 text-center">
+                    <p class="text-gray-600">Contenu additionnel de votre landing page...</p>
+                </div>
             `;
-            
-            document.getElementById('landing-actions').classList.remove('hidden');
         }
 
         function saveLanding() {
             const title = document.getElementById('landing-title').value;
             const subtitle = document.getElementById('landing-subtitle').value;
-            const description = document.getElementById('landing-description').value;
             const image = document.getElementById('landing-image').value;
             const cta = document.getElementById('landing-cta').value;
-            const theme = document.getElementById('landing-theme').value;
             const price = document.getElementById('landing-price').value;
+            const theme = document.getElementById('landing-theme').value;
+            
+            if (!title) {
+                showToast('Veuillez remplir au moins le titre', 'error');
+                return;
+            }
             
             const newLanding = {
                 id: Date.now(),
                 title: title,
                 subtitle: subtitle,
-                description: description,
                 image: image,
                 cta: cta,
-                theme: theme,
                 price: price,
-                created: new Date().toISOString().split('T')[0]
+                theme: theme,
+                dateCreation: new Date().toISOString().split('T')[0]
             };
             
-            mockData.landings.unshift(newLanding);
+            mockData.landings.push(newLanding);
             saveDataToStorage();
             loadSavedLandings();
             
-            showToast('Landing Page sauvegardée !', `La landing page "${title}" a été sauvegardée.`);
+            showToast('Landing page sauvegardée avec succès!');
         }
 
         function exportLanding() {
             const title = document.getElementById('landing-title').value;
             const subtitle = document.getElementById('landing-subtitle').value;
-            const description = document.getElementById('landing-description').value;
             const image = document.getElementById('landing-image').value;
             const cta = document.getElementById('landing-cta').value;
-            const theme = document.getElementById('landing-theme').value;
             const price = document.getElementById('landing-price').value;
+            const theme = document.getElementById('landing-theme').value;
             
+            if (!title) {
+                showToast('Veuillez remplir au moins le titre', 'error');
+                return;
+            }
+            
+            const html = generateLandingHTML(title, subtitle, image, cta, price, theme);
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `landing-${title.toLowerCase().replace(/\s+/g, '-')}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Landing page exportée avec succès!');
+        }
+
+        function generateLandingHTML(title, subtitle, image, cta, price, theme) {
             const themeColors = {
                 'blue': 'from-blue-600 to-blue-800',
                 'green': 'from-green-600 to-green-800',
@@ -1313,7 +1224,7 @@
                 'orange': 'from-orange-600 to-orange-800'
             };
             
-            const html = `<!DOCTYPE html>
+            return `<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -1321,122 +1232,149 @@
     <title>${title}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-4xl mx-auto p-8">
-        <div class="bg-gradient-to-r ${themeColors[theme]} text-white p-12 rounded-lg text-center">
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <div class="bg-gradient-to-br ${themeColors[theme]} text-white text-center py-20 px-6">
             <h1 class="text-5xl font-bold mb-6">${title}</h1>
-            ${subtitle ? `<h2 class="text-2xl mb-8 opacity-90">${subtitle}</h2>` : ''}
-            ${image ? `<img src="${image}" alt="${title}" class="w-full h-64 object-cover rounded-lg mb-8">` : ''}
-            <p class="text-xl mb-8 opacity-90">${description}</p>
-            ${price ? `<div class="text-5xl font-bold mb-8">${price}</div>` : ''}
-            <button class="bg-white text-${theme}-600 px-12 py-4 rounded-lg font-semibold text-xl hover:bg-gray-100 transition-colors">
+            ${subtitle ? `<p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto">${subtitle}</p>` : ''}
+            ${image ? `<img src="${image}" alt="Image" class="mx-auto mb-8 rounded-lg max-w-md shadow-lg">` : ''}
+            ${price ? `<div class="text-3xl font-bold mb-8">${price}</div>` : ''}
+            <button class="bg-white text-gray-900 px-12 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors duration-200 shadow-lg">
                 ${cta}
             </button>
+        </div>
+        <div class="py-16 px-6 text-center">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Pourquoi nous choisir ?</h2>
+            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="p-6">
+                    <div class="text-4xl mb-4">🚀</div>
+                    <h3 class="text-xl font-semibold mb-2">Rapide</h3>
+                    <p class="text-gray-600">Des résultats visibles rapidement</p>
+                </div>
+                <div class="p-6">
+                    <div class="text-4xl mb-4">💎</div>
+                    <h3 class="text-xl font-semibold mb-2">Qualité</h3>
+                    <p class="text-gray-600">Excellence garantie</p>
+                </div>
+                <div class="p-6">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-semibold mb-2">Efficace</h3>
+                    <p class="text-gray-600">Solutions sur mesure</p>
+                </div>
+            </div>
         </div>
     </div>
 </body>
 </html>`;
-            
-            const blob = new Blob([html], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${title.replace(/\s+/g, '-').toLowerCase()}.html`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('Export réussi !', 'Le fichier HTML a été téléchargé.');
         }
 
         function loadSavedLandings() {
             const container = document.getElementById('saved-landings');
             container.innerHTML = '';
             
+            mockData.landings.sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation));
+            
             mockData.landings.forEach(landing => {
                 const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-lg shadow-md card-hover';
+                card.className = 'bg-white rounded-lg shadow-md p-4 card-hover';
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
                         <h4 class="font-semibold text-gray-900">${landing.title}</h4>
-                        <button onclick="deleteLanding(${landing.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="flex space-x-1">
+                            <button onclick="previewLanding(${landing.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="duplicateLanding(${landing.id})" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button onclick="deleteSavedLanding(${landing.id})" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    ${landing.image ? `<img src="${landing.image}" alt="${landing.title}" class="w-full h-32 object-cover rounded mb-3">` : ''}
-                    <p class="text-sm text-gray-600 mb-3">${landing.description.substring(0, 100)}...</p>
-                    <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
-                        <span><i class="fas fa-calendar mr-1"></i>${new Date(landing.created).toLocaleDateString('fr-FR')}</span>
-                        <span class="px-2 py-1 rounded-full bg-${landing.theme}-100 text-${landing.theme}-800">${landing.theme}</span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="previewLanding(${landing.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                            <i class="fas fa-eye mr-1"></i>Aperçu
-                        </button>
-                        <button onclick="duplicateLanding(${landing.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                            <i class="fas fa-copy mr-1"></i>Dupliquer
-                        </button>
+                    ${landing.subtitle ? `<p class="text-sm text-gray-600 mb-2">${landing.subtitle}</p>` : ''}
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span class="px-2 py-1 rounded-full bg-${landing.theme}-100 text-${landing.theme}-800">
+                            ${landing.theme.charAt(0).toUpperCase() + landing.theme.slice(1)}
+                        </span>
+                        <span>${new Date(landing.dateCreation).toLocaleDateString('fr-FR')}</span>
                     </div>
                 `;
                 container.appendChild(card);
             });
-        }
-
-        function deleteLanding(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette landing page ?')) {
-                mockData.landings = mockData.landings.filter(l => l.id !== id);
-                saveDataToStorage();
-                loadSavedLandings();
-                showToast('Landing Page supprimée', 'La landing page a été supprimée avec succès.');
+            
+            if (mockData.landings.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8 col-span-full">Aucune landing page sauvegardée</p>';
             }
         }
 
         function previewLanding(id) {
             const landing = mockData.landings.find(l => l.id === id);
             if (landing) {
-                // Remplir le formulaire avec les données de la landing page
-                document.getElementById('landing-title').value = landing.title;
-                document.getElementById('landing-subtitle').value = landing.subtitle || '';
-                document.getElementById('landing-description').value = landing.description;
-                document.getElementById('landing-image').value = landing.image || '';
-                document.getElementById('landing-cta').value = landing.cta;
-                document.getElementById('landing-theme').value = landing.theme;
-                document.getElementById('landing-price').value = landing.price || '';
-                
-                // Générer l'aperçu
-                generateLanding({ preventDefault: () => {} });
+                updateLandingPreview(landing.title, landing.subtitle, landing.image, landing.cta, landing.price, landing.theme);
+                showToast('Aperçu chargé!', 'info');
             }
         }
 
         function duplicateLanding(id) {
             const landing = mockData.landings.find(l => l.id === id);
             if (landing) {
-                const duplicate = {
-                    ...landing,
-                    id: Date.now(),
-                    title: landing.title + ' (Copie)',
-                    created: new Date().toISOString().split('T')[0]
-                };
+                document.getElementById('landing-title').value = landing.title + ' (Copie)';
+                document.getElementById('landing-subtitle').value = landing.subtitle || '';
+                document.getElementById('landing-image').value = landing.image || '';
+                document.getElementById('landing-cta').value = landing.cta || '';
+                document.getElementById('landing-price').value = landing.price || '';
+                document.getElementById('landing-theme').value = landing.theme || 'blue';
                 
-                mockData.landings.unshift(duplicate);
-                saveDataToStorage();
-                loadSavedLandings();
-                showToast('Landing Page dupliquée !', `Une copie de "${landing.title}" a été créée.`);
+                updateLandingPreview(landing.title + ' (Copie)', landing.subtitle, landing.image, landing.cta, landing.price, landing.theme);
+                showToast('Landing page dupliquée dans le formulaire!', 'info');
             }
         }
 
-        // Fonction pour mettre à jour toutes les métriques
+        function deleteSavedLanding(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette landing page ?')) {
+                mockData.landings = mockData.landings.filter(l => l.id !== id);
+                saveDataToStorage();
+                loadSavedLandings();
+                showToast('Landing page supprimée avec succès!');
+            }
+        }
+
+        // Mise à jour en temps réel de l'aperçu
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const inputs = ['landing-title', 'landing-subtitle', 'landing-image', 'landing-cta', 'landing-price', 'landing-theme'];
+                inputs.forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        input.addEventListener('input', function() {
+                            const title = document.getElementById('landing-title').value;
+                            const subtitle = document.getElementById('landing-subtitle').value;
+                            const image = document.getElementById('landing-image').value;
+                            const cta = document.getElementById('landing-cta').value;
+                            const price = document.getElementById('landing-price').value;
+                            const theme = document.getElementById('landing-theme').value;
+                            
+                            updateLandingPreview(title, subtitle, image, cta, price, theme);
+                        });
+                    }
+                });
+            }, 1000);
+        });
+
+        // Fonction générale pour mettre à jour les métriques
         function updateMetrics() {
             updateEmailMetrics();
-            updateLeadsMetrics();
+            updateLeadMetrics();
         }
 
         // Fermer les menus en cliquant à l'extérieur
         document.addEventListener('click', function(event) {
-            const quickActions = document.getElementById('quick-actions');
-            const floatingBtn = document.querySelector('.floating-btn');
+            const quickActions = document.getElementById('quick-actions-menu');
+            const quickButton = event.target.closest('button[onclick="toggleQuickActions()"]');
             
-            if (!floatingBtn.contains(event.target)) {
-                quickActions.classList.add('hidden');
+            if (quickActions && !quickActions.contains(event.target) && !quickButton) {
+                hideQuickActions();
             }
         });
     </script>
