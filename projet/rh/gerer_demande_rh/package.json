@@ -1,0 +1,7 @@
+@@ .. @@
+   "name": "gerer_demande_rh",
+-  "version": "0.1.0",
++  "version": "1.0.0",
+   "private": true,
++  "description": "Application de gestion RH moderne avec React et TailwindCSS",
+   "dependencies": {
