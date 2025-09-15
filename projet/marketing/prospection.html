@@ -1514,6 +1514,13 @@
                 floatingMenuOpen = false;
             }
         });
+
+    // Initialisation de l'application
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDataFromStorage();
+        showPage('emails');
+        updateMetrics();
+    });
     </script>
 </body>
 </html>
