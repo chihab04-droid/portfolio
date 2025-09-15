@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sales - Application de Vente Moderne</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles personnalisés pour les animations et effets */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-sales {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .note-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            color: white;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .invoice-preview {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .calculator-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* Styles pour les badges de prix */
+        .price-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Animation pour les cartes produits */
+        .product-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .product-shine:hover::before {
+            left: 100%;
+        }
+        
+        /* Styles pour les notes */
+        .note-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .note-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Responsive design amélioré */
+        @media (max-width: 768px) {
+            .floating-btn {
+                bottom: 80px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .invoice-preview {
+                padding: 20px;
+            }
+            
+            .calculator-display {
+                font-size: 1.5rem;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-sales text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Smart Sales</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('notes')" class="nav-link hover:text-yellow-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-sticky-note mr-2"></i>Notes
+                    </button>
+                    <button onclick="showPage('devis')" class="nav-link hover:text-yellow-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-file-invoice mr-2"></i>Devis & Factures
+                    </button>
+                    <button onclick="showPage('cotations')" class="nav-link hover:text-yellow-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-calculator mr-2"></i>Cotations
+                    </button>
+                    <button onclick="showPage('catalogue')" class="nav-link hover:text-yellow-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-shopping-bag mr-2"></i>Catalogue
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-yellow-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('notes')" class="block w-full text-left px-3 py-2 hover:bg-red-600 rounded-md">
+                    <i class="fas fa-sticky-note mr-2"></i>Notes
+                </button>
+                <button onclick="showPage('devis')" class="block w-full text-left px-3 py-2 hover:bg-red-600 rounded-md">
+                    <i class="fas fa-file-invoice mr-2"></i>Devis & Factures
+                </button>
+                <button onclick="showPage('cotations')" class="block w-full text-left px-3 py-2 hover:bg-red-600 rounded-md">
+                    <i class="fas fa-calculator mr-2"></i>Cotations
+                </button>
+                <button onclick="showPage('catalogue')" class="block w-full text-left px-3 py-2 hover:bg-red-600 rounded-md">
+                    <i class="fas fa-shopping-bag mr-2"></i>Catalogue
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Notes -->
+        <div id="notes-page" class="page-content">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-sales rounded-full flex items-center justify-center pulse-animation">
+                    <i class="fas fa-sticky-note text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Prise de Notes Rapide</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Capturez vos idées et informations importantes en déplacement. Optimisé pour une utilisation mobile.
+                </p>
+            </div>
+
+            <!-- Formulaire de prise de notes -->
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover mb-8">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle text-orange-500 mr-3"></i>
+                    Nouvelle Note
+                </h3>
+                <form onsubmit="addNote(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre de la note</label>
+                        <input type="text" id="note-title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                        <select id="note-category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="">Sélectionner une catégorie...</option>
+                            <option value="client">Client</option>
+                            <option value="prospect">Prospect</option>
+                            <option value="produit">Produit</option>
+                            <option value="reunion">Réunion</option>
+                            <option value="idee">Idée</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contenu de la note</label>
+                        <textarea id="note-content" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Tapez votre note ici..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full gradient-sales text-white px-4 py-2 rounded-md transition-colors duration-200 hover:opacity-90">
+                        <i class="fas fa-save mr-2"></i>Enregistrer la Note
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Liste des notes -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-list text-blue-500 mr-3"></i>
+                    Mes Notes
+                </h3>
+                <div id="notes-list" class="space-y-4">
+                    <!-- Les notes seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Devis & Factures -->
+        <div id="devis-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-bg rounded-full flex items-center justify-center pulse-animation">
+                    <i class="fas fa-file-invoice text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Devis & Factures</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Générez rapidement vos devis et factures avec un aperçu en temps réel.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de génération -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle text-blue-600 mr-3"></i>
+                        Nouveau Document
+                    </h3>
+                    <form onsubmit="generateInvoice(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type de document</label>
+                            <select id="doc-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="devis">Devis</option>
+                                <option value="facture">Facture</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom du client</label>
+                            <input type="text" id="client-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email du client</label>
+                            <input type="email" id="client-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Produit/Service</label>
+                            <input type="text" id="product-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Quantité</label>
+                                <input type="number" id="product-quantity" required min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Prix unitaire (€)</label>
+                                <input type="number" id="product-price" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">TVA (%)</label>
+                            <select id="tax-rate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">0%</option>
+                                <option value="5.5">5.5%</option>
+                                <option value="10">10%</option>
+                                <option value="20" selected>20%</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-file-alt mr-2"></i>Générer l'Aperçu
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Aperçu du document -->
+                <div id="invoice-preview" class="hidden">
+                    <div class="invoice-preview">
+                        <div class="text-center mb-6">
+                            <h3 id="preview-title" class="text-3xl font-bold text-gray-900 mb-2">DEVIS</h3>
+                            <p class="text-gray-600">N° <span id="preview-number">2024-001</span></p>
+                            <p class="text-gray-600">Date : <span id="preview-date"></span></p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">De :</h4>
+                                <p class="text-gray-600">
+                                    Votre Entreprise<br>
+                                    123 Rue de la Vente<br>
+                                    75001 Paris<br>
+                                    contact@entreprise.com
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">À :</h4>
+                                <div id="preview-client" class="text-gray-600">
+                                    <!-- Informations client -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <table class="w-full border-collapse border border-gray-300">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-gray-300 px-4 py-2 text-left">Description</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center">Qté</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-right">Prix Unit.</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-right">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-items">
+                                    <!-- Lignes de produits -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="text-right">
+                            <div class="inline-block">
+                                <div class="flex justify-between mb-2">
+                                    <span class="mr-8">Total HT :</span>
+                                    <span id="preview-subtotal" class="font-semibold">0,00 €</span>
+                                </div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="mr-8">TVA (<span id="preview-tax-rate">20</span>%) :</span>
+                                    <span id="preview-tax" class="font-semibold">0,00 €</span>
+                                </div>
+                                <div class="flex justify-between text-xl font-bold border-t pt-2">
+                                    <span class="mr-8">Total TTC :</span>
+                                    <span id="preview-total" class="text-blue-600">0,00 €</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 text-center">
+                            <button onclick="downloadPDF()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md mr-4">
+                                <i class="fas fa-download mr-2"></i>Télécharger PDF
+                            </button>
+                            <button onclick="sendEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
+                                <i class="fas fa-envelope mr-2"></i>Envoyer par Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Cotations -->
+        <div id="cotations-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-blue-600 rounded-full flex items-center justify-center pulse-animation">
+                    <i class="fas fa-calculator text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Calcul de Cotations</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Calculez automatiquement vos cotations avec des paramètres personnalisables.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de cotation -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-cogs text-green-600 mr-3"></i>
+                        Paramètres de Cotation
+                    </h3>
+                    <form onsubmit="calculateQuote(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type de produit</label>
+                            <select id="quote-product-type" required onchange="updateQuoteCalculation()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="service" data-base-price="50">Service de consultation</option>
+                                <option value="produit-simple" data-base-price="25">Produit simple</option>
+                                <option value="produit-complexe" data-base-price="100">Produit complexe</option>
+                                <option value="formation" data-base-price="200">Formation</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Quantité</label>
+                            <input type="number" id="quote-quantity" required min="1" value="1" onchange="updateQuoteCalculation()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Complexité</label>
+                            <select id="quote-complexity" onchange="updateQuoteCalculation()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="1">Simple (x1)</option>
+                                <option value="1.5" selected>Moyen (x1.5)</option>
+                                <option value="2">Complexe (x2)</option>
+                                <option value="3">Très complexe (x3)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Urgence</label>
+                            <select id="quote-urgency" onchange="updateQuoteCalculation()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="1">Standard (x1)</option>
+                                <option value="1.25">Prioritaire (x1.25)</option>
+                                <option value="1.5">Urgent (x1.5)</option>
+                                <option value="2">Très urgent (x2)</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Remise (%)</label>
+                            <input type="number" id="quote-discount" min="0" max="50" value="0" onchange="updateQuoteCalculation()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-calculator mr-2"></i>Calculer la Cotation
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Résultat de la cotation -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-bar text-blue-600 mr-3"></i>
+                        Résultat de la Cotation
+                    </h3>
+                    
+                    <!-- Affichage principal -->
+                    <div class="calculator-display mb-6">
+                        <div class="text-sm opacity-75 mb-2">Prix Total</div>
+                        <div id="quote-result">0,00 €</div>
+                    </div>
+                    
+                    <!-- Détails du calcul -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Prix de base</span>
+                            <span id="quote-base-price" class="text-lg font-semibold text-gray-900">0,00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Quantité</span>
+                            <span id="quote-quantity-display" class="text-lg font-semibold text-blue-600">1</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Multiplicateur complexité</span>
+                            <span id="quote-complexity-display" class="text-lg font-semibold text-yellow-600">x1.5</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Multiplicateur urgence</span>
+                            <span id="quote-urgency-display" class="text-lg font-semibold text-red-600">x1</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Remise</span>
+                            <span id="quote-discount-display" class="text-lg font-semibold text-green-600">0%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="mt-6 space-y-3">
+                        <button onclick="saveQuote()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-save mr-2"></i>Sauvegarder la Cotation
+                        </button>
+                        <button onclick="createQuoteFromCalculation()" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-file-alt mr-2"></i>Créer un Devis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Catalogue -->
+        <div id="catalogue-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center pulse-animation">
+                    <i class="fas fa-shopping-bag text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Catalogue Produits</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Explorez notre catalogue de produits avec recherche et filtrage avancés.
+                </p>
+            </div>
+
+            <!-- Barre de recherche et filtres -->
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover mb-8">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+                        <input type="text" id="product-search" placeholder="Nom du produit..." onkeyup="filterProducts()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                        <select id="category-filter" onchange="filterProducts()" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Toutes les catégories</option>
+                            <option value="electronique">Électronique</option>
+                            <option value="vetements">Vêtements</option>
+                            <option value="maison">Maison & Jardin</option>
+                            <option value="sport">Sport & Loisirs</option>
+                            <option value="beaute">Beauté & Santé</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prix maximum</label>
+                        <input type="range" id="price-filter" min="0" max="1000" value="1000" onchange="filterProducts(); updatePriceDisplay()" class="w-full">
+                        <div class="text-center text-sm text-gray-600 mt-1">
+                            <span id="price-display">1000</span> €
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grille de produits -->
+            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Les produits seront ajoutés ici dynamiquement -->
+            </div>
+            
+            <!-- Message si aucun produit trouvé -->
+            <div id="no-products" class="hidden text-center py-12">
+                <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">Aucun produit trouvé</h3>
+                <p class="text-gray-500">Essayez de modifier vos critères de recherche.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bouton flottant pour actions rapides -->
+    <button class="floating-btn" onclick="showQuickActions()">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <!-- Modal pour actions rapides -->
+    <div id="quick-actions-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="gradient-sales text-white p-4 rounded-t-lg">
+                <h3 class="text-lg font-semibold">Actions Rapides</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <button onclick="quickAction('note')" class="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-sticky-note text-orange-500 mr-3"></i>
+                    Nouvelle Note Rapide
+                </button>
+                <button onclick="quickAction('devis')" class="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-file-invoice text-blue-500 mr-3"></i>
+                    Nouveau Devis
+                </button>
+                <button onclick="quickAction('cotation')" class="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-calculator text-green-500 mr-3"></i>
+                    Nouvelle Cotation
+                </button>
+                <button onclick="closeQuickActions()" class="w-full text-center p-3 text-gray-500 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'notes';
+        
+        // Mock data pour les produits du catalogue
+        const catalogueProducts = [
+            {
+                id: 1,
+                name: "Smartphone Pro Max",
+                category: "electronique",
+                price: 899,
+                image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop",
+                description: "Smartphone haut de gamme avec écran OLED et triple caméra",
+                stock: 15
+            },
+            {
+                id: 2,
+                name: "T-shirt Premium",
+                category: "vetements",
+                price: 29,
+                image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop",
+                description: "T-shirt en coton bio, coupe moderne",
+                stock: 50
+            },
+            {
+                id: 3,
+                name: "Casque Audio Sans Fil",
+                category: "electronique",
+                price: 199,
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop",
+                description: "Casque Bluetooth avec réduction de bruit active",
+                stock: 25
+            },
+            {
+                id: 4,
+                name: "Plante d'Intérieur",
+                category: "maison",
+                price: 35,
+                image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop",
+                description: "Monstera deliciosa, parfaite pour décorer votre intérieur",
+                stock: 12
+            },
+            {
+                id: 5,
+                name: "Chaussures de Running",
+                category: "sport",
+                price: 129,
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop",
+                description: "Chaussures de course légères avec amorti optimal",
+                stock: 30
+            },
+            {
+                id: 6,
+                name: "Crème Hydratante Bio",
+                category: "beaute",
+                price: 45,
+                image: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop",
+                description: "Crème visage bio aux ingrédients naturels",
+                stock: 40
+            },
+            {
+                id: 7,
+                name: "Ordinateur Portable",
+                category: "electronique",
+                price: 1299,
+                image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop",
+                description: "Laptop performant pour le travail et les loisirs",
+                stock: 8
+            },
+            {
+                id: 8,
+                name: "Veste en Cuir",
+                category: "vetements",
+                price: 249,
+                image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300&h=300&fit=crop",
+                description: "Veste en cuir véritable, style intemporel",
+                stock: 18
+            }
+        ];
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('notes');
+            loadProducts();
+            updatePriceDisplay();
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-red-600'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'notes':
+                    loadNotes();
+                    break;
+                case 'devis':
+                    // Page devis n'a pas besoin de chargement spécial
+                    break;
+                case 'cotations':
+                    updateQuoteCalculation();
+                    break;
+                case 'catalogue':
+                    loadProducts();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            const data = {
+                notes: JSON.parse(localStorage.getItem('smartSalesNotes') || '[]'),
+                quotes: JSON.parse(localStorage.getItem('smartSalesQuotes') || '[]'),
+                invoices: JSON.parse(localStorage.getItem('smartSalesInvoices') || '[]')
+            };
+            localStorage.setItem('smartSalesData', JSON.stringify(data));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('smartSalesData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                localStorage.setItem('smartSalesNotes', JSON.stringify(data.notes || []));
+                localStorage.setItem('smartSalesQuotes', JSON.stringify(data.quotes || []));
+                localStorage.setItem('smartSalesInvoices', JSON.stringify(data.invoices || []));
+            }
+        }
+
+        // GESTION DES NOTES
+        function loadNotes() {
+            const container = document.getElementById('notes-list');
+            const notes = JSON.parse(localStorage.getItem('smartSalesNotes') || '[]');
+            
+            container.innerHTML = '';
+            
+            if (notes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-sticky-note text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Aucune note pour le moment</h3>
+                        <p class="text-gray-500">Créez votre première note ci-dessus.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            notes.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            notes.forEach(note => {
+                const noteCard = document.createElement('div');
+                noteCard.className = 'note-card slide-in';
+                noteCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-lg font-semibold">${note.title}</h4>
+                        <button onclick="deleteNote(${note.id})" class="text-white hover:text-red-200 opacity-75 hover:opacity-100">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center mb-3">
+                        <span class="bg-white bg-opacity-20 text-white px-2 py-1 rounded-full text-xs font-medium mr-2">
+                            ${note.category}
+                        </span>
+                        <span class="text-white text-opacity-75 text-sm">
+                            ${new Date(note.date).toLocaleDateString('fr-FR')}
+                        </span>
+                    </div>
+                    <p class="text-white text-opacity-90">${note.content}</p>
+                `;
+                container.appendChild(noteCard);
+            });
+        }
+
+        function addNote(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('note-title').value;
+            const category = document.getElementById('note-category').value;
+            const content = document.getElementById('note-content').value;
+            
+            const newNote = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                content: content,
+                date: new Date().toISOString()
+            };
+            
+            const notes = JSON.parse(localStorage.getItem('smartSalesNotes') || '[]');
+            notes.unshift(newNote);
+            localStorage.setItem('smartSalesNotes', JSON.stringify(notes));
+            
+            // Réinitialiser le formulaire
+            event.target.reset();
+            
+            // Recharger les notes
+            loadNotes();
+            
+            // Notification
+            showNotification('Note ajoutée avec succès !', 'success');
+        }
+
+        function deleteNote(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
+                const notes = JSON.parse(localStorage.getItem('smartSalesNotes') || '[]');
+                const filteredNotes = notes.filter(note => note.id !== id);
+                localStorage.setItem('smartSalesNotes', JSON.stringify(filteredNotes));
+                loadNotes();
+                showNotification('Note supprimée', 'info');
+            }
+        }
+
+        // GESTION DES DEVIS ET FACTURES
+        function generateInvoice(event) {
+            event.preventDefault();
+            
+            const docType = document.getElementById('doc-type').value;
+            const clientName = document.getElementById('client-name').value;
+            const clientEmail = document.getElementById('client-email').value;
+            const productName = document.getElementById('product-name').value;
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const price = parseFloat(document.getElementById('product-price').value);
+            const taxRate = parseFloat(document.getElementById('tax-rate').value);
+            
+            // Calculs
+            const subtotal = quantity * price;
+            const tax = subtotal * (taxRate / 100);
+            const total = subtotal + tax;
+            
+            // Mise à jour de l'aperçu
+            document.getElementById('preview-title').textContent = docType.toUpperCase();
+            document.getElementById('preview-date').textContent = new Date().toLocaleDateString('fr-FR');
+            document.getElementById('preview-client').innerHTML = `
+                ${clientName}<br>
+                ${clientEmail}
+            `;
+            
+            document.getElementById('preview-items').innerHTML = `
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">${productName}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">${quantity}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right">${price.toFixed(2)} €</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right">${subtotal.toFixed(2)} €</td>
+                </tr>
+            `;
+            
+            document.getElementById('preview-subtotal').textContent = `${subtotal.toFixed(2)} €`;
+            document.getElementById('preview-tax-rate').textContent = taxRate;
+            document.getElementById('preview-tax').textContent = `${tax.toFixed(2)} €`;
+            document.getElementById('preview-total').textContent = `${total.toFixed(2)} €`;
+            
+            // Afficher l'aperçu
+            document.getElementById('invoice-preview').classList.remove('hidden');
+            
+            // Sauvegarder dans localStorage
+            const invoice = {
+                id: Date.now(),
+                type: docType,
+                client: { name: clientName, email: clientEmail },
+                items: [{ name: productName, quantity, price, total: subtotal }],
+                subtotal,
+                tax,
+                total,
+                date: new Date().toISOString()
+            };
+            
+            const invoices = JSON.parse(localStorage.getItem('smartSalesInvoices') || '[]');
+            invoices.unshift(invoice);
+            localStorage.setItem('smartSalesInvoices', JSON.stringify(invoices));
+            
+            showNotification(`${docType} généré avec succès !`, 'success');
+        }
+
+        function downloadPDF() {
+            showNotification('Fonctionnalité de téléchargement PDF simulée', 'info');
+        }
+
+        function sendEmail() {
+            showNotification('Email envoyé avec succès !', 'success');
+        }
+
+        // GESTION DES COTATIONS
+        function updateQuoteCalculation() {
+            const productType = document.getElementById('quote-product-type');
+            const quantity = parseInt(document.getElementById('quote-quantity').value) || 1;
+            const complexity = parseFloat(document.getElementById('quote-complexity').value) || 1;
+            const urgency = parseFloat(document.getElementById('quote-urgency').value) || 1;
+            const discount = parseFloat(document.getElementById('quote-discount').value) || 0;
+            
+            if (!productType.value) return;
+            
+            const basePrice = parseFloat(productType.selectedOptions[0].dataset.basePrice) || 0;
+            const subtotal = basePrice * quantity * complexity * urgency;
+            const discountAmount = subtotal * (discount / 100);
+            const total = subtotal - discountAmount;
+            
+            // Mise à jour de l'affichage
+            document.getElementById('quote-result').textContent = `${total.toFixed(2)} €`;
+            document.getElementById('quote-base-price').textContent = `${basePrice.toFixed(2)} €`;
+            document.getElementById('quote-quantity-display').textContent = quantity;
+            document.getElementById('quote-complexity-display').textContent = `x${complexity}`;
+            document.getElementById('quote-urgency-display').textContent = `x${urgency}`;
+            document.getElementById('quote-discount-display').textContent = `${discount}%`;
+        }
+
+        function calculateQuote(event) {
+            event.preventDefault();
+            updateQuoteCalculation();
+            showNotification('Cotation calculée !', 'success');
+        }
+
+        function saveQuote() {
+            const quote = {
+                id: Date.now(),
+                productType: document.getElementById('quote-product-type').value,
+                quantity: document.getElementById('quote-quantity').value,
+                complexity: document.getElementById('quote-complexity').value,
+                urgency: document.getElementById('quote-urgency').value,
+                discount: document.getElementById('quote-discount').value,
+                total: document.getElementById('quote-result').textContent,
+                date: new Date().toISOString()
+            };
+            
+            const quotes = JSON.parse(localStorage.getItem('smartSalesQuotes') || '[]');
+            quotes.unshift(quote);
+            localStorage.setItem('smartSalesQuotes', JSON.stringify(quotes));
+            
+            showNotification('Cotation sauvegardée !', 'success');
+        }
+
+        function createQuoteFromCalculation() {
+            // Pré-remplir le formulaire de devis avec les données de la cotation
+            showPage('devis');
+            
+            const productType = document.getElementById('quote-product-type').selectedOptions[0].text;
+            const total = document.getElementById('quote-result').textContent.replace(' €', '');
+            
+            document.getElementById('doc-type').value = 'devis';
+            document.getElementById('product-name').value = productType;
+            document.getElementById('product-quantity').value = document.getElementById('quote-quantity').value;
+            document.getElementById('product-price').value = parseFloat(total) / parseInt(document.getElementById('quote-quantity').value);
+            
+            showNotification('Données transférées vers le formulaire de devis', 'info');
+        }
+
+        // GESTION DU CATALOGUE
+        function loadProducts() {
+            const container = document.getElementById('products-grid');
+            container.innerHTML = '';
+            
+            catalogueProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card product-shine';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${product.name}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="price-badge">${product.price} €</span>
+                            <span class="text-sm text-gray-500">Stock: ${product.stock}</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToQuote(${product.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                                <i class="fas fa-plus mr-1"></i>Devis
+                            </button>
+                            <button onclick="viewProduct(${product.id})" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                                <i class="fas fa-eye mr-1"></i>Voir
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('product-search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            const maxPrice = parseFloat(document.getElementById('price-filter').value);
+            
+            const filteredProducts = catalogueProducts.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                    product.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                const matchesPrice = product.price <= maxPrice;
+                
+                return matchesSearch && matchesCategory && matchesPrice;
+            });
+            
+            const container = document.getElementById('products-grid');
+            const noProductsMsg = document.getElementById('no-products');
+            
+            container.innerHTML = '';
+            
+            if (filteredProducts.length === 0) {
+                container.classList.add('hidden');
+                noProductsMsg.classList.remove('hidden');
+            } else {
+                container.classList.remove('hidden');
+                noProductsMsg.classList.add('hidden');
+                
+                filteredProducts.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card product-shine';
+                    productCard.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">${product.name}</h3>
+                            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="price-badge">${product.price} €</span>
+                                <span class="text-sm text-gray-500">Stock: ${product.stock}</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="addToQuote(${product.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                                    <i class="fas fa-plus mr-1"></i>Devis
+                                </button>
+                                <button onclick="viewProduct(${product.id})" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                                    <i class="fas fa-eye mr-1"></i>Voir
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(productCard);
+                });
+            }
+        }
+
+        function updatePriceDisplay() {
+            const priceFilter = document.getElementById('price-filter');
+            const priceDisplay = document.getElementById('price-display');
+            if (priceDisplay) {
+                priceDisplay.textContent = priceFilter.value;
+            }
+        }
+
+        function addToQuote(productId) {
+            const product = catalogueProducts.find(p => p.id === productId);
+            if (product) {
+                showPage('devis');
+                
+                // Pré-remplir le formulaire
+                document.getElementById('doc-type').value = 'devis';
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-price').value = product.price;
+                
+                showNotification(`${product.name} ajouté au devis`, 'success');
+            }
+        }
+
+        function viewProduct(productId) {
+            const product = catalogueProducts.find(p => p.id === productId);
+            if (product) {
+                alert(`Produit: ${product.name}\nPrix: ${product.price} €\nDescription: ${product.description}\nStock: ${product.stock} unités`);
+            }
+        }
+
+        // ACTIONS RAPIDES
+        function showQuickActions() {
+            document.getElementById('quick-actions-modal').classList.remove('hidden');
+        }
+
+        function closeQuickActions() {
+            document.getElementById('quick-actions-modal').classList.add('hidden');
+        }
+
+        function quickAction(action) {
+            closeQuickActions();
+            
+            switch(action) {
+                case 'note':
+                    showPage('notes');
+                    document.getElementById('note-title').focus();
+                    break;
+                case 'devis':
+                    showPage('devis');
+                    document.getElementById('doc-type').focus();
+                    break;
+                case 'cotation':
+                    showPage('cotations');
+                    document.getElementById('quote-product-type').focus();
+                    break;
+            }
+        }
+
+        // NOTIFICATIONS
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white max-w-sm slide-in`;
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500');
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Fermer les modals en cliquant à l'extérieur
+        document.addEventListener('click', function(event) {
+            const quickActionsModal = document.getElementById('quick-actions-modal');
+            if (quickActionsModal && event.target === quickActionsModal) {
+                closeQuickActions();
+            }
+        });
+
+        // Fermer les modals avec la touche Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeQuickActions();
+            }
+        });
+    </script>
+</body>
+</html>
