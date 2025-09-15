@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Projets - Entreprise</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Styles personnalisés pour les animations et effets */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .timeline-item {
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: -20px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 14px;
+            top: 8px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-medium { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
+        
+        .status-todo { background-color: #fef3c7; color: #92400e; }
+        .status-progress { background-color: #dbeafe; color: #1e40af; }
+        .status-done { background-color: #d1fae5; color: #065f46; }
+        .status-blocked { background-color: #fee2e2; color: #991b1b; }
+        
+        .hidden { display: none !important; }
+        
+        /* Styles pour les badges de rôles */
+        .role-manager { background-color: #8b5cf6; color: white; }
+        .role-developer { background-color: #06b6d4; color: white; }
+        .role-designer { background-color: #f59e0b; color: white; }
+        .role-analyst { background-color: #10b981; color: white; }
+        .role-tester { background-color: #ef4444; color: white; }
+        
+        /* Styles pour les types de fichiers */
+        .file-pdf { color: #ef4444; }
+        .file-doc { color: #2563eb; }
+        .file-xls { color: #059669; }
+        .file-ppt { color: #dc2626; }
+        .file-img { color: #7c3aed; }
+        .file-zip { color: #6b7280; }
+        
+        /* Animation pour les cartes */
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card-shine:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-project-diagram text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Gestion de Projets</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('assignation')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-user-plus mr-2"></i>Assignation
+                    </button>
+                    <button onclick="showPage('taches')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-tasks mr-2"></i>Tâches
+                    </button>
+                    <button onclick="showPage('actions')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-history mr-2"></i>Actions
+                    </button>
+                    <button onclick="showPage('documents')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-cloud mr-2"></i>Documents Cloud
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('assignation')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-user-plus mr-2"></i>Assignation
+                </button>
+                <button onclick="showPage('taches')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-tasks mr-2"></i>Tâches
+                </button>
+                <button onclick="showPage('actions')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-history mr-2"></i>Actions
+                </button>
+                <button onclick="showPage('documents')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-cloud mr-2"></i>Documents Cloud
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Assignation -->
+        <div id="assignation-page" class="page-content">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-plus text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Assignation des Ressources</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Gérez efficacement l'assignation des ressources à vos projets et optimisez la répartition des tâches.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire d'assignation -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle text-blue-600 mr-3"></i>
+                        Nouvelle Assignation
+                    </h3>
+                    <form onsubmit="addAssignation(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Projet</label>
+                            <select id="assign-projet" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner un projet...</option>
+                                <option value="Site Web E-commerce">Site Web E-commerce</option>
+                                <option value="Application Mobile">Application Mobile</option>
+                                <option value="Système CRM">Système CRM</option>
+                                <option value="Dashboard Analytics">Dashboard Analytics</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom de la ressource</label>
+                            <input type="text" id="assign-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
+                            <select id="assign-role" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner un rôle...</option>
+                                <option value="manager">Chef de Projet</option>
+                                <option value="developer">Développeur</option>
+                                <option value="designer">Designer</option>
+                                <option value="analyst">Analyste</option>
+                                <option value="tester">Testeur</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
+                            <input type="date" id="assign-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tâche assignée</label>
+                            <textarea id="assign-tache" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-save mr-2"></i>Assigner la Ressource
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Statistiques des assignations -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-pie text-green-600 mr-3"></i>
+                        Statistiques
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Total Assignations</span>
+                            <span id="stat-total" class="text-2xl font-bold text-blue-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Projets Actifs</span>
+                            <span id="stat-projets" class="text-2xl font-bold text-green-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Ressources Uniques</span>
+                            <span id="stat-ressources" class="text-2xl font-bold text-purple-600">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Graphique de répartition des rôles -->
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-4">Répartition des Rôles</h4>
+                        <canvas id="rolesChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des assignations -->
+            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-users text-purple-600 mr-3"></i>
+                    Assignations Actuelles
+                </h3>
+                <div id="assignations-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <!-- Les assignations seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Tâches -->
+        <div id="taches-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-tasks text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Gestion des Tâches</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Suivez l'avancement de vos projets et gérez les tâches restantes de manière efficace.
+                </p>
+            </div>
+
+            <!-- Filtres -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Projet</label>
+                        <select id="filter-projet" onchange="filterTaches()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous les projets</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                        <select id="filter-priorite" onchange="filterTaches()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Toutes les priorités</option>
+                            <option value="high">Haute</option>
+                            <option value="medium">Moyenne</option>
+                            <option value="low">Basse</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                        <select id="filter-statut" onchange="filterTaches()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous les statuts</option>
+                            <option value="todo">À faire</option>
+                            <option value="progress">En cours</option>
+                            <option value="done">Terminé</option>
+                            <option value="blocked">Bloqué</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                        <input type="text" id="search-taches" onkeyup="filterTaches()" placeholder="Rechercher une tâche..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bouton d'ajout de tâche -->
+            <div class="mb-6">
+                <button onclick="showAddTacheForm()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Tâche
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de tâche (caché par défaut) -->
+            <div id="add-tache-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter une nouvelle tâche</h3>
+                <form onsubmit="addTache(event)">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                            <input type="text" id="tache-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Projet</label>
+                            <select id="tache-projet" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="Site Web E-commerce">Site Web E-commerce</option>
+                                <option value="Application Mobile">Application Mobile</option>
+                                <option value="Système CRM">Système CRM</option>
+                                <option value="Dashboard Analytics">Dashboard Analytics</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                            <select id="tache-priorite" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="high">Haute</option>
+                                <option value="medium">Moyenne</option>
+                                <option value="low">Basse</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date d'échéance</label>
+                            <input type="date" id="tache-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="tache-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddTacheForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des tâches -->
+            <div id="taches-list" class="space-y-4">
+                <!-- Les tâches seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Actions -->
+        <div id="actions-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-history text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Historique des Actions</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Centralisez et suivez toutes les actions effectuées sur vos projets en temps réel.
+                </p>
+            </div>
+
+            <!-- Filtres pour les actions -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Projet</label>
+                        <select id="filter-action-projet" onchange="filterActions()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Tous les projets</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type d'action</label>
+                        <select id="filter-action-type" onchange="filterActions()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Tous les types</option>
+                            <option value="creation">Création</option>
+                            <option value="modification">Modification</option>
+                            <option value="completion">Completion</option>
+                            <option value="assignation">Assignation</option>
+                            <option value="commentaire">Commentaire</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Utilisateur</label>
+                        <select id="filter-action-user" onchange="filterActions()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Tous les utilisateurs</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                        <input type="text" id="search-actions" onkeyup="filterActions()" placeholder="Rechercher une action..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline des actions -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-clock text-purple-600 mr-3"></i>
+                    Timeline des Actions
+                </h3>
+                <div id="actions-timeline" class="space-y-6">
+                    <!-- Les actions seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Documents Cloud -->
+        <div id="documents-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-cloud text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Documents Cloud</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Accédez et gérez tous vos documents stockés dans le cloud depuis une interface centralisée.
+                </p>
+            </div>
+
+            <!-- Filtres et recherche -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Plateforme</label>
+                        <select id="filter-plateforme" onchange="filterDocuments()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">Toutes les plateformes</option>
+                            <option value="Google Drive">Google Drive</option>
+                            <option value="Dropbox">Dropbox</option>
+                            <option value="SharePoint">SharePoint</option>
+                            <option value="OneDrive">OneDrive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type de fichier</label>
+                        <select id="filter-type" onchange="filterDocuments()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">Tous les types</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">Document</option>
+                            <option value="xls">Tableur</option>
+                            <option value="ppt">Présentation</option>
+                            <option value="img">Image</option>
+                            <option value="zip">Archive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Projet</label>
+                        <select id="filter-doc-projet" onchange="filterDocuments()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">Tous les projets</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
+                        <input type="text" id="search-documents" onkeyup="filterDocuments()" placeholder="Rechercher un document..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bouton d'ajout de document -->
+            <div class="mb-6">
+                <button onclick="showAddDocumentForm()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Ajouter un Document
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de document (caché par défaut) -->
+            <div id="add-document-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter un nouveau document</h3>
+                <form onsubmit="addDocument(event)">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom du fichier</label>
+                            <input type="text" id="doc-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                            <select id="doc-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="pdf">PDF</option>
+                                <option value="doc">Document</option>
+                                <option value="xls">Tableur</option>
+                                <option value="ppt">Présentation</option>
+                                <option value="img">Image</option>
+                                <option value="zip">Archive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Plateforme</label>
+                            <select id="doc-plateforme" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="Google Drive">Google Drive</option>
+                                <option value="Dropbox">Dropbox</option>
+                                <option value="SharePoint">SharePoint</option>
+                                <option value="OneDrive">OneDrive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Projet</label>
+                            <select id="doc-projet" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="Site Web E-commerce">Site Web E-commerce</option>
+                                <option value="Application Mobile">Application Mobile</option>
+                                <option value="Système CRM">Système CRM</option>
+                                <option value="Dashboard Analytics">Dashboard Analytics</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Taille (MB)</label>
+                        <input type="number" id="doc-taille" step="0.1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="flex space-x-4 mt-6">
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddDocumentForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Statistiques des documents -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center card-hover">
+                    <i class="fas fa-file text-3xl text-blue-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-total-docs">0</div>
+                    <div class="text-sm text-gray-600">Total Documents</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center card-hover">
+                    <i class="fas fa-hdd text-3xl text-green-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-taille-docs">0 MB</div>
+                    <div class="text-sm text-gray-600">Espace Utilisé</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center card-hover">
+                    <i class="fas fa-cloud text-3xl text-purple-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-plateformes">0</div>
+                    <div class="text-sm text-gray-600">Plateformes</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center card-hover">
+                    <i class="fas fa-project-diagram text-3xl text-orange-600 mb-3"></i>
+                    <div class="text-2xl font-bold text-gray-900" id="stat-projets-docs">0</div>
+                    <div class="text-sm text-gray-600">Projets</div>
+                </div>
+            </div>
+            
+            <!-- Liste des documents -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-folder text-cyan-600 mr-3"></i>
+                    Mes Documents
+                </h3>
+                <div id="documents-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <!-- Les documents seront ajoutés ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'assignation';
+        let rolesChart = null;
+        
+        // Données mock initiales
+        const mockData = {
+            assignations: [
+                {
+                    id: 1,
+                    projet: "Site Web E-commerce",
+                    nom: "Marie Dupont",
+                    role: "manager",
+                    date: "2024-01-15",
+                    tache: "Coordination générale du projet et gestion des équipes",
+                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+                },
+                {
+                    id: 2,
+                    projet: "Application Mobile",
+                    nom: "Thomas Martin",
+                    role: "developer",
+                    date: "2024-01-20",
+                    tache: "Développement des fonctionnalités principales de l'application",
+                    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                },
+                {
+                    id: 3,
+                    projet: "Système CRM",
+                    nom: "Sophie Leroy",
+                    role: "designer",
+                    date: "2024-01-18",
+                    tache: "Conception de l'interface utilisateur et expérience utilisateur",
+                    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+                }
+            ],
+            taches: [
+                {
+                    id: 1,
+                    titre: "Développement de la page d'accueil",
+                    projet: "Site Web E-commerce",
+                    priorite: "high",
+                    statut: "progress",
+                    dateEcheance: "2024-02-15",
+                    description: "Créer une page d'accueil attractive avec les derniers produits et promotions",
+                    assignee: "Thomas Martin",
+                    progression: 65
+                },
+                {
+                    id: 2,
+                    titre: "Tests d'intégration API",
+                    projet: "Application Mobile",
+                    priorite: "medium",
+                    statut: "todo",
+                    dateEcheance: "2024-02-20",
+                    description: "Effectuer les tests d'intégration avec les APIs externes",
+                    assignee: "Claire Moreau",
+                    progression: 0
+                },
+                {
+                    id: 3,
+                    titre: "Design des mockups",
+                    projet: "Dashboard Analytics",
+                    priorite: "high",
+                    statut: "done",
+                    dateEcheance: "2024-01-30",
+                    description: "Créer les mockups pour toutes les pages du dashboard",
+                    assignee: "Sophie Leroy",
+                    progression: 100
+                },
+                {
+                    id: 4,
+                    titre: "Configuration serveur",
+                    projet: "Système CRM",
+                    priorite: "low",
+                    statut: "blocked",
+                    dateEcheance: "2024-02-25",
+                    description: "Configurer l'environnement de production",
+                    assignee: "Jean Dubois",
+                    progression: 25
+                }
+            ],
+            actions: [
+                {
+                    id: 1,
+                    date: "2024-01-22T14:30:00",
+                    utilisateur: "Marie Dupont",
+                    action: "Création de la tâche 'Développement de la page d'accueil'",
+                    projet: "Site Web E-commerce",
+                    type: "creation",
+                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face"
+                },
+                {
+                    id: 2,
+                    date: "2024-01-22T11:15:00",
+                    utilisateur: "Thomas Martin",
+                    action: "Modification du statut de la tâche en 'En cours'",
+                    projet: "Site Web E-commerce",
+                    type: "modification",
+                    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+                },
+                {
+                    id: 3,
+                    date: "2024-01-21T16:45:00",
+                    utilisateur: "Sophie Leroy",
+                    action: "Completion de la tâche 'Design des mockups'",
+                    projet: "Dashboard Analytics",
+                    type: "completion",
+                    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face"
+                },
+                {
+                    id: 4,
+                    date: "2024-01-21T09:20:00",
+                    utilisateur: "Marie Dupont",
+                    action: "Assignation de Claire Moreau au projet Application Mobile",
+                    projet: "Application Mobile",
+                    type: "assignation",
+                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face"
+                },
+                {
+                    id: 5,
+                    date: "2024-01-20T13:10:00",
+                    utilisateur: "Jean Dubois",
+                    action: "Ajout d'un commentaire sur la tâche 'Configuration serveur'",
+                    projet: "Système CRM",
+                    type: "commentaire",
+                    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
+                }
+            ],
+            documents: [
+                {
+                    id: 1,
+                    nom: "Cahier des charges E-commerce.pdf",
+                    type: "pdf",
+                    plateforme: "Google Drive",
+                    projet: "Site Web E-commerce",
+                    taille: 2.5,
+                    dateModification: "2024-01-20",
+                    partage: true
+                },
+                {
+                    id: 2,
+                    nom: "Mockups Application Mobile.fig",
+                    type: "img",
+                    plateforme: "Dropbox",
+                    projet: "Application Mobile",
+                    taille: 15.8,
+                    dateModification: "2024-01-18",
+                    partage: false
+                },
+                {
+                    id: 3,
+                    nom: "Base de données CRM.xlsx",
+                    type: "xls",
+                    plateforme: "SharePoint",
+                    projet: "Système CRM",
+                    taille: 4.2,
+                    dateModification: "2024-01-22",
+                    partage: true
+                },
+                {
+                    id: 4,
+                    nom: "Présentation Dashboard.pptx",
+                    type: "ppt",
+                    plateforme: "OneDrive",
+                    projet: "Dashboard Analytics",
+                    taille: 8.7,
+                    dateModification: "2024-01-19",
+                    partage: true
+                },
+                {
+                    id: 5,
+                    nom: "Documentation technique.docx",
+                    type: "doc",
+                    plateforme: "Google Drive",
+                    projet: "Site Web E-commerce",
+                    taille: 1.3,
+                    dateModification: "2024-01-21",
+                    partage: false
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('assignation');
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'assignation':
+                    loadAssignations();
+                    updateAssignationStats();
+                    createRolesChart();
+                    break;
+                case 'taches':
+                    loadTaches();
+                    populateFilters();
+                    break;
+                case 'actions':
+                    loadActions();
+                    populateActionFilters();
+                    break;
+                case 'documents':
+                    loadDocuments();
+                    updateDocumentStats();
+                    populateDocumentFilters();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('projectData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('projectData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // ASSIGNATIONS
+        function loadAssignations() {
+            const container = document.getElementById('assignations-list');
+            container.innerHTML = '';
+            
+            mockData.assignations.forEach(assignation => {
+                const roleClasses = {
+                    'manager': 'role-manager',
+                    'developer': 'role-developer',
+                    'designer': 'role-designer',
+                    'analyst': 'role-analyst',
+                    'tester': 'role-tester'
+                };
+                
+                const roleNames = {
+                    'manager': 'Chef de Projet',
+                    'developer': 'Développeur',
+                    'designer': 'Designer',
+                    'analyst': 'Analyste',
+                    'tester': 'Testeur'
+                };
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md card-hover card-shine';
+                card.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <img src="${assignation.avatar}" alt="${assignation.nom}" class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div class="flex-1">
+                            <h4 class="text-lg font-semibold text-gray-900">${assignation.nom}</h4>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${roleClasses[assignation.role]}">
+                                ${roleNames[assignation.role]}
+                            </span>
+                        </div>
+                        <button onclick="deleteAssignation(${assignation.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="font-medium text-gray-700 mb-1">Projet:</h5>
+                        <p class="text-sm text-gray-600">${assignation.projet}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="font-medium text-gray-700 mb-1">Tâche:</h5>
+                        <p class="text-sm text-gray-600">${assignation.tache}</p>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-calendar mr-2"></i>
+                        Début: ${new Date(assignation.date).toLocaleDateString('fr-FR')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addAssignation(event) {
+            event.preventDefault();
+            
+            const projet = document.getElementById('assign-projet').value;
+            const nom = document.getElementById('assign-nom').value;
+            const role = document.getElementById('assign-role').value;
+            const date = document.getElementById('assign-date').value;
+            const tache = document.getElementById('assign-tache').value;
+            
+            const newAssignation = {
+                id: Date.now(),
+                projet: projet,
+                nom: nom,
+                role: role,
+                date: date,
+                tache: tache,
+                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+            };
+            
+            mockData.assignations.push(newAssignation);
+            
+            // Ajouter une action
+            addAction(`Assignation de ${nom} au projet ${projet}`, projet, 'assignation');
+            
+            saveDataToStorage();
+            loadAssignations();
+            updateAssignationStats();
+            createRolesChart();
+            
+            // Reset form
+            event.target.reset();
+        }
+
+        function deleteAssignation(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette assignation ?')) {
+                mockData.assignations = mockData.assignations.filter(a => a.id !== id);
+                saveDataToStorage();
+                loadAssignations();
+                updateAssignationStats();
+                createRolesChart();
+            }
+        }
+
+        function updateAssignationStats() {
+            const totalAssignations = mockData.assignations.length;
+            const projetsUniques = [...new Set(mockData.assignations.map(a => a.projet))].length;
+            const ressourcesUniques = [...new Set(mockData.assignations.map(a => a.nom))].length;
+            
+            document.getElementById('stat-total').textContent = totalAssignations;
+            document.getElementById('stat-projets').textContent = projetsUniques;
+            document.getElementById('stat-ressources').textContent = ressourcesUniques;
+        }
+
+        function createRolesChart() {
+            const ctx = document.getElementById('rolesChart').getContext('2d');
+            
+            // Détruire le graphique existant s'il existe
+            if (rolesChart) {
+                rolesChart.destroy();
+            }
+            
+            // Compter les rôles
+            const roleCounts = {};
+            mockData.assignations.forEach(assignation => {
+                roleCounts[assignation.role] = (roleCounts[assignation.role] || 0) + 1;
+            });
+            
+            const roleNames = {
+                'manager': 'Chef de Projet',
+                'developer': 'Développeur',
+                'designer': 'Designer',
+                'analyst': 'Analyste',
+                'tester': 'Testeur'
+            };
+            
+            const labels = Object.keys(roleCounts).map(role => roleNames[role] || role);
+            const data = Object.values(roleCounts);
+            
+            rolesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#8b5cf6',
+                            '#06b6d4',
+                            '#f59e0b',
+                            '#10b981',
+                            '#ef4444'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // TÂCHES
+        function loadTaches() {
+            const container = document.getElementById('taches-list');
+            container.innerHTML = '';
+            
+            const filteredTaches = getFilteredTaches();
+            
+            filteredTaches.forEach(tache => {
+                const priorityClasses = {
+                    'high': 'priority-high',
+                    'medium': 'priority-medium',
+                    'low': 'priority-low'
+                };
+                
+                const statusClasses = {
+                    'todo': 'status-todo',
+                    'progress': 'status-progress',
+                    'done': 'status-done',
+                    'blocked': 'status-blocked'
+                };
+                
+                const statusNames = {
+                    'todo': 'À faire',
+                    'progress': 'En cours',
+                    'done': 'Terminé',
+                    'blocked': 'Bloqué'
+                };
+                
+                const priorityNames = {
+                    'high': 'Haute',
+                    'medium': 'Moyenne',
+                    'low': 'Basse'
+                };
+                
+                const card = document.createElement('div');
+                card.className = `bg-white p-6 rounded-lg shadow-md card-hover ${priorityClasses[tache.priorite]}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">${tache.titre}</h4>
+                            <p class="text-sm text-gray-600 mb-3">${tache.description}</p>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button onclick="toggleTacheStatus(${tache.id})" class="text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTache(${tache.id})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">Projet:</span>
+                            <p class="text-sm text-gray-600">${tache.projet}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">Assigné à:</span>
+                            <p class="text-sm text-gray-600">${tache.assignee}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">Échéance:</span>
+                            <p class="text-sm text-gray-600">${new Date(tache.dateEcheance).toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">Priorité:</span>
+                            <span class="text-sm font-medium text-${tache.priorite === 'high' ? 'red' : tache.priorite === 'medium' ? 'yellow' : 'green'}-600">
+                                ${priorityNames[tache.priorite]}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Progression:</span>
+                            <span class="text-sm font-medium text-gray-900">${tache.progression}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar bg-blue-600 h-2 rounded-full" style="width: ${tache.progression}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClasses[tache.statut]}">
+                            ${statusNames[tache.statut]}
+                        </span>
+                        <div class="flex space-x-2">
+                            ${tache.statut !== 'done' ? `
+                                <button onclick="markTacheComplete(${tache.id})" class="text-green-600 hover:text-green-800 text-sm">
+                                    <i class="fas fa-check mr-1"></i>Marquer terminé
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            if (filteredTaches.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune tâche trouvée</p>';
+            }
+        }
+
+        function getFilteredTaches() {
+            let filtered = [...mockData.taches];
+            
+            const projetFilter = document.getElementById('filter-projet')?.value;
+            const prioriteFilter = document.getElementById('filter-priorite')?.value;
+            const statutFilter = document.getElementById('filter-statut')?.value;
+            const searchTerm = document.getElementById('search-taches')?.value.toLowerCase();
+            
+            if (projetFilter) {
+                filtered = filtered.filter(tache => tache.projet === projetFilter);
+            }
+            
+            if (prioriteFilter) {
+                filtered = filtered.filter(tache => tache.priorite === prioriteFilter);
+            }
+            
+            if (statutFilter) {
+                filtered = filtered.filter(tache => tache.statut === statutFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(tache => 
+                    tache.titre.toLowerCase().includes(searchTerm) ||
+                    tache.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            return filtered;
+        }
+
+        function filterTaches() {
+            loadTaches();
+        }
+
+        function populateFilters() {
+            const projets = [...new Set(mockData.taches.map(t => t.projet))];
+            const projetSelect = document.getElementById('filter-projet');
+            
+            projetSelect.innerHTML = '<option value="">Tous les projets</option>';
+            projets.forEach(projet => {
+                const option = document.createElement('option');
+                option.value = projet;
+                option.textContent = projet;
+                projetSelect.appendChild(option);
+            });
+        }
+
+        function showAddTacheForm() {
+            document.getElementById('add-tache-form').classList.remove('hidden');
+        }
+
+        function hideAddTacheForm() {
+            document.getElementById('add-tache-form').classList.add('hidden');
+            document.getElementById('add-tache-form').querySelector('form').reset();
+        }
+
+        function addTache(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('tache-titre').value;
+            const projet = document.getElementById('tache-projet').value;
+            const priorite = document.getElementById('tache-priorite').value;
+            const dateEcheance = document.getElementById('tache-date').value;
+            const description = document.getElementById('tache-description').value;
+            
+            const newTache = {
+                id: Date.now(),
+                titre: titre,
+                projet: projet,
+                priorite: priorite,
+                statut: 'todo',
+                dateEcheance: dateEcheance,
+                description: description,
+                assignee: 'Non assigné',
+                progression: 0
+            };
+            
+            mockData.taches.push(newTache);
+            
+            // Ajouter une action
+            addAction(`Création de la tâche '${titre}'`, projet, 'creation');
+            
+            saveDataToStorage();
+            loadTaches();
+            populateFilters();
+            hideAddTacheForm();
+        }
+
+        function deleteTache(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+                const tache = mockData.taches.find(t => t.id === id);
+                if (tache) {
+                    addAction(`Suppression de la tâche '${tache.titre}'`, tache.projet, 'modification');
+                }
+                
+                mockData.taches = mockData.taches.filter(t => t.id !== id);
+                saveDataToStorage();
+                loadTaches();
+            }
+        }
+
+        function markTacheComplete(id) {
+            const tache = mockData.taches.find(t => t.id === id);
+            if (tache) {
+                tache.statut = 'done';
+                tache.progression = 100;
+                
+                addAction(`Completion de la tâche '${tache.titre}'`, tache.projet, 'completion');
+                
+                saveDataToStorage();
+                loadTaches();
+            }
+        }
+
+        function toggleTacheStatus(id) {
+            const tache = mockData.taches.find(t => t.id === id);
+            if (tache) {
+                const statuses = ['todo', 'progress', 'done', 'blocked'];
+                const currentIndex = statuses.indexOf(tache.statut);
+                const nextIndex = (currentIndex + 1) % statuses.length;
+                tache.statut = statuses[nextIndex];
+                
+                // Ajuster la progression selon le statut
+                switch(tache.statut) {
+                    case 'todo': tache.progression = 0; break;
+                    case 'progress': tache.progression = 50; break;
+                    case 'done': tache.progression = 100; break;
+                    case 'blocked': tache.progression = 25; break;
+                }
+                
+                addAction(`Modification du statut de la tâche '${tache.titre}'`, tache.projet, 'modification');
+                
+                saveDataToStorage();
+                loadTaches();
+            }
+        }
+
+        // ACTIONS
+        function loadActions() {
+            const container = document.getElementById('actions-timeline');
+            container.innerHTML = '';
+            
+            const filteredActions = getFilteredActions();
+            
+            filteredActions.forEach((action, index) => {
+                const typeIcons = {
+                    'creation': 'fas fa-plus-circle text-green-500',
+                    'modification': 'fas fa-edit text-blue-500',
+                    'completion': 'fas fa-check-circle text-purple-500',
+                    'assignation': 'fas fa-user-plus text-orange-500',
+                    'commentaire': 'fas fa-comment text-gray-500'
+                };
+                
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'timeline-item pl-12 pb-6';
+                actionDiv.innerHTML = `
+                    <div class="timeline-dot bg-white"></div>
+                    <div class="bg-white p-4 rounded-lg shadow-md card-hover">
+                        <div class="flex items-center mb-3">
+                            <img src="${action.avatar}" alt="${action.utilisateur}" class="w-8 h-8 rounded-full mr-3 object-cover">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${action.utilisateur}</h4>
+                                <p class="text-sm text-gray-500">${formatTimestamp(action.date)}</p>
+                            </div>
+                            <i class="${typeIcons[action.type]}"></i>
+                        </div>
+                        <p class="text-gray-700 mb-2">${action.action}</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-project-diagram mr-2"></i>
+                            ${action.projet}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(actionDiv);
+            });
+            
+            if (filteredActions.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune action trouvée</p>';
+            }
+        }
+
+        function getFilteredActions() {
+            let filtered = [...mockData.actions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const projetFilter = document.getElementById('filter-action-projet')?.value;
+            const typeFilter = document.getElementById('filter-action-type')?.value;
+            const userFilter = document.getElementById('filter-action-user')?.value;
+            const searchTerm = document.getElementById('search-actions')?.value.toLowerCase();
+            
+            if (projetFilter) {
+                filtered = filtered.filter(action => action.projet === projetFilter);
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(action => action.type === typeFilter);
+            }
+            
+            if (userFilter) {
+                filtered = filtered.filter(action => action.utilisateur === userFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(action => 
+                    action.action.toLowerCase().includes(searchTerm) ||
+                    action.utilisateur.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            return filtered;
+        }
+
+        function filterActions() {
+            loadActions();
+        }
+
+        function populateActionFilters() {
+            const projets = [...new Set(mockData.actions.map(a => a.projet))];
+            const utilisateurs = [...new Set(mockData.actions.map(a => a.utilisateur))];
+            
+            const projetSelect = document.getElementById('filter-action-projet');
+            const userSelect = document.getElementById('filter-action-user');
+            
+            projetSelect.innerHTML = '<option value="">Tous les projets</option>';
+            projets.forEach(projet => {
+                const option = document.createElement('option');
+                option.value = projet;
+                option.textContent = projet;
+                projetSelect.appendChild(option);
+            });
+            
+            userSelect.innerHTML = '<option value="">Tous les utilisateurs</option>';
+            utilisateurs.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = user;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function addAction(actionText, projet, type) {
+            const newAction = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                utilisateur: "Utilisateur Actuel",
+                action: actionText,
+                projet: projet,
+                type: type,
+                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+            };
+            
+            mockData.actions.unshift(newAction);
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffInHours = (now - date) / (1000 * 60 * 60);
+            
+            if (diffInHours < 1) {
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+                return `il y a ${diffInMinutes} min`;
+            } else if (diffInHours < 24) {
+                return `il y a ${Math.floor(diffInHours)}h`;
+            } else {
+                return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+            }
+        }
+
+        // DOCUMENTS
+        function loadDocuments() {
+            const container = document.getElementById('documents-list');
+            container.innerHTML = '';
+            
+            const filteredDocuments = getFilteredDocuments();
+            
+            filteredDocuments.forEach(document => {
+                const typeIcons = {
+                    'pdf': 'fas fa-file-pdf file-pdf',
+                    'doc': 'fas fa-file-word file-doc',
+                    'xls': 'fas fa-file-excel file-xls',
+                    'ppt': 'fas fa-file-powerpoint file-ppt',
+                    'img': 'fas fa-file-image file-img',
+                    'zip': 'fas fa-file-archive file-zip'
+                };
+                
+                const platformIcons = {
+                    'Google Drive': 'fab fa-google-drive text-yellow-500',
+                    'Dropbox': 'fab fa-dropbox text-blue-500',
+                    'SharePoint': 'fas fa-share-alt text-blue-600',
+                    'OneDrive': 'fas fa-cloud text-blue-400'
+                };
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md card-hover card-shine';
+                card.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <i class="${typeIcons[document.type]} text-3xl mr-4"></i>
+                        <div class="flex-1">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-1">${document.nom}</h4>
+                            <p class="text-sm text-gray-600">${document.taille} MB</p>
+                        </div>
+                        <button onclick="deleteDocument(${document.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="${platformIcons[document.plateforme]} mr-2"></i>
+                            ${document.plateforme}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-project-diagram mr-2"></i>
+                            ${document.projet}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-calendar mr-2"></i>
+                            Modifié le ${new Date(document.dateModification).toLocaleDateString('fr-FR')}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        ${document.partage ? 
+                            '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Partagé</span>' :
+                            '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Privé</span>'
+                        }
+                        <div class="flex space-x-2">
+                            <button onclick="viewDocument(${document.id})" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-eye mr-1"></i>Voir
+                            </button>
+                            <button onclick="shareDocument(${document.id})" class="text-green-600 hover:text-green-800 text-sm">
+                                <i class="fas fa-share mr-1"></i>Partager
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            if (filteredDocuments.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun document trouvé</p>';
+            }
+        }
+
+        function getFilteredDocuments() {
+            let filtered = [...mockData.documents];
+            
+            const plateformeFilter = document.getElementById('filter-plateforme')?.value;
+            const typeFilter = document.getElementById('filter-type')?.value;
+            const projetFilter = document.getElementById('filter-doc-projet')?.value;
+            const searchTerm = document.getElementById('search-documents')?.value.toLowerCase();
+            
+            if (plateformeFilter) {
+                filtered = filtered.filter(doc => doc.plateforme === plateformeFilter);
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(doc => doc.type === typeFilter);
+            }
+            
+            if (projetFilter) {
+                filtered = filtered.filter(doc => doc.projet === projetFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(doc => 
+                    doc.nom.toLowerCase().includes(searchTerm) ||
+                    doc.projet.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            return filtered;
+        }
+
+        function filterDocuments() {
+            loadDocuments();
+        }
+
+        function populateDocumentFilters() {
+            const projets = [...new Set(mockData.documents.map(d => d.projet))];
+            const projetSelect = document.getElementById('filter-doc-projet');
+            
+            projetSelect.innerHTML = '<option value="">Tous les projets</option>';
+            projets.forEach(projet => {
+                const option = document.createElement('option');
+                option.value = projet;
+                option.textContent = projet;
+                projetSelect.appendChild(option);
+            });
+        }
+
+        function updateDocumentStats() {
+            const totalDocs = mockData.documents.length;
+            const totalSize = mockData.documents.reduce((sum, doc) => sum + doc.taille, 0);
+            const plateformes = [...new Set(mockData.documents.map(d => d.plateforme))].length;
+            const projets = [...new Set(mockData.documents.map(d => d.projet))].length;
+            
+            document.getElementById('stat-total-docs').textContent = totalDocs;
+            document.getElementById('stat-taille-docs').textContent = totalSize.toFixed(1) + ' MB';
+            document.getElementById('stat-plateformes').textContent = plateformes;
+            document.getElementById('stat-projets-docs').textContent = projets;
+        }
+
+        function showAddDocumentForm() {
+            document.getElementById('add-document-form').classList.remove('hidden');
+        }
+
+        function hideAddDocumentForm() {
+            document.getElementById('add-document-form').classList.add('hidden');
+            document.getElementById('add-document-form').querySelector('form').reset();
+        }
+
+        function addDocument(event) {
+            event.preventDefault();
+            
+            const nom = document.getElementById('doc-nom').value;
+            const type = document.getElementById('doc-type').value;
+            const plateforme = document.getElementById('doc-plateforme').value;
+            const projet = document.getElementById('doc-projet').value;
+            const taille = parseFloat(document.getElementById('doc-taille').value);
+            
+            const newDocument = {
+                id: Date.now(),
+                nom: nom,
+                type: type,
+                plateforme: plateforme,
+                projet: projet,
+                taille: taille,
+                dateModification: new Date().toISOString().split('T')[0],
+                partage: false
+            };
+            
+            mockData.documents.push(newDocument);
+            
+            // Ajouter une action
+            addAction(`Ajout du document '${nom}'`, projet, 'creation');
+            
+            saveDataToStorage();
+            loadDocuments();
+            updateDocumentStats();
+            populateDocumentFilters();
+            hideAddDocumentForm();
+        }
+
+        function deleteDocument(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                const document = mockData.documents.find(d => d.id === id);
+                if (document) {
+                    addAction(`Suppression du document '${document.nom}'`, document.projet, 'modification');
+                }
+                
+                mockData.documents = mockData.documents.filter(d => d.id !== id);
+                saveDataToStorage();
+                loadDocuments();
+                updateDocumentStats();
+            }
+        }
+
+        function viewDocument(id) {
+            const document = mockData.documents.find(d => d.id === id);
+            if (document) {
+                alert(`Ouverture du document: ${document.nom}\nPlateforme: ${document.plateforme}\nTaille: ${document.taille} MB`);
+                
+                addAction(`Consultation du document '${document.nom}'`, document.projet, 'modification');
+                saveDataToStorage();
+            }
+        }
+
+        function shareDocument(id) {
+            const document = mockData.documents.find(d => d.id === id);
+            if (document) {
+                document.partage = !document.partage;
+                
+                const action = document.partage ? 'Partage' : 'Arrêt du partage';
+                addAction(`${action} du document '${document.nom}'`, document.projet, 'modification');
+                
+                saveDataToStorage();
+                loadDocuments();
+            }
+        }
+    </script>
+</body>
+</html>
