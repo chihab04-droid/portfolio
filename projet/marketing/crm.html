@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Gestion des Ventes</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Styles personnalisés pour les animations et effets */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .status-nouveau { background-color: #3b82f6; color: white; }
+        .status-contact { background-color: #f59e0b; color: white; }
+        .status-qualifie { background-color: #8b5cf6; color: white; }
+        .status-negocie { background-color: #ef4444; color: white; }
+        .status-gagne { background-color: #10b981; color: white; }
+        .status-perdu { background-color: #6b7280; color: white; }
+        
+        .priority-haute { border-left: 4px solid #ef4444; }
+        .priority-moyenne { border-left: 4px solid #f59e0b; }
+        .priority-faible { border-left: 4px solid #10b981; }
+        
+        .source-website { background-color: #3b82f6; }
+        .source-social { background-color: #8b5cf6; }
+        .source-email { background-color: #10b981; }
+        .source-referral { background-color: #f59e0b; }
+        .source-ads { background-color: #ef4444; }
+        
+        .hidden { display: none !important; }
+        
+        /* Animation pour les cartes */
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card-shine:hover::before {
+            left: 100%;
+        }
+        
+        /* Styles pour les graphiques */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        /* Styles pour les notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Styles pour les modales */
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Styles pour les boutons d'action flottants */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .fab-menu.show {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">CRM - Gestion des Ventes</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('vue-crm')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-eye mr-2"></i>Vue CRM
+                    </button>
+                    <button onclick="showPage('creation-crm')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-plus-circle mr-2"></i>Création CRM
+                    </button>
+                    <button onclick="showPage('dashboards')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-chart-bar mr-2"></i>Dashboards
+                    </button>
+                    <button onclick="showPage('nouveaux-leads')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-user-plus mr-2"></i>Nouveaux Leads
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('vue-crm')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-eye mr-2"></i>Vue CRM
+                </button>
+                <button onclick="showPage('creation-crm')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-plus-circle mr-2"></i>Création CRM
+                </button>
+                <button onclick="showPage('dashboards')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-chart-bar mr-2"></i>Dashboards
+                </button>
+                <button onclick="showPage('nouveaux-leads')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-user-plus mr-2"></i>Nouveaux Leads
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Vue CRM -->
+        <div id="vue-crm-page" class="page-content">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-bg rounded-full flex items-center justify-center">
+                    <i class="fas fa-eye text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Vue CRM</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Visualisez rapidement tous vos leads et prospects avec leurs statuts et priorités.
+                </p>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Leads</p>
+                            <p id="stat-total-leads" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-trophy text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Ventes Gagnées</p>
+                            <p id="stat-ventes-gagnees" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-handshake text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">En Négociation</p>
+                            <p id="stat-en-negociation" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-euro-sign text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">CA Prévisionnel</p>
+                            <p id="stat-ca-previsionnel" class="text-2xl font-bold text-gray-900">0€</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres et recherche -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex-1 min-w-64">
+                        <input type="text" id="search-leads" placeholder="Rechercher un lead..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Tous les statuts</option>
+                        <option value="nouveau">Nouveau</option>
+                        <option value="contact">Contacté</option>
+                        <option value="qualifie">Qualifié</option>
+                        <option value="negocie">Négocié</option>
+                        <option value="gagne">Gagné</option>
+                        <option value="perdu">Perdu</option>
+                    </select>
+                    <select id="filter-priority" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Toutes priorités</option>
+                        <option value="haute">Haute</option>
+                        <option value="moyenne">Moyenne</option>
+                        <option value="faible">Faible</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Liste des leads -->
+            <div id="leads-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les leads seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Création CRM -->
+        <div id="creation-crm-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-success rounded-full flex items-center justify-center">
+                    <i class="fas fa-plus-circle text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Création CRM</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Créez rapidement de nouveaux leads et gérez votre pipeline de ventes.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de création -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-user-plus text-green-600 mr-3"></i>
+                        Nouveau Lead
+                    </h3>
+                    <form onsubmit="addLead(event)">
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                                <input type="text" id="lead-prenom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                                <input type="text" id="lead-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Entreprise</label>
+                            <input type="text" id="lead-entreprise" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" id="lead-email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                                <input type="tel" id="lead-telephone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+                                <select id="lead-statut" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="nouveau">Nouveau</option>
+                                    <option value="contact">Contacté</option>
+                                    <option value="qualifie">Qualifié</option>
+                                    <option value="negocie">Négocié</option>
+                                    <option value="gagne">Gagné</option>
+                                    <option value="perdu">Perdu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                                <select id="lead-priorite" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="faible">Faible</option>
+                                    <option value="moyenne">Moyenne</option>
+                                    <option value="haute">Haute</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Valeur estimée (€)</label>
+                                <input type="number" id="lead-valeur" min="0" step="100" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                                <select id="lead-source" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="website">Site Web</option>
+                                    <option value="social">Réseaux Sociaux</option>
+                                    <option value="email">Email Marketing</option>
+                                    <option value="referral">Recommandation</option>
+                                    <option value="ads">Publicité</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                            <textarea id="lead-notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            <i class="fas fa-save mr-2"></i>Créer le Lead
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Aperçu et statistiques -->
+                <div class="space-y-6">
+                    <!-- Leads récents -->
+                    <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <i class="fas fa-clock text-blue-600 mr-3"></i>
+                            Leads Récents
+                        </h3>
+                        <div id="recent-leads" class="space-y-3">
+                            <!-- Les leads récents seront ajoutés ici -->
+                        </div>
+                    </div>
+                    
+                    <!-- Actions rapides -->
+                    <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <i class="fas fa-bolt text-yellow-600 mr-3"></i>
+                            Actions Rapides
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="importLeads()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                                <i class="fas fa-upload mr-2"></i>Importer des Leads
+                            </button>
+                            <button onclick="exportLeads()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                                <i class="fas fa-download mr-2"></i>Exporter les Données
+                            </button>
+                            <button onclick="generateReport()" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                                <i class="fas fa-chart-line mr-2"></i>Générer un Rapport
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Dashboards -->
+        <div id="dashboards-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-warning rounded-full flex items-center justify-center">
+                    <i class="fas fa-chart-bar text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Dashboards</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Suivez vos performances de vente avec des tableaux de bord interactifs et actionnables.
+                </p>
+            </div>
+
+            <!-- Métriques principales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">CA Réalisé</p>
+                            <p id="dashboard-ca-realise" class="text-3xl font-bold text-green-600">0€</p>
+                            <p class="text-sm text-gray-500">+12% vs mois dernier</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-green-100">
+                            <i class="fas fa-euro-sign text-2xl text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Taux de Conversion</p>
+                            <p id="dashboard-taux-conversion" class="text-3xl font-bold text-blue-600">0%</p>
+                            <p class="text-sm text-gray-500">+3% vs mois dernier</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-blue-100">
+                            <i class="fas fa-percentage text-2xl text-blue-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Panier Moyen</p>
+                            <p id="dashboard-panier-moyen" class="text-3xl font-bold text-purple-600">0€</p>
+                            <p class="text-sm text-gray-500">+8% vs mois dernier</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-purple-100">
+                            <i class="fas fa-shopping-cart text-2xl text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Objectif Mensuel</p>
+                            <p id="dashboard-objectif" class="text-3xl font-bold text-orange-600">75%</p>
+                            <p class="text-sm text-gray-500">Reste 15 jours</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-orange-100">
+                            <i class="fas fa-target text-2xl text-orange-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphiques -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                <!-- Graphique des ventes -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Évolution des Ventes</h3>
+                        <select id="sales-period" class="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                            <option value="7">7 derniers jours</option>
+                            <option value="30">30 derniers jours</option>
+                            <option value="90">3 derniers mois</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Graphique du pipeline -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Pipeline de Ventes</h3>
+                    <div class="chart-container">
+                        <canvas id="pipelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphiques supplémentaires -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Sources de leads -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Sources de Leads</h3>
+                    <div class="chart-container">
+                        <canvas id="sourcesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Performance mensuelle -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-xl font-semibold mb-4">Performance Mensuelle</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Janvier</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-32 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full progress-bar" style="width: 85%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">85%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Février</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-32 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full progress-bar" style="width: 92%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">92%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Mars</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-32 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full progress-bar" style="width: 75%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">75%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-600">Avril (en cours)</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-32 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full progress-bar pulse-animation" style="width: 68%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">68%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Nouveaux Leads -->
+        <div id="nouveaux-leads-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-card rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-plus text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nouveaux Leads</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Visualisez rapidement les nouveaux leads provenant de vos outils marketing.
+                </p>
+            </div>
+
+            <!-- Statistiques des nouveaux leads -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-calendar-day text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Aujourd'hui</p>
+                            <p id="stat-leads-today" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-calendar-week text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Cette Semaine</p>
+                            <p id="stat-leads-week" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-calendar-alt text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Ce Mois</p>
+                            <p id="stat-leads-month" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres pour nouveaux leads -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex-1 min-w-64">
+                        <input type="text" id="search-new-leads" placeholder="Rechercher un nouveau lead..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <select id="filter-source" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Toutes les sources</option>
+                        <option value="website">Site Web</option>
+                        <option value="social">Réseaux Sociaux</option>
+                        <option value="email">Email Marketing</option>
+                        <option value="referral">Recommandation</option>
+                        <option value="ads">Publicité</option>
+                    </select>
+                    <select id="filter-date" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Toutes les dates</option>
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Liste des nouveaux leads -->
+            <div id="new-leads-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les nouveaux leads seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bouton d'action flottant -->
+    <div class="fab">
+        <button onclick="toggleFabMenu()" class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center">
+            <i class="fas fa-plus text-xl"></i>
+        </button>
+        <div id="fab-menu" class="fab-menu">
+            <div class="flex flex-col space-y-2">
+                <button onclick="quickAddLead()" class="w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center">
+                    <i class="fas fa-user-plus"></i>
+                </button>
+                <button onclick="quickNote()" class="w-12 h-12 bg-yellow-600 hover:bg-yellow-700 text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center">
+                    <i class="fas fa-sticky-note"></i>
+                </button>
+                <button onclick="quickCall()" class="w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg transition-all duration-300 flex items-center justify-center">
+                    <i class="fas fa-phone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-3"></i>
+            <span id="notification-text">Action réalisée avec succès !</span>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'vue-crm';
+        let fabMenuOpen = false;
+        
+        // Données mock initiales pour le CRM
+        const mockData = {
+            leads: [
+                {
+                    id: 1,
+                    prenom: "Marie",
+                    nom: "Dupont",
+                    entreprise: "TechCorp",
+                    email: "marie.dupont@techcorp.com",
+                    telephone: "01 23 45 67 89",
+                    statut: "qualifie",
+                    priorite: "haute",
+                    valeur: 15000,
+                    source: "website",
+                    notes: "Intéressée par notre solution CRM complète",
+                    dateCreation: "2024-01-15",
+                    dernierContact: "2024-01-20"
+                },
+                {
+                    id: 2,
+                    prenom: "Thomas",
+                    nom: "Martin",
+                    entreprise: "StartupXYZ",
+                    email: "thomas@startupxyz.com",
+                    telephone: "01 98 76 54 32",
+                    statut: "negocie",
+                    priorite: "haute",
+                    valeur: 25000,
+                    source: "referral",
+                    notes: "Négociation en cours pour un contrat annuel",
+                    dateCreation: "2024-01-10",
+                    dernierContact: "2024-01-22"
+                },
+                {
+                    id: 3,
+                    prenom: "Sophie",
+                    nom: "Leroy",
+                    entreprise: "DigitalAgency",
+                    email: "sophie.leroy@digital.com",
+                    telephone: "01 11 22 33 44",
+                    statut: "contact",
+                    priorite: "moyenne",
+                    valeur: 8000,
+                    source: "social",
+                    notes: "Premier contact établi, à recontacter la semaine prochaine",
+                    dateCreation: "2024-01-18",
+                    dernierContact: "2024-01-18"
+                },
+                {
+                    id: 4,
+                    prenom: "Jean",
+                    nom: "Dubois",
+                    entreprise: "InnovCorp",
+                    email: "j.dubois@innovcorp.fr",
+                    telephone: "01 55 66 77 88",
+                    statut: "gagne",
+                    priorite: "haute",
+                    valeur: 35000,
+                    source: "ads",
+                    notes: "Contrat signé ! Client très satisfait",
+                    dateCreation: "2024-01-05",
+                    dernierContact: "2024-01-25"
+                },
+                {
+                    id: 5,
+                    prenom: "Claire",
+                    nom: "Moreau",
+                    entreprise: "WebSolutions",
+                    email: "claire@websolutions.fr",
+                    telephone: "01 44 55 66 77",
+                    statut: "nouveau",
+                    priorite: "faible",
+                    valeur: 5000,
+                    source: "email",
+                    notes: "Lead récent, à qualifier rapidement",
+                    dateCreation: "2024-01-23",
+                    dernierContact: null
+                },
+                {
+                    id: 6,
+                    prenom: "Pierre",
+                    nom: "Bernard",
+                    entreprise: "CloudTech",
+                    email: "p.bernard@cloudtech.com",
+                    telephone: "01 33 44 55 66",
+                    statut: "perdu",
+                    priorite: "moyenne",
+                    valeur: 12000,
+                    source: "website",
+                    notes: "Budget insuffisant pour cette année",
+                    dateCreation: "2024-01-12",
+                    dernierContact: "2024-01-21"
+                }
+            ],
+            nouveauxLeads: [
+                {
+                    id: 101,
+                    prenom: "Alice",
+                    nom: "Rousseau",
+                    entreprise: "FutureTech",
+                    email: "alice@futuretech.com",
+                    source: "website",
+                    dateCreation: "2024-01-25",
+                    statut: "nouveau"
+                },
+                {
+                    id: 102,
+                    prenom: "Marc",
+                    nom: "Petit",
+                    entreprise: "GreenEnergy",
+                    email: "marc@greenenergy.fr",
+                    source: "social",
+                    dateCreation: "2024-01-25",
+                    statut: "nouveau"
+                },
+                {
+                    id: 103,
+                    prenom: "Emma",
+                    nom: "Blanc",
+                    entreprise: "HealthCare+",
+                    email: "emma@healthcare.com",
+                    source: "ads",
+                    dateCreation: "2024-01-24",
+                    statut: "nouveau"
+                },
+                {
+                    id: 104,
+                    prenom: "Lucas",
+                    nom: "Roux",
+                    entreprise: "EduTech",
+                    email: "lucas@edutech.fr",
+                    source: "referral",
+                    dateCreation: "2024-01-24",
+                    statut: "nouveau"
+                },
+                {
+                    id: 105,
+                    prenom: "Camille",
+                    nom: "Girard",
+                    entreprise: "RetailPro",
+                    email: "camille@retailpro.com",
+                    source: "email",
+                    dateCreation: "2024-01-23",
+                    statut: "nouveau"
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('vue-crm');
+            setupEventListeners();
+        });
+
+        // Configuration des écouteurs d'événements
+        function setupEventListeners() {
+            // Filtres et recherche pour Vue CRM
+            document.getElementById('search-leads').addEventListener('input', filterLeads);
+            document.getElementById('filter-status').addEventListener('change', filterLeads);
+            document.getElementById('filter-priority').addEventListener('change', filterLeads);
+            
+            // Filtres pour Nouveaux Leads
+            document.getElementById('search-new-leads').addEventListener('input', filterNewLeads);
+            document.getElementById('filter-source').addEventListener('change', filterNewLeads);
+            document.getElementById('filter-date').addEventListener('change', filterNewLeads);
+            
+            // Période pour le graphique des ventes
+            document.getElementById('sales-period').addEventListener('change', updateSalesChart);
+        }
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'vue-crm':
+                    loadLeads();
+                    updateStats();
+                    break;
+                case 'creation-crm':
+                    loadRecentLeads();
+                    break;
+                case 'dashboards':
+                    loadDashboards();
+                    break;
+                case 'nouveaux-leads':
+                    loadNewLeads();
+                    updateNewLeadsStats();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('crmData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('crmData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // FONCTIONS POUR VUE CRM
+        function loadLeads() {
+            const container = document.getElementById('leads-list');
+            container.innerHTML = '';
+            
+            const filteredLeads = getFilteredLeads();
+            
+            filteredLeads.forEach(lead => {
+                const card = document.createElement('div');
+                card.className = `bg-white p-6 rounded-lg shadow-md card-hover card-shine priority-${lead.priorite}`;
+                
+                const statusColors = {
+                    'nouveau': 'status-nouveau',
+                    'contact': 'status-contact',
+                    'qualifie': 'status-qualifie',
+                    'negocie': 'status-negocie',
+                    'gagne': 'status-gagne',
+                    'perdu': 'status-perdu'
+                };
+                
+                const sourceIcons = {
+                    'website': 'fas fa-globe',
+                    'social': 'fab fa-facebook',
+                    'email': 'fas fa-envelope',
+                    'referral': 'fas fa-user-friends',
+                    'ads': 'fas fa-bullhorn'
+                };
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-gray-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${lead.prenom} ${lead.nom}</h3>
+                                <p class="text-sm text-gray-600">${lead.entreprise}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[lead.statut]}">
+                            ${lead.statut.charAt(0).toUpperCase() + lead.statut.slice(1)}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-envelope mr-2"></i>
+                            ${lead.email}
+                        </div>
+                        ${lead.telephone ? `
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-phone mr-2"></i>
+                            ${lead.telephone}
+                        </div>
+                        ` : ''}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="${sourceIcons[lead.source]} mr-2"></i>
+                            Source: ${lead.source}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-green-600">${lead.valeur ? lead.valeur.toLocaleString() + '€' : 'N/A'}</span>
+                        <span class="px-2 py-1 rounded text-xs font-medium ${lead.priorite === 'haute' ? 'bg-red-100 text-red-800' : lead.priorite === 'moyenne' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                            Priorité ${lead.priorite}
+                        </span>
+                    </div>
+                    
+                    ${lead.notes ? `
+                    <p class="text-sm text-gray-600 mb-4 italic">"${lead.notes}"</p>
+                    ` : ''}
+                    
+                    <div class="flex space-x-2">
+                        <button onclick="contactLead(${lead.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                            <i class="fas fa-phone mr-1"></i>Contacter
+                        </button>
+                        <button onclick="editLead(${lead.id})" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                            <i class="fas fa-edit mr-1"></i>Modifier
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function getFilteredLeads() {
+            const searchTerm = document.getElementById('search-leads').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const priorityFilter = document.getElementById('filter-priority').value;
+            
+            return mockData.leads.filter(lead => {
+                const matchesSearch = !searchTerm || 
+                    lead.prenom.toLowerCase().includes(searchTerm) ||
+                    lead.nom.toLowerCase().includes(searchTerm) ||
+                    lead.entreprise.toLowerCase().includes(searchTerm) ||
+                    lead.email.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || lead.statut === statusFilter;
+                const matchesPriority = !priorityFilter || lead.priorite === priorityFilter;
+                
+                return matchesSearch && matchesStatus && matchesPriority;
+            });
+        }
+
+        function filterLeads() {
+            loadLeads();
+        }
+
+        function updateStats() {
+            const totalLeads = mockData.leads.length;
+            const ventesGagnees = mockData.leads.filter(lead => lead.statut === 'gagne').length;
+            const enNegociation = mockData.leads.filter(lead => lead.statut === 'negocie').length;
+            const caPrevisionnel = mockData.leads
+                .filter(lead => ['qualifie', 'negocie'].includes(lead.statut))
+                .reduce((sum, lead) => sum + (lead.valeur || 0), 0);
+            
+            document.getElementById('stat-total-leads').textContent = totalLeads;
+            document.getElementById('stat-ventes-gagnees').textContent = ventesGagnees;
+            document.getElementById('stat-en-negociation').textContent = enNegociation;
+            document.getElementById('stat-ca-previsionnel').textContent = caPrevisionnel.toLocaleString() + '€';
+        }
+
+        // FONCTIONS POUR CRÉATION CRM
+        function addLead(event) {
+            event.preventDefault();
+            
+            const newLead = {
+                id: Date.now(),
+                prenom: document.getElementById('lead-prenom').value,
+                nom: document.getElementById('lead-nom').value,
+                entreprise: document.getElementById('lead-entreprise').value,
+                email: document.getElementById('lead-email').value,
+                telephone: document.getElementById('lead-telephone').value,
+                statut: document.getElementById('lead-statut').value,
+                priorite: document.getElementById('lead-priorite').value,
+                valeur: parseInt(document.getElementById('lead-valeur').value) || 0,
+                source: document.getElementById('lead-source').value,
+                notes: document.getElementById('lead-notes').value,
+                dateCreation: new Date().toISOString().split('T')[0],
+                dernierContact: null
+            };
+            
+            mockData.leads.unshift(newLead);
+            saveDataToStorage();
+            
+            // Réinitialiser le formulaire
+            event.target.reset();
+            
+            // Afficher notification
+            showNotification('Lead créé avec succès !', 'success');
+            
+            // Recharger les leads récents
+            loadRecentLeads();
+        }
+
+        function loadRecentLeads() {
+            const container = document.getElementById('recent-leads');
+            container.innerHTML = '';
+            
+            const recentLeads = mockData.leads
+                .sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation))
+                .slice(0, 5);
+            
+            recentLeads.forEach(lead => {
+                const leadDiv = document.createElement('div');
+                leadDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                leadDiv.innerHTML = `
+                    <div>
+                        <p class="font-medium text-gray-900">${lead.prenom} ${lead.nom}</p>
+                        <p class="text-sm text-gray-600">${lead.entreprise}</p>
+                    </div>
+                    <span class="text-xs text-gray-500">${new Date(lead.dateCreation).toLocaleDateString('fr-FR')}</span>
+                `;
+                container.appendChild(leadDiv);
+            });
+        }
+
+        // FONCTIONS POUR DASHBOARDS
+        function loadDashboards() {
+            updateDashboardStats();
+            createCharts();
+        }
+
+        function updateDashboardStats() {
+            const caRealise = mockData.leads
+                .filter(lead => lead.statut === 'gagne')
+                .reduce((sum, lead) => sum + (lead.valeur || 0), 0);
+            
+            const totalLeads = mockData.leads.length;
+            const leadsGagnes = mockData.leads.filter(lead => lead.statut === 'gagne').length;
+            const tauxConversion = totalLeads > 0 ? Math.round((leadsGagnes / totalLeads) * 100) : 0;
+            
+            const panierMoyen = leadsGagnes > 0 ? Math.round(caRealise / leadsGagnes) : 0;
+            
+            document.getElementById('dashboard-ca-realise').textContent = caRealise.toLocaleString() + '€';
+            document.getElementById('dashboard-taux-conversion').textContent = tauxConversion + '%';
+            document.getElementById('dashboard-panier-moyen').textContent = panierMoyen.toLocaleString() + '€';
+        }
+
+        function createCharts() {
+            createSalesChart();
+            createPipelineChart();
+            createSourcesChart();
+        }
+
+        function createSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // Détruire le graphique existant s'il existe
+            if (window.salesChart) {
+                window.salesChart.destroy();
+            }
+            
+            window.salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Ventes (€)',
+                        data: [45000, 52000, 48000, 61000, 55000, 67000],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '€';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPipelineChart() {
+            const ctx = document.getElementById('pipelineChart').getContext('2d');
+            
+            if (window.pipelineChart) {
+                window.pipelineChart.destroy();
+            }
+            
+            const pipelineData = {
+                'nouveau': mockData.leads.filter(lead => lead.statut === 'nouveau').length,
+                'contact': mockData.leads.filter(lead => lead.statut === 'contact').length,
+                'qualifie': mockData.leads.filter(lead => lead.statut === 'qualifie').length,
+                'negocie': mockData.leads.filter(lead => lead.statut === 'negocie').length,
+                'gagne': mockData.leads.filter(lead => lead.statut === 'gagne').length
+            };
+            
+            window.pipelineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nouveau', 'Contacté', 'Qualifié', 'Négocié', 'Gagné'],
+                    datasets: [{
+                        data: Object.values(pipelineData),
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#ef4444',
+                            '#10b981'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createSourcesChart() {
+            const ctx = document.getElementById('sourcesChart').getContext('2d');
+            
+            if (window.sourcesChart) {
+                window.sourcesChart.destroy();
+            }
+            
+            const sourcesData = {
+                'website': mockData.leads.filter(lead => lead.source === 'website').length,
+                'social': mockData.leads.filter(lead => lead.source === 'social').length,
+                'email': mockData.leads.filter(lead => lead.source === 'email').length,
+                'referral': mockData.leads.filter(lead => lead.source === 'referral').length,
+                'ads': mockData.leads.filter(lead => lead.source === 'ads').length
+            };
+            
+            window.sourcesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Site Web', 'Réseaux Sociaux', 'Email', 'Recommandation', 'Publicité'],
+                    datasets: [{
+                        label: 'Nombre de leads',
+                        data: Object.values(sourcesData),
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSalesChart() {
+            // Cette fonction pourrait être étendue pour changer les données selon la période sélectionnée
+            createSalesChart();
+        }
+
+        // FONCTIONS POUR NOUVEAUX LEADS
+        function loadNewLeads() {
+            const container = document.getElementById('new-leads-list');
+            container.innerHTML = '';
+            
+            const filteredNewLeads = getFilteredNewLeads();
+            
+            filteredNewLeads.forEach(lead => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md card-hover card-shine';
+                
+                const sourceColors = {
+                    'website': 'source-website',
+                    'social': 'source-social',
+                    'email': 'source-email',
+                    'referral': 'source-referral',
+                    'ads': 'source-ads'
+                };
+                
+                const sourceIcons = {
+                    'website': 'fas fa-globe',
+                    'social': 'fab fa-facebook',
+                    'email': 'fas fa-envelope',
+                    'referral': 'fas fa-user-friends',
+                    'ads': 'fas fa-bullhorn'
+                };
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${lead.prenom} ${lead.nom}</h3>
+                                <p class="text-sm text-gray-600">${lead.entreprise}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium text-white ${sourceColors[lead.source]}">
+                            <i class="${sourceIcons[lead.source]} mr-1"></i>
+                            ${lead.source}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-envelope mr-2"></i>
+                            ${lead.email}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-calendar mr-2"></i>
+                            ${new Date(lead.dateCreation).toLocaleDateString('fr-FR')}
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button onclick="convertToLead(${lead.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                            <i class="fas fa-arrow-right mr-1"></i>Convertir
+                        </button>
+                        <button onclick="contactNewLead(${lead.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                            <i class="fas fa-phone mr-1"></i>Contacter
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function getFilteredNewLeads() {
+            const searchTerm = document.getElementById('search-new-leads').value.toLowerCase();
+            const sourceFilter = document.getElementById('filter-source').value;
+            const dateFilter = document.getElementById('filter-date').value;
+            
+            return mockData.nouveauxLeads.filter(lead => {
+                const matchesSearch = !searchTerm || 
+                    lead.prenom.toLowerCase().includes(searchTerm) ||
+                    lead.nom.toLowerCase().includes(searchTerm) ||
+                    lead.entreprise.toLowerCase().includes(searchTerm) ||
+                    lead.email.toLowerCase().includes(searchTerm);
+                
+                const matchesSource = !sourceFilter || lead.source === sourceFilter;
+                
+                let matchesDate = true;
+                if (dateFilter) {
+                    const leadDate = new Date(lead.dateCreation);
+                    const today = new Date();
+                    
+                    switch(dateFilter) {
+                        case 'today':
+                            matchesDate = leadDate.toDateString() === today.toDateString();
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            matchesDate = leadDate >= weekAgo;
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            matchesDate = leadDate >= monthAgo;
+                            break;
+                    }
+                }
+                
+                return matchesSearch && matchesSource && matchesDate;
+            });
+        }
+
+        function filterNewLeads() {
+            loadNewLeads();
+        }
+
+        function updateNewLeadsStats() {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+            
+            const leadsToday = mockData.nouveauxLeads.filter(lead => 
+                new Date(lead.dateCreation).toDateString() === today.toDateString()
+            ).length;
+            
+            const leadsWeek = mockData.nouveauxLeads.filter(lead => 
+                new Date(lead.dateCreation) >= weekAgo
+            ).length;
+            
+            const leadsMonth = mockData.nouveauxLeads.filter(lead => 
+                new Date(lead.dateCreation) >= monthAgo
+            ).length;
+            
+            document.getElementById('stat-leads-today').textContent = leadsToday;
+            document.getElementById('stat-leads-week').textContent = leadsWeek;
+            document.getElementById('stat-leads-month').textContent = leadsMonth;
+        }
+
+        // FONCTIONS D'ACTIONS
+        function contactLead(leadId) {
+            const lead = mockData.leads.find(l => l.id === leadId);
+            if (lead) {
+                lead.dernierContact = new Date().toISOString().split('T')[0];
+                if (lead.statut === 'nouveau') {
+                    lead.statut = 'contact';
+                }
+                saveDataToStorage();
+                showNotification(`Contact avec ${lead.prenom} ${lead.nom} enregistré !`, 'success');
+                loadLeads();
+            }
+        }
+
+        function editLead(leadId) {
+            showNotification('Fonctionnalité d\'édition à implémenter', 'info');
+        }
+
+        function convertToLead(newLeadId) {
+            const newLead = mockData.nouveauxLeads.find(l => l.id === newLeadId);
+            if (newLead) {
+                // Convertir le nouveau lead en lead complet
+                const convertedLead = {
+                    id: Date.now(),
+                    prenom: newLead.prenom,
+                    nom: newLead.nom,
+                    entreprise: newLead.entreprise,
+                    email: newLead.email,
+                    telephone: '',
+                    statut: 'nouveau',
+                    priorite: 'moyenne',
+                    valeur: 0,
+                    source: newLead.source,
+                    notes: 'Converti depuis les nouveaux leads',
+                    dateCreation: newLead.dateCreation,
+                    dernierContact: null
+                };
+                
+                mockData.leads.unshift(convertedLead);
+                
+                // Supprimer des nouveaux leads
+                mockData.nouveauxLeads = mockData.nouveauxLeads.filter(l => l.id !== newLeadId);
+                
+                saveDataToStorage();
+                showNotification(`${newLead.prenom} ${newLead.nom} converti en lead !`, 'success');
+                loadNewLeads();
+                updateNewLeadsStats();
+            }
+        }
+
+        function contactNewLead(leadId) {
+            const lead = mockData.nouveauxLeads.find(l => l.id === leadId);
+            if (lead) {
+                showNotification(`Contact avec ${lead.prenom} ${lead.nom} initié !`, 'success');
+            }
+        }
+
+        // FONCTIONS UTILITAIRES
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            
+            // Changer la couleur selon le type
+            notification.className = `notification ${type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'} text-white px-6 py-4 rounded-lg shadow-lg`;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // FONCTIONS POUR LE BOUTON FLOTTANT
+        function toggleFabMenu() {
+            const fabMenu = document.getElementById('fab-menu');
+            fabMenuOpen = !fabMenuOpen;
+            
+            if (fabMenuOpen) {
+                fabMenu.classList.add('show');
+            } else {
+                fabMenu.classList.remove('show');
+            }
+        }
+
+        function quickAddLead() {
+            showPage('creation-crm');
+            toggleFabMenu();
+        }
+
+        function quickNote() {
+            showNotification('Fonctionnalité de note rapide à implémenter', 'info');
+            toggleFabMenu();
+        }
+
+        function quickCall() {
+            showNotification('Fonctionnalité d\'appel rapide à implémenter', 'info');
+            toggleFabMenu();
+        }
+
+        // FONCTIONS D'ACTIONS RAPIDES
+        function importLeads() {
+            showNotification('Fonctionnalité d\'import à implémenter', 'info');
+        }
+
+        function exportLeads() {
+            showNotification('Export des données en cours...', 'info');
+        }
+
+        function generateReport() {
+            showNotification('Génération du rapport en cours...', 'info');
+        }
+
+        // Fermer le menu FAB en cliquant ailleurs
+        document.addEventListener('click', function(event) {
+            const fab = document.querySelector('.fab');
+            if (!fab.contains(event.target) && fabMenuOpen) {
+                toggleFabMenu();
+            }
+        });
+    </script>
+</body>
+</html>
