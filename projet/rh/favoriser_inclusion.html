@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoriser l'Inclusion - Entreprise</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles personnalisés inspirés de l'image */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero-illustration {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .mobile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Styles pour le scanner QR Code */
+        .qr-scanner {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-heart text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Inclusion & Accessibilité</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('assistance')" class="nav-item nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-hands-helping mr-2"></i>Assistance
+                    </button>
+                    <button onclick="showPage('sensibilisation')" class="nav-item nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-lightbulb mr-2"></i>Sensibilisation
+                    </button>
+                    <button onclick="showPage('groupes')" class="nav-item nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-users mr-2"></i>Groupes d'échange
+                    </button>
+                    <button onclick="showPage('qrcode')" class="nav-item nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-qrcode mr-2"></i>QR Code
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('assistance')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-hands-helping mr-2"></i>Assistance
+                </button>
+                <button onclick="showPage('sensibilisation')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-lightbulb mr-2"></i>Sensibilisation
+                </button>
+                <button onclick="showPage('groupes')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-users mr-2"></i>Groupes d'échange
+                </button>
+                <button onclick="showPage('qrcode')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-qrcode mr-2"></i>QR Code
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page d'accueil / Assistance -->
+        <div id="assistance-page" class="page-content">
+            <!-- Hero Section inspiré de l'image -->
+            <div class="text-center mb-12">
+                <div class="hero-illustration mb-6">
+                    <i class="fas fa-hands-helping text-6xl text-purple-600"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Une Cause qui Mérite d'être Partagée</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Utilisez cette plateforme pour partager des informations importantes sur l'inclusion et demander de l'assistance.
+                </p>
+            </div>
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-hands-helping text-blue-600 mr-3"></i>Demandes d'Assistance
+                </h3>
+                <button onclick="showAddAssistanceForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Demande
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de demande d'assistance -->
+            <div id="add-assistance-form" class="hidden mobile-card mb-8">
+                <h4 class="text-xl font-semibold mb-4">Nouvelle demande d'assistance</h4>
+                <form onsubmit="addAssistance(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre de la demande</label>
+                        <input type="text" id="assistance-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="assistance-description" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Niveau d'urgence</label>
+                        <select id="assistance-urgence" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="faible">Faible</option>
+                            <option value="moyenne">Moyenne</option>
+                            <option value="élevée">Élevée</option>
+                            <option value="critique">Critique</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Envoyer
+                        </button>
+                        <button type="button" onclick="hideAddAssistanceForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des demandes d'assistance -->
+            <div id="assistance-list" class="grid gap-6 md:grid-cols-2">
+                <!-- Les demandes seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Sensibilisation -->
+        <div id="sensibilisation-page" class="page-content hidden">
+            <div class="text-center mb-12">
+                <div class="hero-illustration mb-6">
+                    <i class="fas fa-lightbulb text-6xl text-yellow-500"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Sensibilisation au Handicap</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Découvrez les bonnes pratiques pour favoriser l'inclusion en entreprise.
+                </p>
+            </div>
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>Bonnes Pratiques
+                </h3>
+                <button onclick="showAddPratiqueForm()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Ajouter une Pratique
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de bonne pratique -->
+            <div id="add-pratique-form" class="hidden mobile-card mb-8">
+                <h4 class="text-xl font-semibold mb-4">Ajouter une bonne pratique</h4>
+                <form onsubmit="addPratique(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="pratique-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                        <select id="pratique-categorie" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="communication">Communication</option>
+                            <option value="accessibilite">Accessibilité</option>
+                            <option value="management">Management</option>
+                            <option value="formation">Formation</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="pratique-description" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddPratiqueForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des bonnes pratiques -->
+            <div id="pratiques-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les pratiques seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Groupes d'échange -->
+        <div id="groupes-page" class="page-content hidden">
+            <div class="text-center mb-12">
+                <div class="hero-illustration mb-6">
+                    <i class="fas fa-users text-6xl text-green-500"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Groupes d'Échange</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Rejoignez ou créez des groupes d'échange pour partager vos expériences.
+                </p>
+            </div>
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-users text-green-500 mr-3"></i>Groupes Actifs
+                </h3>
+                <button onclick="showAddGroupeForm()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Créer un Groupe
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de groupe -->
+            <div id="add-groupe-form" class="hidden mobile-card mb-8">
+                <h4 class="text-xl font-semibold mb-4">Créer un nouveau groupe</h4>
+                <form onsubmit="addGroupe(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom du groupe</label>
+                        <input type="text" id="groupe-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Thème</label>
+                        <select id="groupe-theme" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="handicap-visuel">Handicap visuel</option>
+                            <option value="handicap-auditif">Handicap auditif</option>
+                            <option value="handicap-moteur">Handicap moteur</option>
+                            <option value="troubles-cognitifs">Troubles cognitifs</option>
+                            <option value="general">Général</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="groupe-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Créer
+                        </button>
+                        <button type="button" onclick="hideAddGroupeForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des groupes -->
+            <div id="groupes-list" class="grid gap-6 md:grid-cols-2">
+                <!-- Les groupes seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page QR Code -->
+        <div id="qrcode-page" class="page-content hidden">
+            <div class="text-center mb-12">
+                <div class="hero-illustration mb-6">
+                    <i class="fas fa-qrcode text-6xl text-purple-600"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Scanner QR Code</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Outil d'assistance pour personnes malvoyantes - Scanner et lecture de QR Codes.
+                </p>
+            </div>
+
+            <div class="max-w-2xl mx-auto">
+                <!-- Scanner QR Code simulé -->
+                <div class="qr-scanner mb-8">
+                    <i class="fas fa-qrcode text-6xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">Scanner QR Code</h3>
+                    <p class="text-gray-600 mb-6">Simulez un scan en entrant le contenu du QR Code ci-dessous :</p>
+                    
+                    <div class="mb-4">
+                        <input type="text" id="qr-input" placeholder="Entrez le contenu du QR Code..." 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg">
+                    </div>
+                    
+                    <button onclick="scanQRCode()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg text-lg">
+                        <i class="fas fa-search mr-2"></i>Scanner
+                    </button>
+                </div>
+                
+                <!-- Résultat du scan -->
+                <div id="qr-result" class="hidden mobile-card">
+                    <h4 class="text-xl font-semibold mb-4">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>QR Code Scanné
+                    </h4>
+                    <div id="qr-content" class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <!-- Le contenu sera affiché ici -->
+                    </div>
+                    <button onclick="readAloud()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md mr-2">
+                        <i class="fas fa-volume-up mr-2"></i>Lire à voix haute
+                    </button>
+                    <button onclick="clearQRResult()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-times mr-2"></i>Effacer
+                    </button>
+                </div>
+                
+                <!-- QR Codes d'exemple -->
+                <div class="mobile-card mt-8">
+                    <h4 class="text-xl font-semibold mb-4">QR Codes d'exemple à tester :</h4>
+                    <div class="grid gap-4">
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <strong>Informations de contact :</strong><br>
+                            <code class="text-sm">MECARD:N:Dupont,Marie;ORG:Entreprise ABC;TEL:0123456789;EMAIL:marie.dupont@entreprise.com;</code>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <strong>URL du site web :</strong><br>
+                            <code class="text-sm">https://www.entreprise-inclusive.com</code>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <strong>Texte simple :</strong><br>
+                            <code class="text-sm">Bienvenue dans notre espace d'inclusion et d'accessibilité !</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'assistance';
+        
+        // Données mock initiales
+        const mockData = {
+            assistance: [
+                {
+                    id: 1,
+                    titre: "Adaptation poste de travail",
+                    description: "Besoin d'un écran plus grand et d'un clavier ergonomique pour améliorer mon confort de travail.",
+                    urgence: "moyenne",
+                    date: "2024-01-15",
+                    statut: "en_cours"
+                },
+                {
+                    id: 2,
+                    titre: "Formation langue des signes",
+                    description: "Demande de formation en langue des signes pour mieux communiquer avec mes collègues malentendants.",
+                    urgence: "faible",
+                    date: "2024-01-10",
+                    statut: "approuvee"
+                }
+            ],
+            pratiques: [
+                {
+                    id: 1,
+                    titre: "Communication inclusive",
+                    categorie: "communication",
+                    description: "Utiliser un langage simple et clair, éviter le jargon technique, et proposer plusieurs formats de communication."
+                },
+                {
+                    id: 2,
+                    titre: "Accessibilité numérique",
+                    categorie: "accessibilite",
+                    description: "S'assurer que tous les outils numériques sont compatibles avec les technologies d'assistance."
+                },
+                {
+                    id: 3,
+                    titre: "Management bienveillant",
+                    categorie: "management",
+                    description: "Adapter le management aux besoins spécifiques de chaque collaborateur en situation de handicap."
+                }
+            ],
+            groupes: [
+                {
+                    id: 1,
+                    nom: "Entraide Handicap Visuel",
+                    theme: "handicap-visuel",
+                    description: "Groupe d'échange pour les personnes avec un handicap visuel et leurs collègues.",
+                    participants: 12,
+                    messages: 45,
+                    dernierMessage: "2024-01-15"
+                },
+                {
+                    id: 2,
+                    nom: "Accessibilité au Travail",
+                    theme: "general",
+                    description: "Discussions générales sur l'amélioration de l'accessibilité en entreprise.",
+                    participants: 28,
+                    messages: 89,
+                    dernierMessage: "2024-01-14"
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('assistance');
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'assistance':
+                    loadAssistance();
+                    break;
+                case 'sensibilisation':
+                    loadPratiques();
+                    break;
+                case 'groupes':
+                    loadGroupes();
+                    break;
+                case 'qrcode':
+                    // Page QR Code n'a pas besoin de chargement spécial
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('inclusionData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('inclusionData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // ASSISTANCE
+        function loadAssistance() {
+            const container = document.getElementById('assistance-list');
+            container.innerHTML = '';
+            
+            mockData.assistance.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            mockData.assistance.forEach(demande => {
+                const urgenceColors = {
+                    'faible': 'bg-green-100 text-green-800',
+                    'moyenne': 'bg-yellow-100 text-yellow-800',
+                    'élevée': 'bg-orange-100 text-orange-800',
+                    'critique': 'bg-red-100 text-red-800'
+                };
+                
+                const statutColors = {
+                    'en_attente': 'bg-gray-100 text-gray-800',
+                    'en_cours': 'bg-blue-100 text-blue-800',
+                    'approuvee': 'bg-green-100 text-green-800',
+                    'refusee': 'bg-red-100 text-red-800'
+                };
+                
+                const card = document.createElement('div');
+                card.className = 'mobile-card hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-xl font-semibold text-gray-900">${demande.titre}</h4>
+                        <button onclick="deleteAssistance(${demande.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-600 mb-4">${demande.description}</p>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${urgenceColors[demande.urgence]}">
+                            ${demande.urgence.charAt(0).toUpperCase() + demande.urgence.slice(1)}
+                        </span>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statutColors[demande.statut]}">
+                            ${demande.statut.replace('_', ' ').charAt(0).toUpperCase() + demande.statut.replace('_', ' ').slice(1)}
+                        </span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-calendar mr-2"></i>
+                        ${new Date(demande.date).toLocaleDateString('fr-FR')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddAssistanceForm() {
+            document.getElementById('add-assistance-form').classList.remove('hidden');
+        }
+
+        function hideAddAssistanceForm() {
+            document.getElementById('add-assistance-form').classList.add('hidden');
+            document.getElementById('add-assistance-form').querySelector('form').reset();
+        }
+
+        function addAssistance(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('assistance-titre').value;
+            const description = document.getElementById('assistance-description').value;
+            const urgence = document.getElementById('assistance-urgence').value;
+            
+            const newAssistance = {
+                id: Date.now(),
+                titre: titre,
+                description: description,
+                urgence: urgence,
+                date: new Date().toISOString().split('T')[0],
+                statut: 'en_attente'
+            };
+            
+            mockData.assistance.unshift(newAssistance);
+            saveDataToStorage();
+            loadAssistance();
+            hideAddAssistanceForm();
+        }
+
+        function deleteAssistance(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) {
+                mockData.assistance = mockData.assistance.filter(a => a.id !== id);
+                saveDataToStorage();
+                loadAssistance();
+            }
+        }
+
+        // SENSIBILISATION
+        function loadPratiques() {
+            const container = document.getElementById('pratiques-list');
+            container.innerHTML = '';
+            
+            const categorieColors = {
+                'communication': 'bg-blue-100 text-blue-800',
+                'accessibilite': 'bg-green-100 text-green-800',
+                'management': 'bg-purple-100 text-purple-800',
+                'formation': 'bg-orange-100 text-orange-800'
+            };
+            
+            mockData.pratiques.forEach(pratique => {
+                const card = document.createElement('div');
+                card.className = 'mobile-card hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-lg font-semibold text-gray-900">${pratique.titre}</h4>
+                        <button onclick="deletePratique(${pratique.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${categorieColors[pratique.categorie]} mb-3 inline-block">
+                        ${pratique.categorie.charAt(0).toUpperCase() + pratique.categorie.slice(1)}
+                    </span>
+                    <p class="text-gray-600">${pratique.description}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddPratiqueForm() {
+            document.getElementById('add-pratique-form').classList.remove('hidden');
+        }
+
+        function hideAddPratiqueForm() {
+            document.getElementById('add-pratique-form').classList.add('hidden');
+            document.getElementById('add-pratique-form').querySelector('form').reset();
+        }
+
+        function addPratique(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('pratique-titre').value;
+            const categorie = document.getElementById('pratique-categorie').value;
+            const description = document.getElementById('pratique-description').value;
+            
+            const newPratique = {
+                id: Date.now(),
+                titre: titre,
+                categorie: categorie,
+                description: description
+            };
+            
+            mockData.pratiques.push(newPratique);
+            saveDataToStorage();
+            loadPratiques();
+            hideAddPratiqueForm();
+        }
+
+        function deletePratique(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette pratique ?')) {
+                mockData.pratiques = mockData.pratiques.filter(p => p.id !== id);
+                saveDataToStorage();
+                loadPratiques();
+            }
+        }
+
+        // GROUPES D'ÉCHANGE
+        function loadGroupes() {
+            const container = document.getElementById('groupes-list');
+            container.innerHTML = '';
+            
+            const themeColors = {
+                'handicap-visuel': 'bg-blue-100 text-blue-800',
+                'handicap-auditif': 'bg-green-100 text-green-800',
+                'handicap-moteur': 'bg-purple-100 text-purple-800',
+                'troubles-cognitifs': 'bg-orange-100 text-orange-800',
+                'general': 'bg-gray-100 text-gray-800'
+            };
+            
+            mockData.groupes.forEach(groupe => {
+                const card = document.createElement('div');
+                card.className = 'mobile-card hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-xl font-semibold text-gray-900">${groupe.nom}</h4>
+                        <button onclick="deleteGroupe(${groupe.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${themeColors[groupe.theme]} mb-3 inline-block">
+                        ${groupe.theme.replace('-', ' ').charAt(0).toUpperCase() + groupe.theme.replace('-', ' ').slice(1)}
+                    </span>
+                    <p class="text-gray-600 mb-4">${groupe.description}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-users mr-1"></i>
+                            ${groupe.participants} participants
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-comments mr-1"></i>
+                            ${groupe.messages} messages
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-400">
+                        Dernier message : ${new Date(groupe.dernierMessage).toLocaleDateString('fr-FR')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddGroupeForm() {
+            document.getElementById('add-groupe-form').classList.remove('hidden');
+        }
+
+        function hideAddGroupeForm() {
+            document.getElementById('add-groupe-form').classList.add('hidden');
+            document.getElementById('add-groupe-form').querySelector('form').reset();
+        }
+
+        function addGroupe(event) {
+            event.preventDefault();
+            
+            const nom = document.getElementById('groupe-nom').value;
+            const theme = document.getElementById('groupe-theme').value;
+            const description = document.getElementById('groupe-description').value;
+            
+            const newGroupe = {
+                id: Date.now(),
+                nom: nom,
+                theme: theme,
+                description: description,
+                participants: 1,
+                messages: 0,
+                dernierMessage: new Date().toISOString().split('T')[0]
+            };
+            
+            mockData.groupes.push(newGroupe);
+            saveDataToStorage();
+            loadGroupes();
+            hideAddGroupeForm();
+        }
+
+        function deleteGroupe(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) {
+                mockData.groupes = mockData.groupes.filter(g => g.id !== id);
+                saveDataToStorage();
+                loadGroupes();
+            }
+        }
+
+        // QR CODE
+        function scanQRCode() {
+            const input = document.getElementById('qr-input').value.trim();
+            
+            if (!input) {
+                alert('Veuillez entrer le contenu du QR Code');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('qr-result');
+            const contentDiv = document.getElementById('qr-content');
+            
+            // Analyser le type de contenu
+            let content = '';
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                content = `<strong>URL détectée :</strong><br><a href="${input}" target="_blank" class="text-blue-600 hover:underline">${input}</a>`;
+            } else if (input.startsWith('MECARD:')) {
+                // Parser les informations de contact
+                const fields = input.split(';');
+                content = '<strong>Informations de contact :</strong><br>';
+                fields.forEach(field => {
+                    if (field.startsWith('N:')) {
+                        content += `Nom : ${field.substring(2)}<br>`;
+                    } else if (field.startsWith('ORG:')) {
+                        content += `Organisation : ${field.substring(4)}<br>`;
+                    } else if (field.startsWith('TEL:')) {
+                        content += `Téléphone : ${field.substring(4)}<br>`;
+                    } else if (field.startsWith('EMAIL:')) {
+                        content += `Email : ${field.substring(6)}<br>`;
+                    }
+                });
+            } else {
+                content = `<strong>Texte :</strong><br>${input}`;
+            }
+            
+            contentDiv.innerHTML = content;
+            resultDiv.classList.remove('hidden');
+            
+            // Scroll vers le résultat
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function readAloud() {
+            const contentDiv = document.getElementById('qr-content');
+            const text = contentDiv.textContent || contentDiv.innerText;
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('La synthèse vocale n\'est pas supportée par votre navigateur');
+            }
+        }
+
+        function clearQRResult() {
+            document.getElementById('qr-result').classList.add('hidden');
+            document.getElementById('qr-input').value = '';
+        }
+    </script>
+</body>
+</html>
