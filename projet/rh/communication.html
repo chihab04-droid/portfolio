@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Interne - Entreprise</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles personnalisés pour les animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .event-day {
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-building text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Communication Interne</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('actualites')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-newspaper mr-2"></i>Actualités
+                    </button>
+                    <button onclick="showPage('formations')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-graduation-cap mr-2"></i>Formations
+                    </button>
+                    <button onclick="showPage('success-stories')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-star mr-2"></i>Success Stories
+                    </button>
+                    <button onclick="showPage('evenements')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-calendar mr-2"></i>Événements
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('actualites')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-newspaper mr-2"></i>Actualités
+                </button>
+                <button onclick="showPage('formations')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-graduation-cap mr-2"></i>Formations
+                </button>
+                <button onclick="showPage('success-stories')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-star mr-2"></i>Success Stories
+                </button>
+                <button onclick="showPage('evenements')" class="block w-full text-left px-3 py-2 hover:bg-blue-700 rounded-md">
+                    <i class="fas fa-calendar mr-2"></i>Événements
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Actualités -->
+        <div id="actualites-page" class="page-content">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-newspaper text-blue-600 mr-3"></i>Actualités
+                </h2>
+                <button onclick="showAddActualiteForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Actualité
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout d'actualité (caché par défaut) -->
+            <div id="add-actualite-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter une nouvelle actualité</h3>
+                <form onsubmit="addActualite(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="actualite-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Résumé</label>
+                        <textarea id="actualite-resume" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddActualiteForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des actualités -->
+            <div id="actualites-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les actualités seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Formations -->
+        <div id="formations-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-graduation-cap text-green-600 mr-3"></i>Formations
+                </h2>
+                <button onclick="showAddFormationForm()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Formation
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de formation -->
+            <div id="add-formation-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter une nouvelle formation</h3>
+                <form onsubmit="addFormation(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="formation-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                        <input type="date" id="formation-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="formation-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddFormationForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des formations -->
+            <div id="formations-list" class="grid gap-6 md:grid-cols-2">
+                <!-- Les formations seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Success Stories -->
+        <div id="success-stories-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-star text-yellow-500 mr-3"></i>Success Stories
+                </h2>
+                <button onclick="showAddStoryForm()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Success Story
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout de success story -->
+            <div id="add-story-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter une nouvelle success story</h3>
+                <form onsubmit="addStory(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                        <input type="text" id="story-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
+                        <input type="text" id="story-role" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">URL Photo (optionnel)</label>
+                        <input type="url" id="story-photo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Récit</label>
+                        <textarea id="story-recit" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddStoryForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Liste des success stories -->
+            <div id="stories-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Les success stories seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Événements -->
+        <div id="evenements-page" class="page-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-calendar text-purple-600 mr-3"></i>Événements
+                </h2>
+                <button onclick="showAddEventForm()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvel Événement
+                </button>
+            </div>
+            
+            <!-- Formulaire d'ajout d'événement -->
+            <div id="add-event-form" class="hidden bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4">Ajouter un nouvel événement</h3>
+                <form onsubmit="addEvent(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                        <input type="text" id="event-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                        <input type="date" id="event-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="event-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">URL Image (optionnel)</label>
+                        <input type="url" id="event-image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideAddEventForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Calendrier et liste des événements -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Calendrier -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Calendrier</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="previousMonth()" class="p-2 hover:bg-gray-100 rounded">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="current-month" class="px-4 py-2 font-medium"></span>
+                            <button onclick="nextMonth()" class="p-2 hover:bg-gray-100 rounded">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- En-têtes des jours -->
+                    <div class="calendar-grid mb-2">
+                        <div class="text-center font-medium text-gray-600 py-2">Dim</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Lun</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Mar</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Mer</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Jeu</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Ven</div>
+                        <div class="text-center font-medium text-gray-600 py-2">Sam</div>
+                    </div>
+                    
+                    <!-- Grille du calendrier -->
+                    <div id="calendar-grid" class="calendar-grid">
+                        <!-- Les jours seront générés dynamiquement -->
+                    </div>
+                </div>
+                
+                <!-- Liste des événements -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Événements à venir</h3>
+                    <div id="events-list">
+                        <!-- Les événements seront ajoutés ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'actualites';
+        let currentDate = new Date();
+        
+        // Données mock initiales
+        const mockData = {
+            actualites: [
+                {
+                    id: 1,
+                    titre: "Nouvelle politique de télétravail",
+                    resume: "L'entreprise adopte une nouvelle politique flexible permettant jusqu'à 3 jours de télétravail par semaine.",
+                    date: "2024-01-15"
+                },
+                {
+                    id: 2,
+                    titre: "Résultats exceptionnels Q4 2023",
+                    resume: "L'entreprise affiche une croissance de 25% par rapport à l'année précédente grâce aux efforts de toutes les équipes.",
+                    date: "2024-01-10"
+                }
+            ],
+            formations: [
+                {
+                    id: 1,
+                    titre: "Formation Leadership",
+                    date: "2024-02-15",
+                    description: "Développez vos compétences en leadership et management d'équipe avec nos experts."
+                },
+                {
+                    id: 2,
+                    titre: "Cybersécurité - Niveau 1",
+                    date: "2024-02-20",
+                    description: "Apprenez les bases de la cybersécurité pour protéger vos données et celles de l'entreprise."
+                }
+            ],
+            stories: [
+                {
+                    id: 1,
+                    nom: "Marie Dupont",
+                    role: "Développeuse Senior",
+                    photo: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                    recit: "Arrivée comme stagiaire il y a 5 ans, Marie a gravi les échelons grâce à sa détermination et sa passion pour le code. Aujourd'hui, elle dirige une équipe de 8 développeurs."
+                },
+                {
+                    id: 2,
+                    nom: "Thomas Martin",
+                    role: "Chef de Projet",
+                    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                    recit: "Thomas a réussi à livrer le projet le plus complexe de l'entreprise en avance et sous budget, grâce à une gestion d'équipe exemplaire et une communication transparente."
+                }
+            ],
+            events: [
+                {
+                    id: 1,
+                    titre: "Calendrier de l'Avent Digital",
+                    date: "2024-12-01",
+                    description: "Chaque jour de décembre, découvrez une surprise digitale pour célébrer les fêtes de fin d'année.",
+                    image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=300&h=200&fit=crop"
+                },
+                {
+                    id: 2,
+                    titre: "Soirée Halloween",
+                    date: "2024-10-31",
+                    description: "Venez déguisés pour notre soirée Halloween avec concours de costumes et buffet terrifiant !",
+                    image: "https://images.unsplash.com/photo-1509557965043-6b9f3d19e87e?w=300&h=200&fit=crop"
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('actualites');
+            generateCalendar();
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-blue-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'actualites':
+                    loadActualites();
+                    break;
+                case 'formations':
+                    loadFormations();
+                    break;
+                case 'success-stories':
+                    loadStories();
+                    break;
+                case 'evenements':
+                    loadEvents();
+                    generateCalendar();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('communicationData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('communicationData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // ACTUALITÉS
+        function loadActualites() {
+            const container = document.getElementById('actualites-list');
+            container.innerHTML = '';
+            
+            mockData.actualites.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            mockData.actualites.forEach(actualite => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-semibold text-gray-900">${actualite.titre}</h3>
+                        <button onclick="deleteActualite(${actualite.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-600 mb-4">${actualite.resume}</p>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-calendar mr-2"></i>
+                        ${new Date(actualite.date).toLocaleDateString('fr-FR')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddActualiteForm() {
+            document.getElementById('add-actualite-form').classList.remove('hidden');
+        }
+
+        function hideAddActualiteForm() {
+            document.getElementById('add-actualite-form').classList.add('hidden');
+            document.getElementById('add-actualite-form').querySelector('form').reset();
+        }
+
+        function addActualite(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('actualite-titre').value;
+            const resume = document.getElementById('actualite-resume').value;
+            
+            const newActualite = {
+                id: Date.now(),
+                titre: titre,
+                resume: resume,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            mockData.actualites.unshift(newActualite);
+            saveDataToStorage();
+            loadActualites();
+            hideAddActualiteForm();
+        }
+
+        function deleteActualite(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) {
+                mockData.actualites = mockData.actualites.filter(a => a.id !== id);
+                saveDataToStorage();
+                loadActualites();
+            }
+        }
+
+        // FORMATIONS
+        function loadFormations() {
+            const container = document.getElementById('formations-list');
+            container.innerHTML = '';
+            
+            mockData.formations.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            mockData.formations.forEach(formation => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-semibold text-gray-900">${formation.titre}</h3>
+                        <button onclick="deleteFormation(${formation.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center text-sm text-green-600 mb-3">
+                        <i class="fas fa-calendar mr-2"></i>
+                        ${new Date(formation.date).toLocaleDateString('fr-FR')}
+                    </div>
+                    <p class="text-gray-600">${formation.description}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddFormationForm() {
+            document.getElementById('add-formation-form').classList.remove('hidden');
+        }
+
+        function hideAddFormationForm() {
+            document.getElementById('add-formation-form').classList.add('hidden');
+            document.getElementById('add-formation-form').querySelector('form').reset();
+        }
+
+        function addFormation(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('formation-titre').value;
+            const date = document.getElementById('formation-date').value;
+            const description = document.getElementById('formation-description').value;
+            
+            const newFormation = {
+                id: Date.now(),
+                titre: titre,
+                date: date,
+                description: description
+            };
+            
+            mockData.formations.push(newFormation);
+            saveDataToStorage();
+            loadFormations();
+            hideAddFormationForm();
+        }
+
+        function deleteFormation(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette formation ?')) {
+                mockData.formations = mockData.formations.filter(f => f.id !== id);
+                saveDataToStorage();
+                loadFormations();
+            }
+        }
+
+        // SUCCESS STORIES
+        function loadStories() {
+            const container = document.getElementById('stories-list');
+            container.innerHTML = '';
+            
+            mockData.stories.forEach(story => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <img src="${story.photo || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}" 
+                                 alt="${story.nom}" class="w-12 h-12 rounded-full mr-4 object-cover">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${story.nom}</h3>
+                                <p class="text-sm text-gray-600">${story.role}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteStory(${story.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-700 italic">"${story.recit}"</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddStoryForm() {
+            document.getElementById('add-story-form').classList.remove('hidden');
+        }
+
+        function hideAddStoryForm() {
+            document.getElementById('add-story-form').classList.add('hidden');
+            document.getElementById('add-story-form').querySelector('form').reset();
+        }
+
+        function addStory(event) {
+            event.preventDefault();
+            
+            const nom = document.getElementById('story-nom').value;
+            const role = document.getElementById('story-role').value;
+            const photo = document.getElementById('story-photo').value;
+            const recit = document.getElementById('story-recit').value;
+            
+            const newStory = {
+                id: Date.now(),
+                nom: nom,
+                role: role,
+                photo: photo,
+                recit: recit
+            };
+            
+            mockData.stories.push(newStory);
+            saveDataToStorage();
+            loadStories();
+            hideAddStoryForm();
+        }
+
+        function deleteStory(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette success story ?')) {
+                mockData.stories = mockData.stories.filter(s => s.id !== id);
+                saveDataToStorage();
+                loadStories();
+            }
+        }
+
+        // ÉVÉNEMENTS
+        function loadEvents() {
+            const container = document.getElementById('events-list');
+            container.innerHTML = '';
+            
+            const upcomingEvents = mockData.events
+                .filter(event => new Date(event.date) >= new Date())
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            if (upcomingEvents.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center">Aucun événement à venir</p>';
+                return;
+            }
+            
+            upcomingEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'border-l-4 border-purple-500 pl-4 mb-4';
+                eventDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${event.titre}</h4>
+                            <p class="text-sm text-gray-600 mb-2">${new Date(event.date).toLocaleDateString('fr-FR')}</p>
+                            <p class="text-gray-700">${event.description}</p>
+                        </div>
+                        <button onclick="deleteEvent(${event.id})" class="text-red-500 hover:text-red-700 ml-4">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    ${event.image ? `<img src="${event.image}" alt="${event.titre}" class="mt-3 w-full h-32 object-cover rounded">` : ''}
+                `;
+                container.appendChild(eventDiv);
+            });
+        }
+
+        function showAddEventForm() {
+            document.getElementById('add-event-form').classList.remove('hidden');
+        }
+
+        function hideAddEventForm() {
+            document.getElementById('add-event-form').classList.add('hidden');
+            document.getElementById('add-event-form').querySelector('form').reset();
+        }
+
+        function addEvent(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('event-titre').value;
+            const date = document.getElementById('event-date').value;
+            const description = document.getElementById('event-description').value;
+            const image = document.getElementById('event-image').value;
+            
+            const newEvent = {
+                id: Date.now(),
+                titre: titre,
+                date: date,
+                description: description,
+                image: image
+            };
+            
+            mockData.events.push(newEvent);
+            saveDataToStorage();
+            loadEvents();
+            generateCalendar();
+            hideAddEventForm();
+        }
+
+        function deleteEvent(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+                mockData.events = mockData.events.filter(e => e.id !== id);
+                saveDataToStorage();
+                loadEvents();
+                generateCalendar();
+            }
+        }
+
+        // CALENDRIER
+        function generateCalendar() {
+            const monthNames = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
+            
+            const currentMonthElement = document.getElementById('current-month');
+            const calendarGrid = document.getElementById('calendar-grid');
+            
+            if (!currentMonthElement || !calendarGrid) return;
+            
+            currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            calendarGrid.innerHTML = '';
+            
+            for (let i = 0; i < 42; i++) {
+                const cellDate = new Date(startDate);
+                cellDate.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day bg-white border border-gray-200';
+                dayElement.textContent = cellDate.getDate();
+                
+                // Vérifier s'il y a un événement ce jour
+                const dateString = cellDate.toISOString().split('T')[0];
+                const hasEvent = mockData.events.some(event => event.date === dateString);
+                
+                if (hasEvent) {
+                    dayElement.classList.add('event-day');
+                }
+                
+                if (cellDate.getMonth() !== currentDate.getMonth()) {
+                    dayElement.classList.add('text-gray-400');
+                }
+                
+                if (cellDate.toDateString() === new Date().toDateString()) {
+                    dayElement.classList.add('bg-blue-100', 'font-bold');
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            generateCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            generateCalendar();
+        }
+    </script>
+</body>
+</html>
