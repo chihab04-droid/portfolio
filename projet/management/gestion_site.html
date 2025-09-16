@@ -144,6 +144,60 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-industry text-white text-sm"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">Gestion Site Industriel</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('maintenance')" class="nav-link text-gray-700 hover:text-teal-600 transition-colors duration-200 px-3 py-2 rounded-md font-medium">
+                        <i class="fas fa-tools mr-2"></i>Maintenance
+                    </button>
+                    <button onclick="showPage('energie')" class="nav-link text-gray-700 hover:text-teal-600 transition-colors duration-200 px-3 py-2 rounded-md font-medium">
+                        <i class="fas fa-bolt mr-2"></i>Énergie
+                    </button>
+                    <button onclick="showPage('risques')" class="nav-link text-gray-700 hover:text-teal-600 transition-colors duration-200 px-3 py-2 rounded-md font-medium">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Lieux à risques
+                    </button>
+                    <button onclick="showPage('reduction')" class="nav-link text-gray-700 hover:text-teal-600 transition-colors duration-200 px-3 py-2 rounded-md font-medium">
+                        <i class="fas fa-leaf mr-2"></i>Réduction conso
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-700 hover:text-teal-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('maintenance')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                    <i class="fas fa-tools mr-2"></i>Maintenance
+                </button>
+                <button onclick="showPage('energie')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                    <i class="fas fa-bolt mr-2"></i>Énergie
+                </button>
+                <button onclick="showPage('risques')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Lieux à risques
+                </button>
+                <button onclick="showPage('reduction')" class="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                    <i class="fas fa-leaf mr-2"></i>Réduction conso
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Bar -->
     <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -739,6 +793,13 @@
             
             currentPage = pageId;
             
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('text-teal-600', 'bg-teal-50'));
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
             // Charger le contenu de la page
             switch(pageId) {
                 case 'maintenance':
@@ -762,6 +823,11 @@
         }
 
         // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
