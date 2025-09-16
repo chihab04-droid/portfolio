@@ -1,0 +1,247 @@
+<!-- gestion_site_final.html -->
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gestion Site - Dashboard Complet</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#4f46e5',
+        secondary: '#14b8a6',
+        accent: '#f59e0b',
+        danger: '#ef4444',
+        bgcard: '#f9fafb'
+      },
+      fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] }
+    }
+  }
+}
+</script>
+<style>
+.fade-enter { opacity: 0; transform: translateY(12px); }
+.fade-enter-active { opacity: 1; transform: translateY(0); transition: all .4s ease; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); transition: all 0.3s ease; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+<div id="app" class="min-h-screen flex flex-col">
+
+<!-- Header / Navbar -->
+<header class="bg-white shadow sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
+<h1 class="text-xl font-bold text-primary">Gestion Site - Dashboard</h1>
+<nav class="hidden md:flex items-center gap-6">
+<a href="#dashboard" class="nav-link hover:text-secondary" data-route="dashboard">Dashboard</a>
+<a href="#maintenance" class="nav-link hover:text-secondary" data-route="maintenance">Maintenance</a>
+<a href="#energie" class="nav-link hover:text-secondary" data-route="energie">Énergie</a>
+<a href="#risques" class="nav-link hover:text-secondary" data-route="risques">Risques</a>
+<a href="#reduction" class="nav-link hover:text-secondary" data-route="reduction">Réduction conso</a>
+</nav>
+<button id="burgerBtn" class="md:hidden p-2 rounded-md hover:bg-gray-100">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+</svg>
+</button>
+</div>
+<div id="mobileMenu" class="md:hidden hidden px-4 py-3 border-t">
+<a href="#dashboard" class="block py-2 nav-link-mobile" data-route="dashboard">Dashboard</a>
+<a href="#maintenance" class="block py-2 nav-link-mobile" data-route="maintenance">Maintenance</a>
+<a href="#energie" class="block py-2 nav-link-mobile" data-route="energie">Énergie</a>
+<a href="#risques" class="block py-2 nav-link-mobile" data-route="risques">Risques</a>
+<a href="#reduction" class="block py-2 nav-link-mobile" data-route="reduction">Réduction conso</a>
+</div>
+</header>
+
+<main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+<div id="pageHeader" class="space-y-2">
+<h2 id="pageTitle" class="text-2xl font-bold tracking-wide">Dashboard</h2>
+<p id="pageSubtitle" class="text-sm text-gray-500">Vue synthétique en temps réel</p>
+</div>
+<div id="content" class="space-y-6"></div>
+</main>
+
+<footer class="bg-white border-t">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-gray-500 flex justify-between">
+<div>© <span id="year"></span> Gestion Site</div>
+<div>Dashboard complet • Design inspiré PNG</div>
+</div>
+</footer>
+</div>
+
+<script>
+const STORE_KEY='gestion_site_final';
+const uid=()=> 'id-'+Math.random().toString(36).slice(2,9);
+
+// Initial data
+let dataStore = JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+if(!dataStore.maintenanceRequests) dataStore.maintenanceRequests=[];
+if(!dataStore.energy) dataStore.energy={consumption:[50,70,30,90,60,40,80]};
+if(!dataStore.risks) dataStore.risks=[{name:'Zone chimique',desc:'Haute dangerosité'}];
+if(!dataStore.initiatives) dataStore.initiatives=[{name:'LED',desc:'Remplacer lumières par LED'}];
+localStorage.setItem(STORE_KEY, JSON.stringify(dataStore));
+
+// Routes
+const routes = {
+dashboard:{title:'Dashboard',subtitle:'Vue globale',render: renderDashboard},
+maintenance:{title:'Maintenance',subtitle:'Demandes ouvertes',render: renderMaintenance},
+energie:{title:'Énergie',subtitle:'Conso et alertes',render: renderEnergie},
+risques:{title:'Risques',subtitle:'Signaler et suivre',render: renderRisques},
+reduction:{title:'Réduction conso',subtitle:'Actions et initiatives',render: renderReduction}
+};
+
+function setActiveNav(route){
+document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(a=>a.classList.toggle('text-secondary font-semibold',a.dataset.route===route));
+}
+
+function renderRoute(hash){
+const route=hash||'dashboard'; const meta=routes[route]; if(!meta) return;
+document.getElementById('pageTitle').textContent=meta.title;
+document.getElementById('pageSubtitle').textContent=meta.subtitle;
+const content=document.getElementById('content'); content.innerHTML=''; const section=meta.render(); section.classList.add('fade-enter'); content.appendChild(section);
+requestAnimationFrame(()=>section.classList.add('fade-enter-active'));
+setActiveNav(route);
+}
+
+// Mobile menu toggle
+document.getElementById('burgerBtn').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('hidden'));
+document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash=a.dataset.route; }));
+window.addEventListener('hashchange',()=>renderRoute(location.hash.replace('#','')));
+document.getElementById('year').textContent=new Date().getFullYear();
+renderRoute(location.hash.replace('#','')||'dashboard');
+
+// ---- Render functions ----
+function renderDashboard(){
+  const c=document.createElement('div'); c.className='grid gap-6 md:grid-cols-2 lg:grid-cols-3';
+
+  // KPI Maintenance
+  const card1=document.createElement('div'); card1.className='bg-white p-6 rounded-xl shadow-lg card';
+  card1.innerHTML=`<h3 class="text-lg font-bold text-primary mb-2">Demandes Maintenance</h3>
+  <p class="text-3xl font-semibold">${dataStore.maintenanceRequests.length}</p>`;
+  c.appendChild(card1);
+
+  // KPI Risques
+  const card2=document.createElement('div'); card2.className='bg-red-50 p-6 rounded-xl shadow-lg card';
+  card2.innerHTML=`<h3 class="text-lg font-bold text-red-600 mb-2">Zones Risques</h3>
+  <p class="text-3xl font-semibold">${dataStore.risks.length}</p>`;
+  c.appendChild(card2);
+
+  // KPI Initiatives énergie
+  const card3=document.createElement('div'); card3.className='bg-gradient-to-r from-primary to-secondary p-6 rounded-xl shadow-lg card';
+  card3.innerHTML=`<h3 class="text-lg font-bold text-white mb-2">Initiatives énergie</h3>
+  <canvas id="energyChart" class="w-full h-40"></canvas>`;
+  c.appendChild(card3);
+
+  // Chart.js graph
+  setTimeout(()=>{
+    const ctx=document.getElementById('energyChart').getContext('2d');
+    new Chart(ctx,{
+      type:'line',
+      data:{labels:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],datasets:[{label:'kWh',data:dataStore.energy.consumption,backgroundColor:'rgba(20,184,166,0.3)',borderColor:'#14b8a6',tension:0.4,fill:true}]},
+      options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+    });
+  },50);
+  return c;
+}
+
+function renderMaintenance(){
+  const c=document.createElement('div'); c.className='space-y-6';
+  // Form
+  const formCard=document.createElement('div'); formCard.className='bg-bgcard p-5 rounded-xl shadow-lg card';
+  formCard.innerHTML=`<h3 class="text-lg font-semibold mb-3">Créer demande</h3>
+    <form id="maintenanceForm" class="grid gap-3 sm:grid-cols-2">
+      <input name="site" placeholder="Site" class="p-2 rounded border-gray-300 col-span-1"/>
+      <input name="equipment" placeholder="Équipement" class="p-2 rounded border-gray-300 col-span-1"/>
+      <textarea name="desc" placeholder="Description" class="p-2 rounded border-gray-300 col-span-2"></textarea>
+      <select name="urgency" class="p-2 rounded border-gray-300 col-span-1">
+        <option>Faible</option><option>Moyenne</option><option selected>Haute</option>
+      </select>
+      <button class="col-span-1 bg-primary text-white p-2 rounded shadow hover:bg-primary/80 transition">Créer</button>
+    </form>`;
+  c.appendChild(formCard);
+
+  // List cards
+  const listCard=document.createElement('div'); listCard.className='grid sm:grid-cols-2 lg:grid-cols-3 gap-4';
+  dataStore.maintenanceRequests.forEach(r=>{
+    const card=document.createElement('div'); card.className='bg-white rounded-xl p-4 shadow card flex flex-col justify-between';
+    card.innerHTML=`<div class="font-bold text-primary">${r.equipment}</div>
+      <div class="text-sm text-gray-500">${r.site}</div>
+      <p class="mt-2 text-gray-700">${r.desc}</p>
+      <div class="mt-3 flex justify-between text-xs text-gray-600">
+        <span>Status: ${r.status||'ouvert'}</span>
+        <div class="flex gap-1">
+          <button class="px-2 py-1 rounded border btn-next">Suivant</button>
+          <button class="px-2 py-1 rounded border btn-delete text-danger">Suppr</button>
+        </div>
+      </div>`;
+    card.querySelector('.btn-delete').addEventListener('click',()=>{ dataStore.maintenanceRequests=dataStore.maintenanceRequests.filter(x=>x.id!==r.id); localStorage.setItem(STORE_KEY,JSON.stringify(dataStore)); renderRoute('maintenance'); });
+    card.querySelector('.btn-next').addEventListener('click',()=>{ r.status=r.status==='ouvert'?'en cours':'resolu'; localStorage.setItem(STORE_KEY,JSON.stringify(dataStore)); renderRoute('maintenance'); });
+    listCard.appendChild(card);
+  });
+  c.appendChild(listCard);
+
+  document.getElementById('maintenanceForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const f=Object.fromEntries(new FormData(e.target).entries());
+    dataStore.maintenanceRequests.unshift({id:uid(), site:f.site, equipment:f.equipment, desc:f.desc, urgency:f.urgency, status:'ouvert'});
+    localStorage.setItem(STORE_KEY,JSON.stringify(dataStore)); renderRoute('maintenance'); e.target.reset();
+  });
+  return c;
+}
+
+function renderEnergie(){
+  const c=document.createElement('div'); c.className='space-y-6';
+  // Graph + initiatives
+  const chartCard=document.createElement('div'); chartCard.className='bg-white p-6 rounded-xl shadow-lg card';
+  chartCard.innerHTML=`<h3 class="text-lg font-bold mb-3">Graphique énergie</h3><canvas id="chartEnergie"></canvas>`;
+  c.appendChild(chartCard);
+
+  setTimeout(()=>{
+    const ctx=document.getElementById('chartEnergie').getContext('2d');
+    new Chart(ctx,{
+      type:'bar',
+      data:{labels:['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], datasets:[{label:'kWh',data:dataStore.energy.consumption,backgroundColor:'#14b8a6'}]},
+      options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+    });
+  },50);
+
+  // Initiatives
+  const initCard=document.createElement('div'); initCard.className='bg-bgcard p-5 rounded-xl shadow-lg card';
+  initCard.innerHTML=`<h3 class="text-lg font-semibold mb-3">Initiatives d'économie</h3>
+    <ul class="list-disc pl-5 text-gray-700">${dataStore.initiatives.map(i=>`<li>${i.name}: ${i.desc}</li>`).join('')}</ul>`;
+  c.appendChild(initCard);
+  return c;
+}
+
+function renderRisques(){
+  const c=document.createElement('div'); c.className='grid sm:grid-cols-2 lg:grid-cols-3 gap-4';
+  dataStore.risks.forEach(r=>{
+    const card=document.createElement('div'); card.className='bg-red-50 p-4 rounded-xl shadow-lg card';
+    card.innerHTML=`<h4 class="font-semibold text-red-600">${r.name}</h4>
+      <p class="text-sm text-gray-600">${r.desc}</p>`;
+    c.appendChild(card);
+  });
+  return c;
+}
+
+function renderReduction(){
+  const c=document.createElement('div'); c.className='space-y-6';
+  dataStore.initiatives.forEach(i=>{
+    const card=document.createElement('div'); card.className='bg-green-50 p-4 rounded-xl shadow-lg card';
+    card.innerHTML=`<h4 class="font-semibold text-green-700">${i.name}</h4>
+      <p class="text-sm text-gray-600">${i.desc}</p>`;
+    c.appendChild(card);
+  });
+  return c;
+}
+</script>
+</body>
+</html>
