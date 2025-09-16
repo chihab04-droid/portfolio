@@ -88,24 +88,52 @@
                     <h1 class="text-xl font-bold">Économie Participative</h1>
                 </div>
                 
-  
-
-
- <!-- Menu Desktop alternatif -->
-<div class="hidden md:flex space-x-6 bg-white shadow-md rounded-lg p-4 justify-center">
-    <button onclick="showPage('covoiturage')" class="flex items-center gap-2 bg-green-50 hover:bg-green-200 text-green-800 font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-lg">
-        <i class="fas fa-car"></i> Covoiturage
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('covoiturage')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-car mr-2"></i>Covoiturage
+                    </button>
+                    <button onclick="showPage('collecte')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-recycle mr-2"></i>Collecte
+                    </button>
+                    <button onclick="showPage('revente')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-shopping-cart mr-2"></i>Revente
+                    </button>
+                    <button onclick="showPage('solidarite')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-heart mr-2"></i>Solidarité
+                    </button>
+                </div>
+<!-- Menu Desktop style onglets -->
+<div class="hidden md:flex justify-center space-x-6 border-b-2 border-gray-200">
+    <button onclick="showPage('covoiturage')" class="tab-item relative px-4 py-2 font-medium text-gray-700 hover:text-green-600 transition-colors">
+        <i class="fas fa-car mr-1"></i> Covoiturage
+        <span class="absolute bottom-0 left-0 w-0 h-1 bg-green-500 transition-all duration-300"></span>
     </button>
-    <button onclick="showPage('collecte')" class="flex items-center gap-2 bg-yellow-50 hover:bg-yellow-200 text-yellow-800 font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-lg">
-        <i class="fas fa-recycle"></i> Collecte
+    <button onclick="showPage('collecte')" class="tab-item relative px-4 py-2 font-medium text-gray-700 hover:text-yellow-600 transition-colors">
+        <i class="fas fa-recycle mr-1"></i> Collecte
+        <span class="absolute bottom-0 left-0 w-0 h-1 bg-yellow-500 transition-all duration-300"></span>
     </button>
-    <button onclick="showPage('revente')" class="flex items-center gap-2 bg-blue-50 hover:bg-blue-200 text-blue-800 font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-lg">
-        <i class="fas fa-shopping-cart"></i> Revente
+    <button onclick="showPage('revente')" class="tab-item relative px-4 py-2 font-medium text-gray-700 hover:text-blue-600 transition-colors">
+        <i class="fas fa-shopping-cart mr-1"></i> Revente
+        <span class="absolute bottom-0 left-0 w-0 h-1 bg-blue-500 transition-all duration-300"></span>
     </button>
-    <button onclick="showPage('solidarite')" class="flex items-center gap-2 bg-pink-50 hover:bg-pink-200 text-pink-800 font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-lg">
-        <i class="fas fa-heart"></i> Solidarité
+    <button onclick="showPage('solidarite')" class="tab-item relative px-4 py-2 font-medium text-gray-700 hover:text-pink-600 transition-colors">
+        <i class="fas fa-heart mr-1"></i> Solidarité
+        <span class="absolute bottom-0 left-0 w-0 h-1 bg-pink-500 transition-all duration-300"></span>
     </button>
 </div>
+
+<script>
+// Gestion indicateur actif animé
+const tabs = document.querySelectorAll('.tab-item');
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.querySelector('span').style.width = '0');
+        tab.querySelector('span').style.width = '100%';
+    });
+});
+</script>
+
            
 
 
