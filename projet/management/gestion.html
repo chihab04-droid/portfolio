@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Espace de Coworking</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles personnalisés inspirés de l'image PNG */
+        :root {
+            --primary-blue: #2563eb;
+            --light-blue: #3b82f6;
+            --dark-blue: #1e40af;
+            --accent-blue: #60a5fa;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        /* Gradient de fond inspiré de l'image */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+        }
+
+        /* Cartes avec effet d'élévation */
+        .card-elevated {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card-elevated:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Boutons avec style mobile moderne */
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Indicateurs de statut */
+        .status-available {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-occupied {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-reserved {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Animation de chargement */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Styles pour les graphiques circulaires */
+        .chart-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .chart-circle {
+            transform: rotate(-90deg);
+        }
+
+        /* Navigation mobile */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            z-index: 50;
+        }
+
+        /* Masquer les éléments */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Styles pour les modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Styles pour les notifications toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 200;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Styles pour les calendriers */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .calendar-day {
+            background: white;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calendar-day:hover {
+            background: #f1f5f9;
+        }
+
+        .calendar-day.selected {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .calendar-day.has-booking {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: block;
+            }
+            
+            .desktop-nav {
+                display: none;
+            }
+            
+            .main-content {
+                padding-bottom: 80px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+            
+            .desktop-nav {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Desktop -->
+    <nav class="desktop-nav gradient-bg text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-building text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">CoWork Manager</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="flex space-x-8">
+                    <button onclick="showPage('reservations')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-calendar-alt mr-2"></i>Réservations
+                    </button>
+                    <button onclick="showPage('cantine')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-utensils mr-2"></i>Cantine
+                    </button>
+                    <button onclick="showPage('parking')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-car mr-2"></i>Parking
+                    </button>
+                    <button onclick="showPage('services')" class="nav-link hover:text-blue-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-tools mr-2"></i>Services
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Mobile -->
+    <nav class="mobile-nav">
+        <div class="flex justify-around items-center py-2">
+            <button onclick="showPage('reservations')" class="nav-mobile-link flex flex-col items-center p-2 text-gray-600">
+                <i class="fas fa-calendar-alt text-lg mb-1"></i>
+                <span class="text-xs">Réservations</span>
+            </button>
+            <button onclick="showPage('cantine')" class="nav-mobile-link flex flex-col items-center p-2 text-gray-600">
+                <i class="fas fa-utensils text-lg mb-1"></i>
+                <span class="text-xs">Cantine</span>
+            </button>
+            <button onclick="showPage('parking')" class="nav-mobile-link flex flex-col items-center p-2 text-gray-600">
+                <i class="fas fa-car text-lg mb-1"></i>
+                <span class="text-xs">Parking</span>
+            </button>
+            <button onclick="showPage('services')" class="nav-mobile-link flex flex-col items-center p-2 text-gray-600">
+                <i class="fas fa-tools text-lg mb-1"></i>
+                <span class="text-xs">Services</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Réservations -->
+        <div id="reservations-page" class="page-content">
+            <!-- En-tête avec statistiques -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Réservations</h2>
+                        <p class="text-gray-600">Gérez vos réservations d'espaces de travail</p>
+                    </div>
+                    <button onclick="showReservationModal()" class="btn-primary mt-4 md:mt-0">
+                        <i class="fas fa-plus mr-2"></i>Nouvelle Réservation
+                    </button>
+                </div>
+
+                <!-- Statistiques rapides -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="stat-total-rooms">0</div>
+                        <div class="text-sm text-gray-600">Salles Total</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-green-600" id="stat-available-rooms">0</div>
+                        <div class="text-sm text-gray-600">Disponibles</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-orange-600" id="stat-reserved-rooms">0</div>
+                        <div class="text-sm text-gray-600">Réservées</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-red-600" id="stat-occupied-rooms">0</div>
+                        <div class="text-sm text-gray-600">Occupées</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres et recherche -->
+            <div class="card-elevated bg-white p-6 rounded-lg mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+                        <input type="text" id="search-rooms" placeholder="Nom de la salle..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                        <input type="date" id="filter-date" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Capacité min.</label>
+                        <select id="filter-capacity" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Toutes</option>
+                            <option value="10">10+ personnes</option>
+                            <option value="20">20+ personnes</option>
+                            <option value="50">50+ personnes</option>
+                            <option value="100">100+ personnes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des salles -->
+            <div id="rooms-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Les salles seront ajoutées ici dynamiquement -->
+            </div>
+
+            <!-- Mes réservations -->
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Mes Réservations</h3>
+                <div id="my-reservations" class="space-y-4">
+                    <!-- Les réservations seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Cantine -->
+        <div id="cantine-page" class="page-content hidden">
+            <!-- En-tête -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Cantine</h2>
+                        <p class="text-gray-600">Découvrez les menus et annonces de la cantine</p>
+                    </div>
+                    <button onclick="showMenuModal()" class="btn-primary mt-4 md:mt-0">
+                        <i class="fas fa-plus mr-2"></i>Ajouter Menu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sélecteur de jour -->
+            <div class="card-elevated bg-white p-6 rounded-lg mb-6">
+                <div class="flex flex-wrap gap-2" id="day-selector">
+                    <!-- Les boutons de jours seront ajoutés ici -->
+                </div>
+            </div>
+
+            <!-- Annonces importantes -->
+            <div id="announcements-section" class="mb-8">
+                <!-- Les annonces seront ajoutées ici -->
+            </div>
+
+            <!-- Menus du jour -->
+            <div id="daily-menus" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Les menus seront ajoutés ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Parking -->
+        <div id="parking-page" class="page-content hidden">
+            <!-- En-tête -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Parking</h2>
+                        <p class="text-gray-600">Gérez vos places de parking</p>
+                    </div>
+                    <button onclick="showParkingModal()" class="btn-primary mt-4 md:mt-0">
+                        <i class="fas fa-plus mr-2"></i>Réserver Place
+                    </button>
+                </div>
+
+                <!-- Statistiques parking -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="stat-total-spots">0</div>
+                        <div class="text-sm text-gray-600">Places Total</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-green-600" id="stat-free-spots">0</div>
+                        <div class="text-sm text-gray-600">Libres</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-orange-600" id="stat-reserved-spots">0</div>
+                        <div class="text-sm text-gray-600">Réservées</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-red-600" id="stat-occupied-spots">0</div>
+                        <div class="text-sm text-gray-600">Occupées</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plan du parking -->
+            <div class="card-elevated bg-white p-6 rounded-lg mb-6">
+                <h3 class="text-xl font-semibold mb-4">Plan du Parking</h3>
+                <div id="parking-grid" class="grid grid-cols-5 md:grid-cols-10 gap-2">
+                    <!-- Les places de parking seront ajoutées ici -->
+                </div>
+                <div class="flex flex-wrap gap-4 mt-4 text-sm">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                        <span>Libre</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-orange-500 rounded mr-2"></div>
+                        <span>Réservé</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                        <span>Occupé</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                        <span>Ma réservation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mes réservations parking -->
+            <div class="mt-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Mes Réservations Parking</h3>
+                <div id="my-parking-reservations" class="space-y-4">
+                    <!-- Les réservations parking seront ajoutées ici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Services -->
+        <div id="services-page" class="page-content hidden">
+            <!-- En-tête -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Services</h2>
+                        <p class="text-gray-600">Gérez les demandes de service et maintenance</p>
+                    </div>
+                    <button onclick="showServiceModal()" class="btn-primary mt-4 md:mt-0">
+                        <i class="fas fa-plus mr-2"></i>Nouvelle Demande
+                    </button>
+                </div>
+
+                <!-- Statistiques services -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="stat-total-requests">0</div>
+                        <div class="text-sm text-gray-600">Total Demandes</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-orange-600" id="stat-pending-requests">0</div>
+                        <div class="text-sm text-gray-600">En Attente</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="stat-progress-requests">0</div>
+                        <div class="text-sm text-gray-600">En Cours</div>
+                    </div>
+                    <div class="card-elevated bg-white p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-green-600" id="stat-completed-requests">0</div>
+                        <div class="text-sm text-gray-600">Terminées</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="card-elevated bg-white p-6 rounded-lg mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type de service</label>
+                        <select id="filter-service-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous les types</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="menage">Ménage</option>
+                            <option value="materiel">Matériel</option>
+                            <option value="informatique">Informatique</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+                        <select id="filter-service-status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous les statuts</option>
+                            <option value="ouvert">Ouvert</option>
+                            <option value="en_cours">En Cours</option>
+                            <option value="resolu">Résolu</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Urgence</label>
+                        <select id="filter-service-urgency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Toutes urgences</option>
+                            <option value="faible">Faible</option>
+                            <option value="moyenne">Moyenne</option>
+                            <option value="elevee">Élevée</option>
+                            <option value="critique">Critique</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des demandes de service -->
+            <div id="service-requests-list" class="space-y-4">
+                <!-- Les demandes seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de réservation -->
+    <div id="reservation-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Nouvelle Réservation</h3>
+                    <button onclick="closeModal('reservation-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form onsubmit="createReservation(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Salle</label>
+                            <select id="reservation-room" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner une salle...</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="reservation-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Participants</label>
+                                <input type="number" id="reservation-participants" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Heure début</label>
+                                <input type="time" id="reservation-start" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Heure fin</label>
+                                <input type="time" id="reservation-end" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Objet de la réunion</label>
+                            <input type="text" id="reservation-subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description (optionnel)</label>
+                            <textarea id="reservation-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="btn-primary flex-1">
+                            <i class="fas fa-save mr-2"></i>Réserver
+                        </button>
+                        <button type="button" onclick="closeModal('reservation-modal')" class="btn-secondary flex-1">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de menu -->
+    <div id="menu-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Ajouter Menu</h3>
+                    <button onclick="closeModal('menu-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form onsubmit="createMenu(event)">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="menu-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                                <select id="menu-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="entree">Entrée</option>
+                                    <option value="plat">Plat Principal</option>
+                                    <option value="dessert">Dessert</option>
+                                    <option value="boisson">Boisson</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom du plat</label>
+                            <input type="text" id="menu-name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="menu-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Prix (€)</label>
+                                <input type="number" id="menu-price" step="0.01" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Allergènes</label>
+                                <input type="text" id="menu-allergens" placeholder="Gluten, Lactose..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="btn-primary flex-1">
+                            <i class="fas fa-save mr-2"></i>Ajouter
+                        </button>
+                        <button type="button" onclick="closeModal('menu-modal')" class="btn-secondary flex-1">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de parking -->
+    <div id="parking-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Réserver Place de Parking</h3>
+                    <button onclick="closeModal('parking-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form onsubmit="createParkingReservation(event)">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="parking-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Type de véhicule</label>
+                                <select id="parking-vehicle" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="voiture">Voiture</option>
+                                    <option value="moto">Moto</option>
+                                    <option value="velo">Vélo</option>
+                                    <option value="electrique">Véhicule Électrique</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Heure d'arrivée</label>
+                                <input type="time" id="parking-start" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Heure de départ</label>
+                                <input type="time" id="parking-end" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Plaque d'immatriculation</label>
+                            <input type="text" id="parking-plate" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="btn-primary flex-1">
+                            <i class="fas fa-save mr-2"></i>Réserver
+                        </button>
+                        <button type="button" onclick="closeModal('parking-modal')" class="btn-secondary flex-1">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de service -->
+    <div id="service-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Nouvelle Demande de Service</h3>
+                    <button onclick="closeModal('service-modal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form onsubmit="createServiceRequest(event)">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Type de service</label>
+                                <select id="service-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="menage">Ménage</option>
+                                    <option value="materiel">Matériel</option>
+                                    <option value="informatique">Informatique</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Urgence</label>
+                                <select id="service-urgency" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="faible">Faible</option>
+                                    <option value="moyenne">Moyenne</option>
+                                    <option value="elevee">Élevée</option>
+                                    <option value="critique">Critique</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                            <input type="text" id="service-title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="service-description" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Localisation</label>
+                            <input type="text" id="service-location" placeholder="Ex: Bureau 205, Salle de réunion A..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="btn-primary flex-1">
+                            <i class="fas fa-save mr-2"></i>Créer Demande
+                        </button>
+                        <button type="button" onclick="closeModal('service-modal')" class="btn-secondary flex-1">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour la gestion de l'application
+        let currentPage = 'reservations';
+        let currentSelectedDay = new Date().toISOString().split('T')[0];
+        
+        // Données mock pour l'application
+        const mockData = {
+            // Données des salles
+            rooms: [
+                {
+                    id: 1,
+                    name: 'Main Room',
+                    capacity: 500,
+                    equipment: ['Smart Board', 'Projector', 'PA + 4 Mics', 'Audio & Video'],
+                    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=250&fit=crop',
+                    status: 'available',
+                    availability: 'Available until 11:00'
+                },
+                {
+                    id: 2,
+                    name: 'Big Room',
+                    capacity: 300,
+                    equipment: ['Projector', 'Sound System', 'Whiteboard'],
+                    image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=400&h=250&fit=crop',
+                    status: 'occupied',
+                    availability: 'Occupied until 15:30'
+                },
+                {
+                    id: 3,
+                    name: 'Medium Room',
+                    capacity: 50,
+                    equipment: ['TV Screen', 'Conference Phone'],
+                    image: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=400&h=250&fit=crop',
+                    status: 'reserved',
+                    availability: 'Reserved 14:00-16:00'
+                },
+                {
+                    id: 4,
+                    name: 'Small Room',
+                    capacity: 10,
+                    equipment: ['TV Screen', 'Whiteboard'],
+                    image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop',
+                    status: 'available',
+                    availability: 'Available all day'
+                },
+                {
+                    id: 5,
+                    name: 'Creative Space',
+                    capacity: 20,
+                    equipment: ['Interactive Board', 'Flexible Seating'],
+                    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=400&h=250&fit=crop',
+                    status: 'available',
+                    availability: 'Available from 10:00'
+                },
+                {
+                    id: 6,
+                    name: 'Phone Booth',
+                    capacity: 2,
+                    equipment: ['Soundproof', 'Phone'],
+                    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=250&fit=crop',
+                    status: 'occupied',
+                    availability: 'Occupied until 12:30'
+                }
+            ],
+            
+            // Réservations existantes
+            reservations: [
+                {
+                    id: 1,
+                    roomId: 2,
+                    roomName: 'Big Room',
+                    date: new Date().toISOString().split('T')[0],
+                    startTime: '09:00',
+                    endTime: '15:30',
+                    subject: 'Réunion équipe marketing',
+                    participants: 25,
+                    status: 'confirmed',
+                    user: 'Vous'
+                },
+                {
+                    id: 2,
+                    roomId: 3,
+                    roomName: 'Medium Room',
+                    date: new Date().toISOString().split('T')[0],
+                    startTime: '14:00',
+                    endTime: '16:00',
+                    subject: 'Formation nouveaux employés',
+                    participants: 15,
+                    status: 'confirmed',
+                    user: 'Marie Dupont'
+                }
+            ],
+            
+            // Menus de la cantine
+            menus: [
+                {
+                    id: 1,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'plat',
+                    name: 'Saumon grillé aux légumes',
+                    description: 'Saumon frais grillé accompagné de légumes de saison',
+                    price: 12.50,
+                    allergens: 'Poisson'
+                },
+                {
+                    id: 2,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'entree',
+                    name: 'Salade César',
+                    description: 'Salade verte, croûtons, parmesan, sauce César',
+                    price: 6.50,
+                    allergens: 'Gluten, Lactose'
+                },
+                {
+                    id: 3,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'dessert',
+                    name: 'Tarte aux pommes',
+                    description: 'Tarte maison aux pommes fraîches',
+                    price: 4.50,
+                    allergens: 'Gluten'
+                }
+            ],
+            
+            // Annonces de la cantine
+            announcements: [
+                {
+                    id: 1,
+                    title: 'Menu végétarien disponible',
+                    message: 'Nous proposons désormais des options végétariennes tous les jours !',
+                    type: 'info',
+                    date: new Date().toISOString().split('T')[0]
+                }
+            ],
+            
+            // Places de parking
+            parkingSpots: Array.from({length: 50}, (_, i) => ({
+                id: i + 1,
+                number: `P${String(i + 1).padStart(2, '0')}`,
+                status: Math.random() > 0.7 ? 'occupied' : Math.random() > 0.5 ? 'reserved' : 'free',
+                type: i < 5 ? 'electric' : i < 10 ? 'motorcycle' : 'car',
+                reservedBy: null,
+                reservedUntil: null
+            })),
+            
+            // Réservations de parking
+            parkingReservations: [
+                {
+                    id: 1,
+                    spotId: 15,
+                    spotNumber: 'P15',
+                    date: new Date().toISOString().split('T')[0],
+                    startTime: '08:00',
+                    endTime: '18:00',
+                    vehicle: 'voiture',
+                    plate: 'AB-123-CD',
+                    status: 'active',
+                    user: 'Vous'
+                }
+            ],
+            
+            // Demandes de service
+            serviceRequests: [
+                {
+                    id: 1,
+                    type: 'maintenance',
+                    title: 'Réparation climatisation',
+                    description: 'La climatisation de la salle de réunion A ne fonctionne plus',
+                    urgency: 'elevee',
+                    status: 'ouvert',
+                    location: 'Salle de réunion A',
+                    createdDate: new Date().toISOString().split('T')[0],
+                    assignedTo: null,
+                    user: 'Jean Dupont'
+                },
+                {
+                    id: 2,
+                    type: 'informatique',
+                    title: 'Problème connexion WiFi',
+                    description: 'Connexion WiFi instable dans l\'open space',
+                    urgency: 'moyenne',
+                    status: 'en_cours',
+                    location: 'Open Space',
+                    createdDate: '2024-01-10',
+                    assignedTo: 'Service IT',
+                    user: 'Marie Martin'
+                },
+                {
+                    id: 3,
+                    type: 'menage',
+                    title: 'Nettoyage urgent',
+                    description: 'Café renversé dans la salle de pause',
+                    urgency: 'faible',
+                    status: 'resolu',
+                    location: 'Salle de pause',
+                    createdDate: '2024-01-08',
+                    assignedTo: 'Équipe ménage',
+                    user: 'Paul Durand'
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('reservations');
+            updateAllStats();
+            
+            // Définir la date par défaut à aujourd'hui
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (!input.value) {
+                    input.value = today;
+                }
+            });
+            
+            // Ajouter les event listeners pour les filtres
+            setupEventListeners();
+        });
+
+        // Configuration des event listeners
+        function setupEventListeners() {
+            // Filtres de recherche pour les salles
+            document.getElementById('search-rooms')?.addEventListener('input', filterRooms);
+            document.getElementById('filter-date')?.addEventListener('change', filterRooms);
+            document.getElementById('filter-capacity')?.addEventListener('change', filterRooms);
+            
+            // Filtres pour les services
+            document.getElementById('filter-service-type')?.addEventListener('change', filterServiceRequests);
+            document.getElementById('filter-service-status')?.addEventListener('change', filterServiceRequests);
+            document.getElementById('filter-service-urgency')?.addEventListener('change', filterServiceRequests);
+        }
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+            
+            // Mettre à jour la navigation active
+            updateActiveNavigation(pageId);
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'reservations':
+                    loadRooms();
+                    loadMyReservations();
+                    updateReservationStats();
+                    break;
+                case 'cantine':
+                    loadDaySelector();
+                    loadDailyMenus();
+                    loadAnnouncements();
+                    break;
+                case 'parking':
+                    loadParkingGrid();
+                    loadMyParkingReservations();
+                    updateParkingStats();
+                    break;
+                case 'services':
+                    loadServiceRequests();
+                    updateServiceStats();
+                    break;
+            }
+        }
+
+        // Mise à jour de la navigation active
+        function updateActiveNavigation(pageId) {
+            // Navigation desktop
+            const desktopLinks = document.querySelectorAll('.nav-link');
+            desktopLinks.forEach(link => {
+                link.classList.remove('bg-blue-700');
+            });
+            
+            // Navigation mobile
+            const mobileLinks = document.querySelectorAll('.nav-mobile-link');
+            mobileLinks.forEach(link => {
+                link.classList.remove('text-blue-600');
+                link.classList.add('text-gray-600');
+            });
+            
+            // Activer le lien correspondant
+            const activeDesktopLink = document.querySelector(`[onclick="showPage('${pageId}')"].nav-link`);
+            const activeMobileLink = document.querySelector(`[onclick="showPage('${pageId}')"].nav-mobile-link`);
+            
+            if (activeDesktopLink) {
+                activeDesktopLink.classList.add('bg-blue-700');
+            }
+            if (activeMobileLink) {
+                activeMobileLink.classList.remove('text-gray-600');
+                activeMobileLink.classList.add('text-blue-600');
+            }
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('coworkingData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('coworkingData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // SECTION RÉSERVATIONS
+        function loadRooms() {
+            const container = document.getElementById('rooms-list');
+            const roomSelect = document.getElementById('reservation-room');
+            
+            if (!container) return;
+            
+            container.innerHTML = '';
+            if (roomSelect) roomSelect.innerHTML = '<option value="">Sélectionner une salle...</option>';
+            
+            mockData.rooms.forEach(room => {
+                // Créer la carte de salle
+                const roomCard = createRoomCard(room);
+                container.appendChild(roomCard);
+                
+                // Ajouter à la liste de sélection
+                if (roomSelect && room.status === 'available') {
+                    const option = document.createElement('option');
+                    option.value = room.id;
+                    option.textContent = `${room.name} (${room.capacity} pers.)`;
+                    roomSelect.appendChild(option);
+                }
+            });
+        }
+
+        function createRoomCard(room) {
+            const card = document.createElement('div');
+            card.className = 'card-elevated bg-white rounded-lg overflow-hidden';
+            
+            const statusClass = room.status === 'available' ? 'status-available' : 
+                               room.status === 'occupied' ? 'status-occupied' : 'status-reserved';
+            
+            card.innerHTML = `
+                <div class="relative">
+                    <img src="${room.image}" alt="${room.name}" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4">
+                        <span class="${statusClass}">${room.status === 'available' ? 'Disponible' : 
+                                                      room.status === 'occupied' ? 'Occupée' : 'Réservée'}</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">${room.name}</h3>
+                    <p class="text-gray-600 mb-3">Capacité: ${room.capacity} personnes</p>
+                    <p class="text-sm text-gray-500 mb-4">${room.availability}</p>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Équipements:</h4>
+                        <div class="flex flex-wrap gap-1">
+                            ${room.equipment.map(eq => `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${eq}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        ${room.status === 'available' ? 
+                            `<button onclick="quickReserve(${room.id})" class="btn-primary flex-1 text-sm py-2">
+                                <i class="fas fa-calendar-plus mr-1"></i>Réserver
+                            </button>` : 
+                            `<button class="btn-secondary flex-1 text-sm py-2" disabled>
+                                <i class="fas fa-lock mr-1"></i>Indisponible
+                            </button>`
+                        }
+                        <button onclick="viewRoomDetails(${room.id})" class="btn-secondary text-sm py-2 px-4">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function quickReserve(roomId) {
+            const room = mockData.rooms.find(r => r.id === roomId);
+            if (room) {
+                document.getElementById('reservation-room').value = roomId;
+                showReservationModal();
+            }
+        }
+
+        function viewRoomDetails(roomId) {
+            const room = mockData.rooms.find(r => r.id === roomId);
+            if (room) {
+                showToast(`Détails de ${room.name}: ${room.capacity} personnes, ${room.equipment.join(', ')}`);
+            }
+        }
+
+        function filterRooms() {
+            const searchTerm = document.getElementById('search-rooms')?.value.toLowerCase() || '';
+            const filterDate = document.getElementById('filter-date')?.value || '';
+            const filterCapacity = document.getElementById('filter-capacity')?.value || '';
+            
+            const filteredRooms = mockData.rooms.filter(room => {
+                const matchesSearch = room.name.toLowerCase().includes(searchTerm);
+                const matchesCapacity = !filterCapacity || room.capacity >= parseInt(filterCapacity);
+                
+                return matchesSearch && matchesCapacity;
+            });
+            
+            const container = document.getElementById('rooms-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            filteredRooms.forEach(room => {
+                const roomCard = createRoomCard(room);
+                container.appendChild(roomCard);
+            });
+        }
+
+        function loadMyReservations() {
+            const container = document.getElementById('my-reservations');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const myReservations = mockData.reservations.filter(res => res.user === 'Vous');
+            
+            if (myReservations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune réservation trouvée</p>';
+                return;
+            }
+            
+            myReservations.forEach(reservation => {
+                const reservationCard = createReservationCard(reservation);
+                container.appendChild(reservationCard);
+            });
+        }
+
+        function createReservationCard(reservation) {
+            const card = document.createElement('div');
+            card.className = 'card-elevated bg-white p-6 rounded-lg';
+            
+            const statusClass = reservation.status === 'confirmed' ? 'status-available' : 'status-reserved';
+            
+            card.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h4 class="text-lg font-semibold text-gray-900">${reservation.subject}</h4>
+                            <span class="${statusClass}">${reservation.status === 'confirmed' ? 'Confirmée' : 'En attente'}</span>
+                        </div>
+                        <div class="text-gray-600 space-y-1">
+                            <p><i class="fas fa-door-open mr-2"></i>${reservation.roomName}</p>
+                            <p><i class="fas fa-calendar mr-2"></i>${new Date(reservation.date).toLocaleDateString('fr-FR')}</p>
+                            <p><i class="fas fa-clock mr-2"></i>${reservation.startTime} - ${reservation.endTime}</p>
+                            <p><i class="fas fa-users mr-2"></i>${reservation.participants} participants</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-4 md:mt-0">
+                        <button onclick="editReservation(${reservation.id})" class="btn-secondary text-sm py-2 px-3">
+                            <i class="fas fa-edit mr-1"></i>Modifier
+                        </button>
+                        <button onclick="cancelReservation(${reservation.id})" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded-md">
+                            <i class="fas fa-times mr-1"></i>Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function editReservation(reservationId) {
+            const reservation = mockData.reservations.find(r => r.id === reservationId);
+            if (reservation) {
+                // Pré-remplir le formulaire avec les données existantes
+                document.getElementById('reservation-room').value = reservation.roomId;
+                document.getElementById('reservation-date').value = reservation.date;
+                document.getElementById('reservation-start').value = reservation.startTime;
+                document.getElementById('reservation-end').value = reservation.endTime;
+                document.getElementById('reservation-participants').value = reservation.participants;
+                document.getElementById('reservation-subject').value = reservation.subject;
+                
+                showReservationModal();
+            }
+        }
+
+        function cancelReservation(reservationId) {
+            if (confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+                mockData.reservations = mockData.reservations.filter(r => r.id !== reservationId);
+                saveDataToStorage();
+                loadMyReservations();
+                updateReservationStats();
+                showToast('Réservation annulée avec succès');
+            }
+        }
+
+        function updateReservationStats() {
+            const totalRooms = mockData.rooms.length;
+            const availableRooms = mockData.rooms.filter(r => r.status === 'available').length;
+            const reservedRooms = mockData.rooms.filter(r => r.status === 'reserved').length;
+            const occupiedRooms = mockData.rooms.filter(r => r.status === 'occupied').length;
+            
+            document.getElementById('stat-total-rooms').textContent = totalRooms;
+            document.getElementById('stat-available-rooms').textContent = availableRooms;
+            document.getElementById('stat-reserved-rooms').textContent = reservedRooms;
+            document.getElementById('stat-occupied-rooms').textContent = occupiedRooms;
+        }
+
+        // SECTION CANTINE
+        function loadDaySelector() {
+            const container = document.getElementById('day-selector');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+            const today = new Date().getDay(); // 0 = Dimanche, 1 = Lundi, etc.
+            
+            days.forEach((day, index) => {
+                const button = document.createElement('button');
+                button.className = `px-4 py-2 rounded-md transition-colors duration-200 ${
+                    index + 1 === today ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`;
+                button.textContent = day;
+                button.onclick = () => selectDay(index + 1, button);
+                container.appendChild(button);
+            });
+        }
+
+        function selectDay(dayIndex, buttonElement) {
+            // Mettre à jour l'apparence des boutons
+            const buttons = document.querySelectorAll('#day-selector button');
+            buttons.forEach(btn => {
+                btn.className = 'px-4 py-2 rounded-md transition-colors duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300';
+            });
+            buttonElement.className = 'px-4 py-2 rounded-md transition-colors duration-200 bg-blue-600 text-white';
+            
+            // Charger les menus du jour sélectionné
+            loadDailyMenus();
+        }
+
+        function loadDailyMenus() {
+            const container = document.getElementById('daily-menus');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Grouper les menus par type
+            const menusByType = {
+                entree: mockData.menus.filter(m => m.type === 'entree'),
+                plat: mockData.menus.filter(m => m.type === 'plat'),
+                dessert: mockData.menus.filter(m => m.type === 'dessert'),
+                boisson: mockData.menus.filter(m => m.type === 'boisson')
+            };
+            
+            Object.entries(menusByType).forEach(([type, menus]) => {
+                if (menus.length > 0) {
+                    const typeCard = createMenuTypeCard(type, menus);
+                    container.appendChild(typeCard);
+                }
+            });
+            
+            if (mockData.menus.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8 col-span-full">Aucun menu disponible pour aujourd\'hui</p>';
+            }
+        }
+
+        function createMenuTypeCard(type, menus) {
+            const card = document.createElement('div');
+            card.className = 'card-elevated bg-white rounded-lg p-6';
+            
+            const typeNames = {
+                entree: 'Entrées',
+                plat: 'Plats Principaux',
+                dessert: 'Desserts',
+                boisson: 'Boissons'
+            };
+            
+            const typeIcons = {
+                entree: 'fas fa-leaf',
+                plat: 'fas fa-drumstick-bite',
+                dessert: 'fas fa-ice-cream',
+                boisson: 'fas fa-glass-water'
+            };
+            
+            card.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <i class="${typeIcons[type]} text-2xl text-blue-600 mr-3"></i>
+                    <h3 class="text-xl font-bold text-gray-900">${typeNames[type]}</h3>
+                </div>
+                <div class="space-y-4">
+                    ${menus.map(menu => `
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-semibold text-gray-900">${menu.name}</h4>
+                                <span class="text-lg font-bold text-blue-600">${menu.price}€</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">${menu.description}</p>
+                            ${menu.allergens ? `
+                                <div class="flex flex-wrap gap-1">
+                                    ${menu.allergens.split(',').map(allergen => 
+                                        `<span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">${allergen.trim()}</span>`
+                                    ).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function loadAnnouncements() {
+            const container = document.getElementById('announcements-section');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (mockData.announcements.length === 0) return;
+            
+            const announcementsCard = document.createElement('div');
+            announcementsCard.className = 'card-elevated bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg';
+            
+            announcementsCard.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-bullhorn text-2xl text-yellow-600 mr-3"></i>
+                    <h3 class="text-xl font-bold text-gray-900">Annonces</h3>
+                </div>
+                <div class="space-y-3">
+                    ${mockData.announcements.map(announcement => `
+                        <div class="bg-white p-4 rounded-md">
+                            <h4 class="font-semibold text-gray-900 mb-2">${announcement.title}</h4>
+                            <p class="text-gray-600">${announcement.message}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.appendChild(announcementsCard);
+        }
+
+        // SECTION PARKING
+        function loadParkingGrid() {
+            const container = document.getElementById('parking-grid');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            mockData.parkingSpots.forEach(spot => {
+                const spotElement = createParkingSpot(spot);
+                container.appendChild(spotElement);
+            });
+        }
+
+        function createParkingSpot(spot) {
+            const spotDiv = document.createElement('div');
+            spotDiv.className = `parking-spot w-12 h-12 rounded-md flex items-center justify-center text-xs font-bold cursor-pointer transition-all duration-200 ${
+                spot.status === 'free' ? 'bg-green-500 text-white hover:bg-green-600' :
+                spot.status === 'reserved' ? 'bg-orange-500 text-white' :
+                spot.status === 'occupied' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            
+            spotDiv.textContent = spot.number;
+            spotDiv.title = `Place ${spot.number} - ${
+                spot.status === 'free' ? 'Libre' :
+                spot.status === 'reserved' ? 'Réservée' :
+                spot.status === 'occupied' ? 'Occupée' : 'Ma réservation'
+            }`;
+            
+            if (spot.status === 'free') {
+                spotDiv.onclick = () => reserveParkingSpot(spot.id);
+            }
+            
+            return spotDiv;
+        }
+
+        function reserveParkingSpot(spotId) {
+            const spot = mockData.parkingSpots.find(s => s.id === spotId);
+            if (spot && spot.status === 'free') {
+                showParkingModal();
+                // Optionnel: pré-sélectionner la place dans le modal
+            }
+        }
+
+        function loadMyParkingReservations() {
+            const container = document.getElementById('my-parking-reservations');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const myReservations = mockData.parkingReservations.filter(res => res.user === 'Vous');
+            
+            if (myReservations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune réservation de parking trouvée</p>';
+                return;
+            }
+            
+            myReservations.forEach(reservation => {
+                const reservationCard = createParkingReservationCard(reservation);
+                container.appendChild(reservationCard);
+            });
+        }
+
+        function createParkingReservationCard(reservation) {
+            const card = document.createElement('div');
+            card.className = 'card-elevated bg-white p-6 rounded-lg';
+            
+            const statusClass = reservation.status === 'active' ? 'status-available' : 'status-reserved';
+            
+            card.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h4 class="text-lg font-semibold text-gray-900">Place ${reservation.spotNumber}</h4>
+                            <span class="${statusClass}">${reservation.status === 'active' ? 'Active' : 'En attente'}</span>
+                        </div>
+                        <div class="text-gray-600 space-y-1">
+                            <p><i class="fas fa-calendar mr-2"></i>${new Date(reservation.date).toLocaleDateString('fr-FR')}</p>
+                            <p><i class="fas fa-clock mr-2"></i>${reservation.startTime} - ${reservation.endTime}</p>
+                            <p><i class="fas fa-car mr-2"></i>${reservation.vehicle} - ${reservation.plate}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-4 md:mt-0">
+                        <button onclick="extendParkingReservation(${reservation.id})" class="btn-secondary text-sm py-2 px-3">
+                            <i class="fas fa-clock mr-1"></i>Prolonger
+                        </button>
+                        <button onclick="cancelParkingReservation(${reservation.id})" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded-md">
+                            <i class="fas fa-times mr-1"></i>Libérer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function extendParkingReservation(reservationId) {
+            showToast('Fonctionnalité de prolongation à venir');
+        }
+
+        function cancelParkingReservation(reservationId) {
+            if (confirm('Êtes-vous sûr de vouloir libérer cette place ?')) {
+                const reservation = mockData.parkingReservations.find(r => r.id === reservationId);
+                if (reservation) {
+                    // Libérer la place
+                    const spot = mockData.parkingSpots.find(s => s.id === reservation.spotId);
+                    if (spot) {
+                        spot.status = 'free';
+                        spot.reservedBy = null;
+                        spot.reservedUntil = null;
+                    }
+                    
+                    // Supprimer la réservation
+                    mockData.parkingReservations = mockData.parkingReservations.filter(r => r.id !== reservationId);
+                    
+                    saveDataToStorage();
+                    loadParkingGrid();
+                    loadMyParkingReservations();
+                    updateParkingStats();
+                    showToast('Place libérée avec succès');
+                }
+            }
+        }
+
+        function updateParkingStats() {
+            const totalSpots = mockData.parkingSpots.length;
+            const freeSpots = mockData.parkingSpots.filter(s => s.status === 'free').length;
+            const reservedSpots = mockData.parkingSpots.filter(s => s.status === 'reserved').length;
+            const occupiedSpots = mockData.parkingSpots.filter(s => s.status === 'occupied').length;
+            
+            document.getElementById('stat-total-spots').textContent = totalSpots;
+            document.getElementById('stat-free-spots').textContent = freeSpots;
+            document.getElementById('stat-reserved-spots').textContent = reservedSpots;
+            document.getElementById('stat-occupied-spots').textContent = occupiedSpots;
+        }
+
+        // SECTION SERVICES
+        function loadServiceRequests() {
+            const container = document.getElementById('service-requests-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (mockData.serviceRequests.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune demande de service trouvée</p>';
+                return;
+            }
+            
+            mockData.serviceRequests.forEach(request => {
+                const requestCard = createServiceRequestCard(request);
+                container.appendChild(requestCard);
+            });
+        }
+
+        function createServiceRequestCard(request) {
+            const card = document.createElement('div');
+            card.className = 'card-elevated bg-white p-6 rounded-lg';
+            
+            const urgencyColors = {
+                faible: 'bg-green-100 text-green-800',
+                moyenne: 'bg-yellow-100 text-yellow-800',
+                elevee: 'bg-orange-100 text-orange-800',
+                critique: 'bg-red-100 text-red-800'
+            };
+            
+            const statusColors = {
+                ouvert: 'bg-blue-100 text-blue-800',
+                en_cours: 'bg-orange-100 text-orange-800',
+                resolu: 'bg-green-100 text-green-800'
+            };
+            
+            const typeIcons = {
+                maintenance: 'fas fa-wrench',
+                menage: 'fas fa-broom',
+                materiel: 'fas fa-box',
+                informatique: 'fas fa-laptop',
+                autre: 'fas fa-question-circle'
+            };
+            
+            card.innerHTML = `
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="${typeIcons[request.type]} text-xl text-blue-600"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">${request.title}</h4>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${urgencyColors[request.urgency]}">
+                                ${request.urgency.charAt(0).toUpperCase() + request.urgency.slice(1)}
+                            </span>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[request.status]}">
+                                ${request.status === 'ouvert' ? 'Ouvert' : 
+                                  request.status === 'en_cours' ? 'En Cours' : 'Résolu'}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 mb-3">${request.description}</p>
+                        
+                        <div class="text-sm text-gray-500 space-y-1">
+                            <p><i class="fas fa-map-marker-alt mr-2"></i>${request.location}</p>
+                            <p><i class="fas fa-user mr-2"></i>Demandé par: ${request.user}</p>
+                            <p><i class="fas fa-calendar mr-2"></i>Créé le: ${new Date(request.createdDate).toLocaleDateString('fr-FR')}</p>
+                            ${request.assignedTo ? `<p><i class="fas fa-user-cog mr-2"></i>Assigné à: ${request.assignedTo}</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 lg:min-w-[150px]">
+                        ${request.status === 'ouvert' ? `
+                            <button onclick="assignServiceRequest(${request.id})" class="btn-primary text-sm py-2">
+                                <i class="fas fa-user-plus mr-1"></i>Assigner
+                            </button>
+                        ` : ''}
+                        ${request.status === 'en_cours' ? `
+                            <button onclick="completeServiceRequest(${request.id})" class="bg-green-500 hover:bg-green-600 text-white text-sm py-2 px-3 rounded-md">
+                                <i class="fas fa-check mr-1"></i>Terminer
+                            </button>
+                        ` : ''}
+                        <button onclick="updateServiceRequest(${request.id})" class="btn-secondary text-sm py-2">
+                            <i class="fas fa-edit mr-1"></i>Modifier
+                        </button>
+                        <button onclick="deleteServiceRequest(${request.id})" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded-md">
+                            <i class="fas fa-trash mr-1"></i>Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function assignServiceRequest(requestId) {
+            const assignee = prompt('Assigner à (nom ou service):');
+            if (assignee) {
+                const request = mockData.serviceRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.assignedTo = assignee;
+                    request.status = 'en_cours';
+                    saveDataToStorage();
+                    loadServiceRequests();
+                    updateServiceStats();
+                    showToast('Demande assignée avec succès');
+                }
+            }
+        }
+
+        function completeServiceRequest(requestId) {
+            if (confirm('Marquer cette demande comme résolue ?')) {
+                const request = mockData.serviceRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'resolu';
+                    saveDataToStorage();
+                    loadServiceRequests();
+                    updateServiceStats();
+                    showToast('Demande marquée comme résolue');
+                }
+            }
+        }
+
+        function updateServiceRequest(requestId) {
+            showToast('Fonctionnalité de modification à venir');
+        }
+
+        function deleteServiceRequest(requestId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) {
+                mockData.serviceRequests = mockData.serviceRequests.filter(r => r.id !== requestId);
+                saveDataToStorage();
+                loadServiceRequests();
+                updateServiceStats();
+                showToast('Demande supprimée avec succès');
+            }
+        }
+
+        function filterServiceRequests() {
+            const typeFilter = document.getElementById('filter-service-type')?.value || '';
+            const statusFilter = document.getElementById('filter-service-status')?.value || '';
+            const urgencyFilter = document.getElementById('filter-service-urgency')?.value || '';
+            
+            const filteredRequests = mockData.serviceRequests.filter(request => {
+                const matchesType = !typeFilter || request.type === typeFilter;
+                const matchesStatus = !statusFilter || request.status === statusFilter;
+                const matchesUrgency = !urgencyFilter || request.urgency === urgencyFilter;
+                
+                return matchesType && matchesStatus && matchesUrgency;
+            });
+            
+            const container = document.getElementById('service-requests-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (filteredRequests.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune demande trouvée avec ces filtres</p>';
+                return;
+            }
+            
+            filteredRequests.forEach(request => {
+                const requestCard = createServiceRequestCard(request);
+                container.appendChild(requestCard);
+            });
+        }
+
+        function updateServiceStats() {
+            const totalRequests = mockData.serviceRequests.length;
+            const pendingRequests = mockData.serviceRequests.filter(r => r.status === 'ouvert').length;
+            const progressRequests = mockData.serviceRequests.filter(r => r.status === 'en_cours').length;
+            const completedRequests = mockData.serviceRequests.filter(r => r.status === 'resolu').length;
+            
+            document.getElementById('stat-total-requests').textContent = totalRequests;
+            document.getElementById('stat-pending-requests').textContent = pendingRequests;
+            document.getElementById('stat-progress-requests').textContent = progressRequests;
+            document.getElementById('stat-completed-requests').textContent = completedRequests;
+        }
+
+        // GESTION DES MODALS
+        function showReservationModal() {
+            document.getElementById('reservation-modal').classList.remove('hidden');
+        }
+
+        function showMenuModal() {
+            document.getElementById('menu-modal').classList.remove('hidden');
+        }
+
+        function showParkingModal() {
+            document.getElementById('parking-modal').classList.remove('hidden');
+        }
+
+        function showServiceModal() {
+            document.getElementById('service-modal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Fermer les modals en cliquant à l'extérieur
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.add('hidden');
+            }
+        });
+
+        // CRÉATION D'ÉLÉMENTS
+        function createReservation(event) {
+            event.preventDefault();
+            
+            const formData = {
+                roomId: parseInt(document.getElementById('reservation-room').value),
+                date: document.getElementById('reservation-date').value,
+                startTime: document.getElementById('reservation-start').value,
+                endTime: document.getElementById('reservation-end').value,
+                participants: parseInt(document.getElementById('reservation-participants').value),
+                subject: document.getElementById('reservation-subject').value,
+                description: document.getElementById('reservation-description').value
+            };
+            
+            // Validation basique
+            if (formData.startTime >= formData.endTime) {
+                showToast('L\'heure de fin doit être après l\'heure de début', 'error');
+                return;
+            }
+            
+            const room = mockData.rooms.find(r => r.id === formData.roomId);
+            if (!room) {
+                showToast('Salle non trouvée', 'error');
+                return;
+            }
+            
+            if (formData.participants > room.capacity) {
+                showToast(`Cette salle ne peut accueillir que ${room.capacity} personnes maximum`, 'error');
+                return;
+            }
+            
+            // Créer la réservation
+            const newReservation = {
+                id: Date.now(),
+                roomId: formData.roomId,
+                roomName: room.name,
+                date: formData.date,
+                startTime: formData.startTime,
+                endTime: formData.endTime,
+                subject: formData.subject,
+                participants: formData.participants,
+                status: 'confirmed',
+                user: 'Vous'
+            };
+            
+            mockData.reservations.push(newReservation);
+            
+            // Mettre à jour le statut de la salle si c'est pour aujourd'hui
+            const today = new Date().toISOString().split('T')[0];
+            if (formData.date === today) {
+                room.status = 'reserved';
+                room.availability = `Réservée ${formData.startTime}-${formData.endTime}`;
+            }
+            
+            saveDataToStorage();
+            closeModal('reservation-modal');
+            loadRooms();
+            loadMyReservations();
+            updateReservationStats();
+            showToast('Réservation créée avec succès');
+            
+            // Réinitialiser le formulaire
+            event.target.reset();
+        }
+
+        function createMenu(event) {
+            event.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('menu-date').value,
+                type: document.getElementById('menu-type').value,
+                name: document.getElementById('menu-name').value,
+                description: document.getElementById('menu-description').value,
+                price: parseFloat(document.getElementById('menu-price').value),
+                allergens: document.getElementById('menu-allergens').value
+            };
+            
+            const newMenu = {
+                id: Date.now(),
+                ...formData
+            };
+            
+            mockData.menus.push(newMenu);
+            saveDataToStorage();
+            closeModal('menu-modal');
+            loadDailyMenus();
+            showToast('Menu ajouté avec succès');
+            
+            event.target.reset();
+        }
+
+        function createParkingReservation(event) {
+            event.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('parking-date').value,
+                vehicle: document.getElementById('parking-vehicle').value,
+                startTime: document.getElementById('parking-start').value,
+                endTime: document.getElementById('parking-end').value,
+                plate: document.getElementById('parking-plate').value
+            };
+            
+            // Validation
+            if (formData.startTime >= formData.endTime) {
+                showToast('L\'heure de départ doit être après l\'heure d\'arrivée', 'error');
+                return;
+            }
+            
+            // Trouver une place libre
+            const freeSpot = mockData.parkingSpots.find(s => s.status === 'free');
+            if (!freeSpot) {
+                showToast('Aucune place libre disponible', 'error');
+                return;
+            }
+            
+            // Créer la réservation
+            const newReservation = {
+                id: Date.now(),
+                spotId: freeSpot.id,
+                spotNumber: freeSpot.number,
+                date: formData.date,
+                startTime: formData.startTime,
+                endTime: formData.endTime,
+                vehicle: formData.vehicle,
+                plate: formData.plate,
+                status: 'active',
+                user: 'Vous'
+            };
+            
+            mockData.parkingReservations.push(newReservation);
+            
+            // Mettre à jour le statut de la place
+            freeSpot.status = 'reserved';
+            freeSpot.reservedBy = 'Vous';
+            freeSpot.reservedUntil = `${formData.date} ${formData.endTime}`;
+            
+            saveDataToStorage();
+            closeModal('parking-modal');
+            loadParkingGrid();
+            loadMyParkingReservations();
+            updateParkingStats();
+            showToast(`Place ${freeSpot.number} réservée avec succès`);
+            
+            event.target.reset();
+        }
+
+        function createServiceRequest(event) {
+            event.preventDefault();
+            
+            const formData = {
+                type: document.getElementById('service-type').value,
+                urgency: document.getElementById('service-urgency').value,
+                title: document.getElementById('service-title').value,
+                description: document.getElementById('service-description').value,
+                location: document.getElementById('service-location').value
+            };
+            
+            const newRequest = {
+                id: Date.now(),
+                ...formData,
+                status: 'ouvert',
+                createdDate: new Date().toISOString().split('T')[0],
+                assignedTo: null,
+                user: 'Vous'
+            };
+            
+            mockData.serviceRequests.push(newRequest);
+            saveDataToStorage();
+            closeModal('service-modal');
+            loadServiceRequests();
+            updateServiceStats();
+            showToast('Demande de service créée avec succès');
+            
+            event.target.reset();
+        }
+
+        // UTILITAIRES
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function updateAllStats() {
+            updateReservationStats();
+            updateParkingStats();
+            updateServiceStats();
+        }
+
+        // Gestion des touches clavier pour l'accessibilité
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal-overlay:not(.hidden)');
+                openModals.forEach(modal => modal.classList.add('hidden'));
+            }
+        });
+
+        // Gestion du focus pour l'accessibilité
+        document.addEventListener('focusin', function(event) {
+            if (event.target.matches('button, input, select, textarea')) {
+                event.target.style.outline = '2px solid var(--primary-blue)';
+                event.target.style.outlineOffset = '2px';
+            }
+        });
+
+        document.addEventListener('focusout', function(event) {
+            if (event.target.matches('button, input, select, textarea')) {
+                event.target.style.outline = '';
+                event.target.style.outlineOffset = '';
+            }
+        });
+    </script>
+</body>
+</html>
