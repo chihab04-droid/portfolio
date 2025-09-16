@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Site Industriel</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles personnalisés inspirés de l'image */
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .status-ouvert { background-color: #fef3c7; color: #92400e; }
+        .status-en-cours { background-color: #dbeafe; color: #1e40af; }
+        .status-resolu { background-color: #d1fae5; color: #065f46; }
+        
+        .priority-haute { border-left: 4px solid #ef4444; }
+        .priority-moyenne { border-left: 4px solid #f59e0b; }
+        .priority-basse { border-left: 4px solid #10b981; }
+        
+        .risk-haut { background-color: #fee2e2; color: #991b1b; }
+        .risk-moyen { background-color: #fef3c7; color: #92400e; }
+        .risk-bas { background-color: #d1fae5; color: #065f46; }
+        
+        .hidden { display: none !important; }
+        
+        /* Styles pour la navbar mobile */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Styles pour les graphiques */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Styles pour la carte des risques */
+        .risk-map {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border: 2px solid #d1d5db;
+        }
+        
+        .risk-point {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .risk-point:hover {
+            transform: scale(1.2);
+        }
+        
+        .risk-point.haut {
+            background-color: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        
+        .risk-point.moyen {
+            background-color: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        
+        .risk-point.bas {
+            background-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar Responsive -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-industry text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Gestion Site Industriel</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('maintenance')" class="nav-link hover:text-teal-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-tools mr-2"></i>Maintenance
+                    </button>
+                    <button onclick="showPage('energie')" class="nav-link hover:text-teal-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-bolt mr-2"></i>Énergie
+                    </button>
+                    <button onclick="showPage('risques')" class="nav-link hover:text-teal-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Lieux à risques
+                    </button>
+                    <button onclick="showPage('reduction')" class="nav-link hover:text-teal-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-leaf mr-2"></i>Réduction conso
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile - Burger -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-teal-200 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu Mobile Overlay -->
+        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="closeMobileMenu()"></div>
+        
+        <!-- Menu Mobile Sidebar -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-64 bg-teal-700 z-50 md:hidden">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-lg font-bold text-white">Menu</h2>
+                    <button onclick="closeMobileMenu()" class="text-white hover:text-teal-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <nav class="space-y-4">
+                    <button onclick="showPage('maintenance'); closeMobileMenu();" class="w-full text-left px-4 py-3 text-white hover:bg-teal-600 rounded-md transition-colors duration-200">
+                        <i class="fas fa-tools mr-3"></i>Maintenance
+                    </button>
+                    <button onclick="showPage('energie'); closeMobileMenu();" class="w-full text-left px-4 py-3 text-white hover:bg-teal-600 rounded-md transition-colors duration-200">
+                        <i class="fas fa-bolt mr-3"></i>Énergie
+                    </button>
+                    <button onclick="showPage('risques'); closeMobileMenu();" class="w-full text-left px-4 py-3 text-white hover:bg-teal-600 rounded-md transition-colors duration-200">
+                        <i class="fas fa-exclamation-triangle mr-3"></i>Lieux à risques
+                    </button>
+                    <button onclick="showPage('reduction'); closeMobileMenu();" class="w-full text-left px-4 py-3 text-white hover:bg-teal-600 rounded-md transition-colors duration-200">
+                        <i class="fas fa-leaf mr-3"></i>Réduction conso
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Maintenance -->
+        <div id="maintenance-page" class="page-content">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-tools text-teal-600 mr-3"></i>Maintenance
+                </h2>
+                <button onclick="showMaintenanceForm()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Nouvelle Demande
+                </button>
+            </div>
+            
+            <!-- Formulaire de maintenance (caché par défaut) -->
+            <div id="maintenance-form" class="hidden bg-white p-6 rounded-lg card-shadow mb-8">
+                <h3 class="text-xl font-semibold mb-4">Nouvelle demande de maintenance</h3>
+                <form onsubmit="addMaintenance(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Site</label>
+                            <select id="maintenance-site" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                <option value="">Sélectionner un site...</option>
+                                <option value="Bâtiment A">Bâtiment A</option>
+                                <option value="Bâtiment B">Bâtiment B</option>
+                                <option value="Entrepôt">Entrepôt</option>
+                                <option value="Zone production">Zone production</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Équipement</label>
+                            <input type="text" id="maintenance-equipement" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Urgence</label>
+                        <select id="maintenance-urgence" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <option value="">Sélectionner...</option>
+                            <option value="basse">Basse</option>
+                            <option value="moyenne">Moyenne</option>
+                            <option value="haute">Haute</option>
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="maintenance-description" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideMaintenanceForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Kanban des demandes de maintenance -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Colonne Ouvert -->
+                <div class="bg-white p-4 rounded-lg card-shadow">
+                    <h3 class="text-lg font-semibold mb-4 text-yellow-700">
+                        <i class="fas fa-clock mr-2"></i>Ouvert
+                    </h3>
+                    <div id="maintenance-ouvert" class="space-y-3 min-h-32">
+                        <!-- Les demandes ouvertes seront ajoutées ici -->
+                    </div>
+                </div>
+                
+                <!-- Colonne En cours -->
+                <div class="bg-white p-4 rounded-lg card-shadow">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-700">
+                        <i class="fas fa-cog mr-2"></i>En cours
+                    </h3>
+                    <div id="maintenance-en-cours" class="space-y-3 min-h-32">
+                        <!-- Les demandes en cours seront ajoutées ici -->
+                    </div>
+                </div>
+                
+                <!-- Colonne Résolu -->
+                <div class="bg-white p-4 rounded-lg card-shadow">
+                    <h3 class="text-lg font-semibold mb-4 text-green-700">
+                        <i class="fas fa-check mr-2"></i>Résolu
+                    </h3>
+                    <div id="maintenance-resolu" class="space-y-3 min-h-32">
+                        <!-- Les demandes résolues seront ajoutées ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Énergie -->
+        <div id="energie-page" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">
+                <i class="fas fa-bolt text-yellow-500 mr-3"></i>Optimisation Énergétique
+            </h2>
+            
+            <!-- Dashboard énergétique -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Graphique de consommation -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-semibold mb-4">Consommation Énergétique</h3>
+                    <div class="chart-container">
+                        <canvas id="energy-chart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-semibold mb-4">Statistiques</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Consommation Actuelle</span>
+                            <span class="text-2xl font-bold text-blue-600">1,250 kWh</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Économies ce mois</span>
+                            <span class="text-2xl font-bold text-green-600">15%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Coût estimé</span>
+                            <span class="text-2xl font-bold text-yellow-600">€2,340</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions d'optimisation -->
+            <div class="bg-white p-6 rounded-lg card-shadow mb-8">
+                <h3 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Suggestions d'Optimisation
+                </h3>
+                <div id="energy-suggestions" class="space-y-4">
+                    <!-- Les suggestions seront ajoutées ici -->
+                </div>
+            </div>
+            
+            <!-- Simulateur d'économies -->
+            <div class="bg-white p-6 rounded-lg card-shadow">
+                <h3 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-calculator text-teal-600 mr-2"></i>Simulateur d'Économies
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pourcentage d'économie visé (%)</label>
+                        <input type="range" id="economy-slider" min="0" max="50" value="10" class="w-full mb-2" oninput="updateEconomySimulation()">
+                        <div class="text-center text-lg font-semibold text-teal-600" id="economy-percentage">10%</div>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-2">Économies Projetées</h4>
+                        <div class="text-2xl font-bold text-teal-600" id="economy-savings">€234/mois</div>
+                        <div class="text-sm text-gray-600" id="economy-kwh">125 kWh/mois</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Lieux à risques -->
+        <div id="risques-page" class="page-content hidden">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>Lieux à Risques
+                </h2>
+                <button onclick="showRiskForm()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>Signaler un Risque
+                </button>
+            </div>
+            
+            <!-- Formulaire de signalement (caché par défaut) -->
+            <div id="risk-form" class="hidden bg-white p-6 rounded-lg card-shadow mb-8">
+                <h3 class="text-xl font-semibold mb-4">Signaler un nouveau risque</h3>
+                <form onsubmit="addRisk(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lieu</label>
+                            <input type="text" id="risk-lieu" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Niveau de risque</label>
+                            <select id="risk-niveau" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="bas">Bas</option>
+                                <option value="moyen">Moyen</option>
+                                <option value="haut">Haut</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description du risque</label>
+                        <textarea id="risk-description" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Signaler
+                        </button>
+                        <button type="button" onclick="hideRiskForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Carte des risques -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-semibold mb-4">Plan du Site</h3>
+                    <div class="risk-map relative w-full h-64 rounded-lg overflow-hidden">
+                        <!-- Points de risque positionnés sur la carte -->
+                        <div class="risk-point haut absolute" style="top: 20%; left: 30%;" title="Risque élevé - Zone de stockage"></div>
+                        <div class="risk-point moyen absolute" style="top: 60%; left: 70%;" title="Risque moyen - Atelier mécanique"></div>
+                        <div class="risk-point bas absolute" style="top: 80%; left: 20%;" title="Risque faible - Bureau"></div>
+                        <div class="risk-point haut absolute" style="top: 40%; left: 80%;" title="Risque élevé - Zone chimique"></div>
+                        
+                        <!-- Légende -->
+                        <div class="absolute bottom-2 left-2 bg-white p-2 rounded shadow">
+                            <div class="text-xs font-semibold mb-1">Légende</div>
+                            <div class="flex items-center mb-1">
+                                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Haut</span>
+                            </div>
+                            <div class="flex items-center mb-1">
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Moyen</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Bas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Liste des risques -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-semibold mb-4">Liste des Risques</h3>
+                    <div id="risks-list" class="space-y-4 max-h-64 overflow-y-auto">
+                        <!-- Les risques seront ajoutés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Réduction consommation -->
+        <div id="reduction-page" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">
+                <i class="fas fa-leaf text-green-500 mr-3"></i>Réduction Consommation
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Checklist d'initiatives -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Initiatives d'Économie</h3>
+                        <button onclick="showInitiativeForm()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-plus mr-1"></i>Ajouter
+                        </button>
+                    </div>
+                    <div id="initiatives-list" class="space-y-3">
+                        <!-- Les initiatives seront ajoutées ici -->
+                    </div>
+                </div>
+                
+                <!-- Suivi des actions -->
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-semibold mb-4">Suivi des Actions</h3>
+                    <div id="actions-list" class="space-y-4">
+                        <!-- Les actions seront ajoutées ici -->
+                    </div>
+                    
+                    <!-- Export -->
+                    <div class="mt-6 pt-4 border-t">
+                        <button onclick="exportData()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-download mr-2"></i>Exporter en JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire d'initiative (caché par défaut) -->
+            <div id="initiative-form" class="hidden bg-white p-6 rounded-lg card-shadow mt-8">
+                <h3 class="text-xl font-semibold mb-4">Nouvelle initiative</h3>
+                <form onsubmit="addInitiative(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                            <input type="text" id="initiative-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Assigné à</label>
+                            <input type="text" id="initiative-assigne" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Impact estimé (%)</label>
+                        <input type="number" id="initiative-impact" min="0" max="100" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="initiative-description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-save mr-2"></i>Enregistrer
+                        </button>
+                        <button type="button" onclick="hideInitiativeForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'maintenance';
+        
+        // Données mock initiales stockées dans localStorage
+        const mockData = {
+            maintenance: [
+                {
+                    id: 1,
+                    site: "Bâtiment A",
+                    equipement: "Climatisation",
+                    description: "Bruit anormal dans l'unité principale",
+                    urgence: "moyenne",
+                    statut: "ouvert",
+                    date: "2024-01-15",
+                    assignee: null,
+                    historique: [
+                        { date: "2024-01-15", action: "Demande créée", utilisateur: "Jean Dupont" }
+                    ]
+                },
+                {
+                    id: 2,
+                    site: "Zone production",
+                    equipement: "Convoyeur B2",
+                    description: "Arrêt fréquent du convoyeur",
+                    urgence: "haute",
+                    statut: "en-cours",
+                    date: "2024-01-14",
+                    assignee: "Marie Martin",
+                    historique: [
+                        { date: "2024-01-14", action: "Demande créée", utilisateur: "Paul Durand" },
+                        { date: "2024-01-15", action: "Assignée à Marie Martin", utilisateur: "Chef maintenance" }
+                    ]
+                }
+            ],
+            energy: {
+                consumption: [120, 135, 128, 142, 138, 125, 130], // Données pour 7 jours
+                suggestions: [
+                    {
+                        id: 1,
+                        titre: "Décaler les heures de pointe",
+                        description: "Programmer certains équipements en dehors des heures de pointe pour réduire les coûts",
+                        economie: "12%",
+                        statut: "recommandee"
+                    },
+                    {
+                        id: 2,
+                        titre: "Maintenance préventive",
+                        description: "Nettoyer les filtres des systèmes de ventilation pour améliorer l'efficacité",
+                        economie: "8%",
+                        statut: "en_cours"
+                    }
+                ]
+            },
+            risks: [
+                {
+                    id: 1,
+                    lieu: "Zone de stockage chimique",
+                    niveau: "haut",
+                    description: "Stockage de produits inflammables sans ventilation adéquate",
+                    date: "2024-01-10",
+                    statut: "ouvert",
+                    actions: ["Installer ventilation", "Former le personnel"]
+                },
+                {
+                    id: 2,
+                    lieu: "Atelier mécanique",
+                    niveau: "moyen",
+                    description: "Sol glissant près des machines",
+                    date: "2024-01-12",
+                    statut: "en_cours",
+                    actions: ["Nettoyer régulièrement", "Installer tapis antidérapants"]
+                }
+            ],
+            initiatives: [
+                {
+                    id: 1,
+                    titre: "Audit énergétique complet",
+                    description: "Évaluation complète de tous les équipements consommateurs",
+                    assigne: "Bureau d'études",
+                    impact: 15,
+                    statut: "planifie",
+                    date: "2024-01-20"
+                },
+                {
+                    id: 2,
+                    titre: "Installation LED",
+                    description: "Remplacement de tous les éclairages par des LED",
+                    assigne: "Équipe électrique",
+                    impact: 25,
+                    statut: "en_cours",
+                    date: "2024-01-05"
+                }
+            ]
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('maintenance');
+            initEnergyChart();
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-teal-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'maintenance':
+                    loadMaintenance();
+                    break;
+                case 'energie':
+                    loadEnergie();
+                    break;
+                case 'risques':
+                    loadRisks();
+                    break;
+                case 'reduction':
+                    loadInitiatives();
+                    break;
+            }
+        }
+
+        // Gestion du menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            
+            mobileMenu.classList.add('open');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            
+            mobileMenu.classList.remove('open');
+            overlay.classList.add('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('gestionSiteData', JSON.stringify(mockData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('gestionSiteData');
+            if (savedData) {
+                Object.assign(mockData, JSON.parse(savedData));
+            }
+        }
+
+        // MAINTENANCE
+        function loadMaintenance() {
+            const colonnes = ['ouvert', 'en-cours', 'resolu'];
+            
+            colonnes.forEach(statut => {
+                const container = document.getElementById(`maintenance-${statut}`);
+                container.innerHTML = '';
+                
+                const demandes = mockData.maintenance.filter(m => m.statut === statut);
+                
+                demandes.forEach(demande => {
+                    const card = document.createElement('div');
+                    card.className = `bg-gray-50 p-3 rounded border-l-4 priority-${demande.urgence} cursor-pointer hover:shadow-md transition-shadow`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-sm">${demande.equipement}</h4>
+                            <span class="text-xs px-2 py-1 rounded status-${demande.statut}">${demande.statut.replace('-', ' ')}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-2">${demande.site}</p>
+                        <p class="text-xs text-gray-700 mb-2">${demande.description}</p>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>${new Date(demande.date).toLocaleDateString('fr-FR')}</span>
+                            <span class="capitalize">${demande.urgence}</span>
+                        </div>
+                        ${demande.assignee ? `<div class="text-xs text-blue-600 mt-1">Assigné à: ${demande.assignee}</div>` : ''}
+                        <div class="mt-2 flex space-x-1">
+                            ${statut === 'ouvert' ? `<button onclick="assignMaintenance(${demande.id})" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">Assigner</button>` : ''}
+                            ${statut === 'en-cours' ? `<button onclick="resolveMaintenance(${demande.id})" class="text-xs bg-green-500 text-white px-2 py-1 rounded">Résoudre</button>` : ''}
+                            <button onclick="deleteMaintenance(${demande.id})" class="text-xs bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function showMaintenanceForm() {
+            document.getElementById('maintenance-form').classList.remove('hidden');
+        }
+
+        function hideMaintenanceForm() {
+            document.getElementById('maintenance-form').classList.add('hidden');
+            document.getElementById('maintenance-form').querySelector('form').reset();
+        }
+
+        function addMaintenance(event) {
+            event.preventDefault();
+            
+            const site = document.getElementById('maintenance-site').value;
+            const equipement = document.getElementById('maintenance-equipement').value;
+            const urgence = document.getElementById('maintenance-urgence').value;
+            const description = document.getElementById('maintenance-description').value;
+            
+            const newMaintenance = {
+                id: Date.now(),
+                site: site,
+                equipement: equipement,
+                description: description,
+                urgence: urgence,
+                statut: 'ouvert',
+                date: new Date().toISOString().split('T')[0],
+                assignee: null,
+                historique: [
+                    { date: new Date().toISOString().split('T')[0], action: "Demande créée", utilisateur: "Utilisateur" }
+                ]
+            };
+            
+            mockData.maintenance.push(newMaintenance);
+            saveDataToStorage();
+            loadMaintenance();
+            hideMaintenanceForm();
+        }
+
+        function assignMaintenance(id) {
+            const assignee = prompt('Assigner à:');
+            if (assignee) {
+                const demande = mockData.maintenance.find(m => m.id === id);
+                if (demande) {
+                    demande.assignee = assignee;
+                    demande.statut = 'en-cours';
+                    demande.historique.push({
+                        date: new Date().toISOString().split('T')[0],
+                        action: `Assignée à ${assignee}`,
+                        utilisateur: "Superviseur"
+                    });
+                    saveDataToStorage();
+                    loadMaintenance();
+                }
+            }
+        }
+
+        function resolveMaintenance(id) {
+            if (confirm('Marquer cette demande comme résolue ?')) {
+                const demande = mockData.maintenance.find(m => m.id === id);
+                if (demande) {
+                    demande.statut = 'resolu';
+                    demande.historique.push({
+                        date: new Date().toISOString().split('T')[0],
+                        action: "Demande résolue",
+                        utilisateur: demande.assignee || "Technicien"
+                    });
+                    saveDataToStorage();
+                    loadMaintenance();
+                }
+            }
+        }
+
+        function deleteMaintenance(id) {
+            if (confirm('Supprimer cette demande de maintenance ?')) {
+                mockData.maintenance = mockData.maintenance.filter(m => m.id !== id);
+                saveDataToStorage();
+                loadMaintenance();
+            }
+        }
+
+        // ÉNERGIE
+        function loadEnergie() {
+            loadEnergySuggestions();
+            updateEconomySimulation();
+        }
+
+        function initEnergyChart() {
+            const canvas = document.getElementById('energy-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const data = mockData.energy.consumption;
+            const maxValue = Math.max(...data);
+            const padding = 40;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dessiner les axes
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Axe Y
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.stroke();
+            
+            // Axe X
+            ctx.beginPath();
+            ctx.moveTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+            
+            // Dessiner la courbe
+            ctx.strokeStyle = '#0d9488';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            data.forEach((value, index) => {
+                const x = padding + (index * chartWidth) / (data.length - 1);
+                const y = canvas.height - padding - (value / maxValue) * chartHeight;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                // Points
+                ctx.fillStyle = '#0d9488';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            ctx.stroke();
+            
+            // Labels des jours
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            days.forEach((day, index) => {
+                const x = padding + (index * chartWidth) / (days.length - 1);
+                ctx.fillText(day, x, canvas.height - 10);
+            });
+        }
+
+        function loadEnergySuggestions() {
+            const container = document.getElementById('energy-suggestions');
+            container.innerHTML = '';
+            
+            mockData.energy.suggestions.forEach(suggestion => {
+                const card = document.createElement('div');
+                card.className = 'border-l-4 border-yellow-500 pl-4 py-2';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${suggestion.titre}</h4>
+                            <p class="text-gray-600 text-sm mt-1">${suggestion.description}</p>
+                            <span class="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                                Économie: ${suggestion.economie}
+                            </span>
+                        </div>
+                        <button onclick="applySuggestion(${suggestion.id})" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded text-sm">
+                            Appliquer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function applySuggestion(id) {
+            const suggestion = mockData.energy.suggestions.find(s => s.id === id);
+            if (suggestion && confirm(`Appliquer la suggestion: ${suggestion.titre} ?`)) {
+                suggestion.statut = 'appliquee';
+                alert(`Suggestion appliquée ! Économie estimée: ${suggestion.economie}`);
+                loadEnergySuggestions();
+            }
+        }
+
+        function updateEconomySimulation() {
+            const slider = document.getElementById('economy-slider');
+            const percentage = slider.value;
+            const currentCost = 2340; // Coût actuel en euros
+            const currentConsumption = 1250; // Consommation actuelle en kWh
+            
+            const savings = Math.round((currentCost * percentage) / 100);
+            const kwhSavings = Math.round((currentConsumption * percentage) / 100);
+            
+            document.getElementById('economy-percentage').textContent = percentage + '%';
+            document.getElementById('economy-savings').textContent = '€' + savings + '/mois';
+            document.getElementById('economy-kwh').textContent = kwhSavings + ' kWh/mois';
+        }
+
+        // RISQUES
+        function loadRisks() {
+            const container = document.getElementById('risks-list');
+            container.innerHTML = '';
+            
+            mockData.risks.forEach(risk => {
+                const card = document.createElement('div');
+                card.className = 'border rounded-lg p-3 hover:shadow-md transition-shadow';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-900">${risk.lieu}</h4>
+                        <span class="px-2 py-1 rounded text-xs font-medium risk-${risk.niveau}">
+                            ${risk.niveau.charAt(0).toUpperCase() + risk.niveau.slice(1)}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">${risk.description}</p>
+                    <div class="text-xs text-gray-500 mb-2">
+                        Signalé le: ${new Date(risk.date).toLocaleDateString('fr-FR')}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs px-2 py-1 bg-gray-100 rounded">${risk.statut}</span>
+                        <button onclick="deleteRisk(${risk.id})" class="text-red-500 hover:text-red-700 text-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showRiskForm() {
+            document.getElementById('risk-form').classList.remove('hidden');
+        }
+
+        function hideRiskForm() {
+            document.getElementById('risk-form').classList.add('hidden');
+            document.getElementById('risk-form').querySelector('form').reset();
+        }
+
+        function addRisk(event) {
+            event.preventDefault();
+            
+            const lieu = document.getElementById('risk-lieu').value;
+            const niveau = document.getElementById('risk-niveau').value;
+            const description = document.getElementById('risk-description').value;
+            
+            const newRisk = {
+                id: Date.now(),
+                lieu: lieu,
+                niveau: niveau,
+                description: description,
+                date: new Date().toISOString().split('T')[0],
+                statut: 'ouvert',
+                actions: []
+            };
+            
+            mockData.risks.push(newRisk);
+            saveDataToStorage();
+            loadRisks();
+            hideRiskForm();
+        }
+
+        function deleteRisk(id) {
+            if (confirm('Supprimer ce signalement de risque ?')) {
+                mockData.risks = mockData.risks.filter(r => r.id !== id);
+                saveDataToStorage();
+                loadRisks();
+            }
+        }
+
+        // RÉDUCTION CONSOMMATION
+        function loadInitiatives() {
+            const container = document.getElementById('initiatives-list');
+            container.innerHTML = '';
+            
+            mockData.initiatives.forEach(initiative => {
+                const card = document.createElement('div');
+                card.className = 'flex items-center space-x-3 p-2 border rounded hover:bg-gray-50';
+                
+                const statusColors = {
+                    'planifie': 'bg-yellow-100 text-yellow-800',
+                    'en_cours': 'bg-blue-100 text-blue-800',
+                    'termine': 'bg-green-100 text-green-800'
+                };
+                
+                card.innerHTML = `
+                    <input type="checkbox" ${initiative.statut === 'termine' ? 'checked' : ''} 
+                           onchange="toggleInitiative(${initiative.id})" class="w-4 h-4 text-teal-600">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-medium text-gray-900">${initiative.titre}</h4>
+                            <span class="px-2 py-1 rounded text-xs ${statusColors[initiative.statut]}">
+                                ${initiative.statut.replace('_', ' ')}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600">${initiative.description}</p>
+                        <div class="flex justify-between items-center mt-1 text-xs text-gray-500">
+                            <span>Assigné à: ${initiative.assigne}</span>
+                            <span>Impact: ${initiative.impact}%</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteInitiative(${initiative.id})" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+            
+            loadActions();
+        }
+
+        function loadActions() {
+            const container = document.getElementById('actions-list');
+            container.innerHTML = '';
+            
+            const actions = mockData.initiatives.filter(i => i.statut !== 'planifie');
+            
+            actions.forEach(action => {
+                const card = document.createElement('div');
+                card.className = 'border-l-4 border-teal-500 pl-3 py-2';
+                card.innerHTML = `
+                    <h4 class="font-medium text-gray-900">${action.titre}</h4>
+                    <div class="flex justify-between items-center mt-1 text-sm text-gray-600">
+                        <span>${action.assigne}</span>
+                        <span class="font-medium text-teal-600">${action.impact}% d'impact</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showInitiativeForm() {
+            document.getElementById('initiative-form').classList.remove('hidden');
+        }
+
+        function hideInitiativeForm() {
+            document.getElementById('initiative-form').classList.add('hidden');
+            document.getElementById('initiative-form').querySelector('form').reset();
+        }
+
+        function addInitiative(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('initiative-titre').value;
+            const assigne = document.getElementById('initiative-assigne').value;
+            const impact = parseInt(document.getElementById('initiative-impact').value);
+            const description = document.getElementById('initiative-description').value;
+            
+            const newInitiative = {
+                id: Date.now(),
+                titre: titre,
+                description: description,
+                assigne: assigne,
+                impact: impact,
+                statut: 'planifie',
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            mockData.initiatives.push(newInitiative);
+            saveDataToStorage();
+            loadInitiatives();
+            hideInitiativeForm();
+        }
+
+        function toggleInitiative(id) {
+            const initiative = mockData.initiatives.find(i => i.id === id);
+            if (initiative) {
+                initiative.statut = initiative.statut === 'termine' ? 'en_cours' : 'termine';
+                saveDataToStorage();
+                loadInitiatives();
+            }
+        }
+
+        function deleteInitiative(id) {
+            if (confirm('Supprimer cette initiative ?')) {
+                mockData.initiatives = mockData.initiatives.filter(i => i.id !== id);
+                saveDataToStorage();
+                loadInitiatives();
+            }
+        }
+
+        function exportData() {
+            const dataToExport = {
+                date_export: new Date().toISOString(),
+                initiatives: mockData.initiatives,
+                maintenance: mockData.maintenance,
+                risks: mockData.risks,
+                energy: mockData.energy
+            };
+            
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `gestion_site_export_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Initialiser le graphique après le chargement de la page
+        setTimeout(() => {
+            if (document.getElementById('energy-chart')) {
+                initEnergyChart();
+            }
+        }, 100);
+    </script>
+</body>
+</html>
