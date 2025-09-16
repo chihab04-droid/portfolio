@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Économie Participative - RSE</title>
+    <title>RSE - Économie Participative</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- TailwindCSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome pour les icônes -->
@@ -75,63 +77,273 @@
         .icon-collecte { color: #3b82f6; }
         .icon-revente { color: #f59e0b; }
         .icon-solidarite { color: #ef4444; }
+        
+        /* Enhanced Navigation Styles */
+        .nav-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item:hover::after,
+        .nav-item.active::after {
+            width: 100%;
+        }
+        
+        .nav-item:focus {
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+        
+        /* Mobile menu animations */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Hamburger animation */
+        .hamburger {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger.active .line1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .hamburger.active .line2 {
+            opacity: 0;
+        }
+        
+        .hamburger.active .line3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        /* Section indicators */
+        .section-indicator {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .section-indicator {
+                display: block;
+            }
+        }
+        
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator-dot.active {
+            background: #10b981;
+            transform: scale(1.2);
+        }
+        
+        /* Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            transition: top 0.3s;
+            z-index: 1000;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        /* Breadcrumb styles */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .breadcrumb a {
+            color: #10b981;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .breadcrumb a:hover {
+            color: #059669;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Passer au contenu principal</a>
+    
     <!-- Navigation Bar -->
-    <nav class="gradient-primary text-white shadow-lg sticky top-0 z-50">
+    <nav class="gradient-primary text-white shadow-lg sticky top-0 z-50" role="navigation" aria-label="Navigation principale">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo/Titre -->
                 <div class="flex items-center">
                     <i class="fas fa-leaf text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold">Économie Participative</h1>
+                    <h1 class="text-xl font-bold">
+                        <a href="#accueil" class="nav-item" aria-label="Retour à l'accueil">RSE - Économie Participative</a>
+                    </h1>
                 </div>
                 
                 <!-- Menu Desktop -->
-                <div class="hidden md:flex space-x-8">
-                    <button onclick="showPage('covoiturage')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
-                        <i class="fas fa-car mr-2"></i>Covoiturage
-                    </button>
-                    <button onclick="showPage('collecte')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
-                        <i class="fas fa-recycle mr-2"></i>Collecte
-                    </button>
-                    <button onclick="showPage('revente')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
-                        <i class="fas fa-shopping-cart mr-2"></i>Revente
-                    </button>
-                    <button onclick="showPage('solidarite')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
-                        <i class="fas fa-heart mr-2"></i>Solidarité
-                    </button>
-                </div>
+                <ul class="hidden md:flex space-x-8" role="menubar">
+                    <li role="none">
+                        <button onclick="showPage('covoiturage')" 
+                                class="nav-item hover:text-green-200 transition-colors px-3 py-2 rounded-md flex items-center" 
+                                role="menuitem" 
+                                aria-label="Aller à la section Covoiturage">
+                            <i class="fas fa-car mr-2"></i>Covoiturage
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button onclick="showPage('collecte')" 
+                                class="nav-item hover:text-green-200 transition-colors px-3 py-2 rounded-md flex items-center" 
+                                role="menuitem" 
+                                aria-label="Aller à la section Collecte">
+                            <i class="fas fa-recycle mr-2"></i>Collecte
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button onclick="showPage('revente')" 
+                                class="nav-item hover:text-green-200 transition-colors px-3 py-2 rounded-md flex items-center" 
+                                role="menuitem" 
+                                aria-label="Aller à la section Revente">
+                            <i class="fas fa-shopping-cart mr-2"></i>Revente
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button onclick="showPage('solidarite')" 
+                                class="nav-item hover:text-green-200 transition-colors px-3 py-2 rounded-md flex items-center" 
+                                role="menuitem" 
+                                aria-label="Aller à la section Solidarité">
+                            <i class="fas fa-heart mr-2"></i>Solidarité
+                        </button>
+                    </li>
+                </ul>
               
-                <!-- Menu Mobile -->
-                <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-white hover:text-green-200">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Menu Mobile Dropdown -->
-            <div id="mobile-menu" class="hidden md:hidden pb-4">
-                <button onclick="showPage('covoiturage')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
-                    <i class="fas fa-car mr-2"></i>Covoiturage
-                </button>
-                <button onclick="showPage('collecte')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
-                    <i class="fas fa-recycle mr-2"></i>Collecte
-                </button>
-                <button onclick="showPage('revente')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
-                    <i class="fas fa-shopping-cart mr-2"></i>Revente
-                </button>
-                <button onclick="showPage('solidarite')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
-                    <i class="fas fa-heart mr-2"></i>Solidarité
+      <!-- Mobile menu button -->
+                <button class="md:hidden hamburger" 
+                        onclick="toggleMobileMenu()" 
+                        aria-label="Ouvrir le menu de navigation"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu">
+                    <div class="hamburger-line line1"></div>
+                    <div class="hamburger-line line2"></div>
+                    <div class="hamburger-line line3"></div>
                 </button>
             </div>
         </div>
+
+      
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-64 bg-gray-900 md:hidden z-40" role="menu">
+            <div class="p-4 pt-20">
+                <button onclick="showPage('covoiturage'); closeMobileMenu();" 
+                        class="block w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors" 
+                        role="menuitem">
+                    <i class="fas fa-car mr-3"></i>Covoiturage
+                </button>
+                <button onclick="showPage('collecte'); closeMobileMenu();" 
+                        class="block w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors mt-2" 
+                        role="menuitem">
+                    <i class="fas fa-recycle mr-3"></i>Collecte
+                </button>
+                <button onclick="showPage('revente'); closeMobileMenu();" 
+                        class="block w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors mt-2" 
+                        role="menuitem">
+                    <i class="fas fa-shopping-cart mr-3"></i>Revente
+                </button>
+                <button onclick="showPage('solidarite'); closeMobileMenu();" 
+                        class="block w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors mt-2" 
+                        role="menuitem">
+                    <i class="fas fa-heart mr-3"></i>Solidarité
+                </button>
+            </div>
+        </div>          
+        
+        <!-- Mobile menu overlay -->
+        <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-30" onclick="closeMobileMenu()"></div>
     </nav>
 
+  
+
+    <!-- Section Indicators (Desktop only) -->
+    <div class="section-indicator">
+        <div class="indicator-dot" onclick="showPage('covoiturage')" title="Covoiturage"></div>
+        <div class="indicator-dot" onclick="showPage('collecte')" title="Collecte"></div>
+        <div class="indicator-dot" onclick="showPage('revente')" title="Revente"></div>
+        <div class="indicator-dot" onclick="showPage('solidarite')" title="Solidarité"></div>
+    </div>
+
     <!-- Contenu Principal -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div id="accueil" class="section text-center mb-12">
+            <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-blue-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-leaf text-3xl text-white"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Économie Participative</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                Participez à une démarche RSE collaborative : covoiturage, collecte solidaire, revente d'objets et actions de solidarité.
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <button onclick="showPage('covoiturage')" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg transition-colors">
+                    <i class="fas fa-car text-2xl mb-2"></i>
+                    <div class="font-semibold">Covoiturage</div>
+                </button>
+                <button onclick="showPage('collecte')" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg transition-colors">
+                    <i class="fas fa-recycle text-2xl mb-2"></i>
+                    <div class="font-semibold">Collecte</div>
+                </button>
+                <button onclick="showPage('revente')" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg transition-colors">
+                    <i class="fas fa-shopping-cart text-2xl mb-2"></i>
+                    <div class="font-semibold">Revente</div>
+                </button>
+                <button onclick="showPage('solidarite')" class="bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg transition-colors">
+                    <i class="fas fa-heart text-2xl mb-2"></i>
+                    <div class="font-semibold">Solidarité</div>
+                </button>
+            </div>
+        </div>
         
         <!-- Page Covoiturage -->
         <div id="covoiturage-page" class="page-content">
@@ -641,6 +853,45 @@
             contributions: []
         };
 
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-overlay');
+            const hamburger = document.querySelector('.hamburger');
+            const button = hamburger.closest('button');
+            
+            const isOpen = mobileMenu.classList.contains('open');
+            
+            if (isOpen) {
+                closeMobileMenu();
+            } else {
+                mobileMenu.classList.add('open');
+                overlay.classList.remove('hidden');
+                hamburger.classList.add('active');
+                button.setAttribute('aria-expanded', 'true');
+                button.setAttribute('aria-label', 'Fermer le menu de navigation');
+                
+                // Prevent body scroll when menu is open
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-overlay');
+            const hamburger = document.querySelector('.hamburger');
+            const button = hamburger.closest('button');
+            
+            mobileMenu.classList.remove('open');
+            overlay.classList.add('hidden');
+            hamburger.classList.remove('active');
+            button.setAttribute('aria-expanded', 'false');
+            button.setAttribute('aria-label', 'Ouvrir le menu de navigation');
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+
         // Initialisation de l'application
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromStorage();
@@ -678,6 +929,9 @@
 
         // Gestion de la navigation
         function showPage(pageId) {
+            // Hide welcome section
+            document.getElementById('accueil').style.display = 'none';
+            
             // Masquer toutes les pages
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => page.classList.add('hidden'));
@@ -694,6 +948,15 @@
             navLinks.forEach(link => link.classList.remove('bg-green-700'));
             
             currentPage = pageId;
+            
+            // Update navigation active states
+            updateActiveNavigation(pageId);
+            
+            // Update breadcrumb
+            updateBreadcrumb(pageId);
+            
+            // Update section indicators
+            updateSectionIndicators(pageId);
             
             // Charger le contenu de la page
             switch(pageId) {
@@ -712,13 +975,47 @@
             }
             
             // Fermer le menu mobile
-            document.getElementById('mobile-menu').classList.add('hidden');
+            closeMobileMenu();
         }
 
-        // Toggle menu mobile
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('hidden');
+        function updateActiveNavigation(sectionName) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to current nav item
+            const activeButton = document.querySelector(`button[onclick*="${sectionName}"]`);
+            if (activeButton && activeButton.classList.contains('nav-item')) {
+                activeButton.classList.add('active');
+            }
+        }
+        
+        function updateBreadcrumb(sectionName) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const currentPage = document.getElementById('current-page');
+            
+            const sectionNames = {
+                'covoiturage': 'Covoiturage',
+                'collecte': 'Collecte',
+                'revente': 'Revente',
+                'solidarite': 'Solidarité'
+            };
+            
+            breadcrumb.classList.remove('hidden');
+            currentPage.textContent = sectionNames[sectionName] || sectionName;
+        }
+        
+        function updateSectionIndicators(sectionName) {
+            const indicators = document.querySelectorAll('.indicator-dot');
+            const sections = ['covoiturage', 'collecte', 'revente', 'solidarite'];
+            
+            indicators.forEach((indicator, index) => {
+                indicator.classList.remove('active');
+                if (sections[index] === sectionName) {
+                    indicator.classList.add('active');
+                }
+            });
         }
 
         // Gestion du localStorage
@@ -1169,167 +1466,6 @@
             };
             
             appData.contributions.push(newContribution);
-            saveDataToStorage();
-            loadContributions();
-            updateSolidariteStats();
-            
-            // Réinitialiser le formulaire
-            document.getElementById('solidarite-form').reset();
-            document.getElementById('montant-section').style.display = 'none';
-            document.getElementById('heures-section').style.display = 'none';
-            document.getElementById('autre-cause-section').style.display = 'none';
-            
-            showNotification('Contribution enregistrée avec succès !', 'success');
-        }
-
-        function loadContributions() {
-            const container = document.getElementById('contributions-list');
-            container.innerHTML = '';
-            
-            if (appData.contributions.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-500 py-8">
-                        <i class="fas fa-heart text-4xl mb-4 opacity-50"></i>
-                        <p>Aucune contribution enregistrée pour le moment.</p>
-                        <p class="text-sm">Commencez dès maintenant votre engagement solidaire !</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            appData.contributions.forEach(contribution => {
-                const contributionDiv = document.createElement('div');
-                contributionDiv.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
-                
-                const typeLabels = {
-                    'jour-solidarite': 'Jour de solidarité',
-                    'don-monetaire': 'Don monétaire',
-                    'benevolat': 'Bénévolat',
-                    'competences': 'Don de compétences'
-                };
-                
-                let valeurContribution = '';
-                if (contribution.type === 'don-monetaire') {
-                    valeurContribution = `${contribution.montant}€`;
-                } else if (contribution.heures > 0) {
-                    valeurContribution = `${contribution.heures}h`;
-                }
-                
-                contributionDiv.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-lg text-gray-900">${typeLabels[contribution.type]}</h4>
-                            <div class="text-sm text-gray-600 mt-1">
-                                <i class="fas fa-heart mr-1"></i>
-                                ${contribution.cause}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xl font-bold text-red-600">${valeurContribution}</div>
-                            <button onclick="deleteContribution(${contribution.id})" class="text-red-500 hover:text-red-700 mt-1">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 mb-3">${contribution.description}</p>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">
-                            ${contribution.statut.charAt(0).toUpperCase() + contribution.statut.slice(1)}
-                        </span>
-                        <span>
-                            <i class="fas fa-calendar mr-1"></i>
-                            ${new Date(contribution.date).toLocaleDateString('fr-FR')}
-                        </span>
-                    </div>
-                `;
-                container.appendChild(contributionDiv);
-            });
-        }
-
-        function deleteContribution(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette contribution ?')) {
-                appData.contributions = appData.contributions.filter(c => c.id !== id);
-                saveDataToStorage();
-                loadContributions();
-                updateSolidariteStats();
-                showNotification('Contribution supprimée', 'info');
-            }
-        }
-
-        function updateSolidariteStats() {
-            let totalHeures = 0;
-            let totalDons = 0;
-            let totalActions = 0;
-            
-            appData.contributions.forEach(contribution => {
-                if (contribution.type === 'don-monetaire') {
-                    totalDons += contribution.montant;
-                } else {
-                    totalHeures += contribution.heures;
-                }
-                totalActions++;
-            });
-            
-            document.getElementById('stat-heures-solidarite').textContent = totalHeures + 'h';
-            document.getElementById('stat-dons-monetaires').textContent = totalDons + '€';
-            document.getElementById('stat-actions-benevoles').textContent = totalActions;
-        }
-
-        // Mise à jour des statistiques générales
-        function updateStats() {
-            // Statistiques covoiturage
-            const totalTrajets = appData.trajets.length;
-            const totalParticipants = appData.trajets.reduce((sum, trajet) => sum + trajet.participants.length, 0);
-            
-            document.getElementById('stat-trajets').textContent = totalTrajets;
-            document.getElementById('stat-participants').textContent = totalParticipants;
-            
-            // Mettre à jour les stats de solidarité si on est sur cette page
-            if (currentPage === 'solidarite') {
-                updateSolidariteStats();
-            }
-        }
-
-        // Système de notifications
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-x-full`;
-            
-            switch(type) {
-                case 'success':
-                    notification.classList.add('bg-green-500');
-                    break;
-                case 'error':
-                    notification.classList.add('bg-red-500');
-                    break;
-                case 'info':
-                default:
-                    notification.classList.add('bg-blue-500');
-                    break;
-            }
-            
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-2"></i>
-                    ${message}
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animation d'entrée
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
-            
-            // Animation de sortie et suppression
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
     </script>
 </body>
 </html>
