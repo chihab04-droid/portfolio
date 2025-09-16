@@ -1,0 +1,613 @@
+<!-- gestion_site.html -->
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gestion Site - Maintenance & Énergie</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Basic styling tweaks -->
+  <style>
+    /* Petite animation pour micro-interactions */
+    .fade-enter { opacity: 0; transform: translateY(6px); }
+    .fade-enter-active { opacity: 1; transform: translateY(0); transition: all .25s ease; }
+
+    /* Simple grid plan for "Lieux à risques" */
+    .risk-cell { min-height: 80px; display:flex; align-items:center; justify-content:center; border-radius:6px; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+  <!-- App root -->
+  <div id="app" class="min-h-screen flex flex-col">
+
+    <!-- Header / Navbar (responsive) -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <!-- Brand -->
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-md bg-gradient-to-tr from-indigo-600 to-teal-400 flex items-center justify-center text-white font-bold">GS</div>
+            <div>
+              <h1 class="text-lg font-semibold">Gestion Site</h1>
+              <p class="text-xs text-gray-500">Maintenance • Énergie • Risques • Conso</p>
+            </div>
+          </div>
+
+          <!-- Desktop menu -->
+          <nav class="hidden md:flex items-center gap-4" role="navigation" aria-label="Main navigation">
+            <a href="#maintenance" class="nav-link px-3 py-2 rounded-md hover:bg-gray-100" data-route="maintenance">Maintenance</a>
+            <a href="#energie" class="nav-link px-3 py-2 rounded-md hover:bg-gray-100" data-route="energie">Énergie</a>
+            <a href="#risques" class="nav-link px-3 py-2 rounded-md hover:bg-gray-100" data-route="risques">Lieux à risques</a>
+            <a href="#reduction" class="nav-link px-3 py-2 rounded-md hover:bg-gray-100" data-route="reduction">Réduction conso</a>
+          </nav>
+
+          <!-- Mobile hamburger -->
+          <div class="md:hidden">
+            <button id="burgerBtn" aria-label="Ouvrir le menu" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <!-- simple icon -->
+              <svg id="burgerIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile menu panel -->
+      <div id="mobileMenu" class="md:hidden hidden border-t bg-white">
+        <div class="px-4 pt-4 pb-6 space-y-1">
+          <a href="#maintenance" class="block px-3 py-2 rounded-md nav-link-mobile" data-route="maintenance">Maintenance</a>
+          <a href="#energie" class="block px-3 py-2 rounded-md nav-link-mobile" data-route="energie">Énergie</a>
+          <a href="#risques" class="block px-3 py-2 rounded-md nav-link-mobile" data-route="risques">Lieux à risques</a>
+          <a href="#reduction" class="block px-3 py-2 rounded-md nav-link-mobile" data-route="reduction">Réduction conso</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Simple breadcrumb / current section title -->
+      <div id="sectionHeader" class="mb-4">
+        <h2 id="pageTitle" class="text-2xl font-semibold">Tableau de bord</h2>
+        <p id="pageSubtitle" class="text-sm text-gray-500">Vue synthétique</p>
+      </div>
+
+      <!-- App container where sections are injected/displayed -->
+      <div id="content" class="space-y-6">
+        <!-- Sections will be rendered here by JS -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-gray-500 flex justify-between">
+        <div>© <span id="year"></span> Gestion Site</div>
+        <div>Design inspiré par l'image jointe • Client-side demo</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ---------------------------
+       JavaScript application
+       - SPA hash routing
+       - localStorage mock persistence
+       - accessible interactions
+       - simple SVG / canvas graphs
+       --------------------------- -->
+  <script>
+  /**************************************************************************
+   * Small SPA renderer and utility helpers
+   ***************************************************************************/
+  const STORE_KEY = 'gestion_site_data_v1';
+
+  // Default mock data
+  const defaultData = {
+    maintenanceRequests: [
+      { id: uid(), site: 'Site A', equipment: 'Compresseur #2', desc: 'Fuite d\'huile', urgency: 'Haute', status: 'ouvert', history: [] },
+      { id: uid(), site: 'Site B', equipment: 'Conveyor 3', desc: 'Capteur défectueux', urgency: 'Moyenne', status: 'en cours', history: [] }
+    ],
+    energy: {
+      consumptionSeries: generateConsumptionMock(), // array daily
+      suggestions: []
+    },
+    risks: [
+      { id: uid(), location: 'Zone stockage produits chimiques', level: 'haut', desc: 'Absence d\'éclairage de secours', reportedAt: (new Date()).toISOString().slice(0,10), status: 'ouvert' },
+      { id: uid(), location: 'Machine 5 zone 2', level: 'moyen', desc: 'Sol glissant', reportedAt: (new Date()).toISOString().slice(0,10), status: 'en cours' }
+    ],
+    initiatives: [
+      { id: uid(), title: 'Remplacement ampoules par LED', owner: 'Tech', status: 'en cours', impactPct: 7 },
+      { id: uid(), title: 'Optimiser planning compresseurs', owner: 'Opérations', status: 'ouvert', impactPct: 4 }
+    ]
+  };
+
+  // Save & load
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) {
+        localStorage.setItem(STORE_KEY, JSON.stringify(defaultData));
+        return JSON.parse(JSON.stringify(defaultData));
+      }
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error('Load error', e);
+      localStorage.setItem(STORE_KEY, JSON.stringify(defaultData));
+      return JSON.parse(JSON.stringify(defaultData));
+    }
+  }
+  function saveData(data) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  }
+
+  // Utilities
+  function uid() { return 'id-' + Math.random().toString(36).slice(2,9); }
+  function el(html) { const tmp = document.createElement('div'); tmp.innerHTML = html.trim(); return tmp.firstChild; }
+
+  function formatDateInput(d= new Date()){ return d.toISOString().slice(0,10); }
+
+  function generateConsumptionMock(days=14) {
+    const arr = [];
+    for(let i=0;i<days;i++){
+      arr.push({
+        date: new Date(Date.now() - (days-1-i)*24*3600*1000).toISOString().slice(0,10),
+        kwh: Math.round(800 + Math.random()*400)
+      });
+    }
+    return arr;
+  }
+
+  /**************************************************************************
+   * Renderer: each "page" returns an element to insert in #content
+   ***************************************************************************/
+  const dataStore = loadData();
+
+  function renderMaintenance() {
+    const container = document.createElement('div');
+    container.className = 'space-y-6';
+
+    // Form to create request
+    const form = document.createElement('form');
+    form.className = 'bg-white rounded-lg shadow p-4 grid gap-3 sm:grid-cols-2';
+    form.innerHTML = `
+      <h3 class="text-lg font-medium col-span-full">Créer une demande de maintenance</h3>
+      <label class="block">
+        <span class="text-sm text-gray-700">Site</span>
+        <input name="site" required class="mt-1 block w-full rounded border-gray-200" placeholder="Ex: Site A" />
+      </label>
+      <label class="block">
+        <span class="text-sm text-gray-700">Équipement</span>
+        <input name="equipment" required class="mt-1 block w-full rounded border-gray-200" placeholder="Ex: Pompe n°1" />
+      </label>
+      <label class="block sm:col-span-2">
+        <span class="text-sm text-gray-700">Description</span>
+        <textarea name="desc" required class="mt-1 block w-full rounded border-gray-200" rows="3" placeholder="Détails..."></textarea>
+      </label>
+      <label class="block">
+        <span class="text-sm text-gray-700">Urgence</span>
+        <select name="urgency" class="mt-1 block w-full rounded border-gray-200">
+          <option>Faible</option><option>Moyenne</option><option selected>Haute</option>
+        </select>
+      </label>
+      <div class="flex items-end justify-end gap-2">
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 focus:outline-none">Créer</button>
+      </div>
+    `;
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target).entries());
+      const newReq = { id: uid(), site: f.site, equipment: f.equipment, desc: f.desc, urgency: f.urgency, status: 'ouvert', history: [{ at: new Date().toISOString(), note: 'Création' }] };
+      dataStore.maintenanceRequests.unshift(newReq);
+      saveData(dataStore);
+      // re-render
+      renderRoute('maintenance');
+      alert('Demande de maintenance créée.');
+    });
+
+    // List / Kanban simplified
+    const cards = document.createElement('div');
+    cards.className = 'grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+    dataStore.maintenanceRequests.forEach(req => {
+      const card = document.createElement('article');
+      card.className = 'bg-white p-4 rounded-lg shadow flex flex-col gap-2';
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div><strong class="text-indigo-600">${req.equipment}</strong><div class="text-xs text-gray-500">${req.site}</div></div>
+          <div class="text-sm px-2 py-1 rounded ${req.urgency==='Haute'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-800'}">${req.urgency}</div>
+        </div>
+        <p class="text-sm text-gray-700">${escapeHtml(req.desc)}</p>
+        <div class="mt-auto flex items-center justify-between text-xs text-gray-500">
+          <div>Status: <span class="font-medium text-gray-700">${req.status}</span></div>
+          <div class="flex gap-2">
+            <button class="btn-assign text-sm px-2 py-1 rounded border">Assigner</button>
+            <button class="btn-next text-sm px-2 py-1 rounded border">Suivant</button>
+            <button class="btn-delete text-sm px-2 py-1 rounded border text-red-600">Suppr</button>
+          </div>
+        </div>
+      `;
+      // actions
+      card.querySelector('.btn-delete').addEventListener('click', ()=>{
+        if(confirm('Supprimer la demande ?')) {
+          const idx = dataStore.maintenanceRequests.findIndex(r=>r.id===req.id);
+          dataStore.maintenanceRequests.splice(idx,1);
+          saveData(dataStore);
+          renderRoute('maintenance');
+        }
+      });
+      card.querySelector('.btn-next').addEventListener('click', ()=>{
+        const map = { 'ouvert':'en cours', 'en cours':'resolu', 'resolu':'resolu' };
+        req.history.push({ at: new Date().toISOString(), note: 'Changement status '+map[req.status] });
+        req.status = map[req.status];
+        saveData(dataStore);
+        renderRoute('maintenance');
+      });
+      card.querySelector('.btn-assign').addEventListener('click', ()=>{
+        const assignee = prompt('Assigner à (nom) :');
+        if(assignee){
+          req.history.push({ at: new Date().toISOString(), note: 'Assigné à '+assignee });
+          saveData(dataStore);
+          renderRoute('maintenance');
+        }
+      });
+
+      cards.appendChild(card);
+    });
+
+    // Assemble
+    container.appendChild(form);
+    container.appendChild(el(`<section class="bg-white rounded-lg shadow p-4"><h3 class="text-lg font-medium">Demandes récentes</h3></section>`));
+    container.appendChild(cards);
+    return container;
+  }
+
+  function renderEnergie() {
+    const container = document.createElement('div');
+    container.className = 'space-y-6';
+
+    // Summary cards
+    const avg = Math.round(dataStore.energy.consumptionSeries.reduce((s,x)=>s+x.kwh,0) / dataStore.energy.consumptionSeries.length);
+    const max = Math.max(...dataStore.energy.consumptionSeries.map(x=>x.kwh));
+    const min = Math.min(...dataStore.energy.consumptionSeries.map(x=>x.kwh));
+
+    const summary = el(`
+      <div class="grid gap-4 grid-cols-1 sm:grid-cols-3">
+        <div class="bg-white p-4 rounded-lg shadow">
+          <div class="text-sm text-gray-500">Consommation moyenne (kWh)</div>
+          <div class="text-2xl font-bold">${avg}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <div class="text-sm text-gray-500">Pic (kWh)</div>
+          <div class="text-2xl font-bold">${max}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <div class="text-sm text-gray-500">Minimum (kWh)</div>
+          <div class="text-2xl font-bold">${min}</div>
+        </div>
+      </div>
+    `);
+    container.appendChild(summary);
+
+    // Canvas graph (simple line)
+    const graphCard = el(`<div class="bg-white p-4 rounded-lg shadow"><h3 class="text-lg font-medium mb-3">Consommation (derniers jours)</h3><canvas id="energyCanvas" width="800" height="200" class="w-full"></canvas></div>`);
+    container.appendChild(graphCard);
+
+    // Simulate savings
+    const simCard = el(`
+      <div class="bg-white p-4 rounded-lg shadow grid gap-3 sm:grid-cols-3">
+        <div>
+          <label class="block text-sm text-gray-600">Économie visée (%)</label>
+          <input id="simPct" type="number" value="10" min="0" max="100" class="mt-1 block w-full rounded border-gray-200" />
+        </div>
+        <div class="flex items-end">
+          <button id="simBtn" class="px-4 py-2 bg-teal-600 text-white rounded">Simuler</button>
+        </div>
+        <div id="simResult" class="text-sm text-gray-700"></div>
+      </div>
+    `);
+    container.appendChild(simCard);
+
+    // Suggestions (mocked)
+    const suggestionsCard = el(`<div class="bg-white p-4 rounded-lg shadow"><h3 class="text-lg font-medium">Suggestions pour réduire la consommation</h3><ul id="suggestionsList" class="mt-3 space-y-2"></ul></div>`);
+    container.appendChild(suggestionsCard);
+
+    // Draw graph
+    setTimeout(()=> {
+      drawEnergyGraph('energyCanvas', dataStore.energy.consumptionSeries);
+    },50);
+
+    // Simulation handler
+    simCard.querySelector('#simBtn').addEventListener('click', ()=> {
+      const pct = Number(simCard.querySelector('#simPct').value) || 0;
+      const total = dataStore.energy.consumptionSeries.reduce((s,x)=>s+x.kwh,0);
+      const savingKwh = Math.round(total * (pct/100));
+      simCard.querySelector('#simResult').textContent = `Économie estimée sur période: ${savingKwh} kWh (~${pct}% )`;
+    });
+
+    // Suggestions list
+    const suggestions = [
+      'Déplacer certaines machines hors pointe (ex: compresseurs)',
+      'Baisser chauffage 1°C en nuit pour bâtiments non occupés',
+      'Maintenance préventive des moteurs pour optimiser rendement',
+    ];
+    const ul = suggestionsCard.querySelector('#suggestionsList');
+    suggestions.forEach(s => {
+      const li = document.createElement('li');
+      li.className = 'text-sm';
+      li.textContent = '• ' + s;
+      ul.appendChild(li);
+    });
+
+    return container;
+  }
+
+  function renderRisques() {
+    const container = document.createElement('div');
+    container.className = 'space-y-6';
+
+    // Grid plan (simple 3x3)
+    const planCard = el(`<div class="bg-white p-4 rounded-lg shadow"><h3 class="text-lg font-medium mb-3">Plan simplifié (ex: bâtiment)</h3><div id="planGrid" class="grid grid-cols-3 gap-3"></div></div>`);
+    container.appendChild(planCard);
+    const planGrid = planCard.querySelector('#planGrid');
+
+    // Fill cells with risk markers mapped from dataStore.risks
+    const labels = ['Entrée', 'Stock 1', 'Stock 2', 'Atelier', 'Bureau', 'Machine 5', 'Zone Chimie', 'Toilettes', 'Garage'];
+    for(let i=0;i<9;i++){
+      const cellRisks = dataStore.risks.filter(r => labels[i] && r.location.toLowerCase().includes(labels[i].toLowerCase()));
+      const level = cellRisks[0] ? cellRisks[0].level : 'bas';
+      const color = level==='haut' ? 'bg-red-100 text-red-700' : (level==='moyen' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-700');
+      const cell = el(`<div class="risk-cell p-4 ${color}">${labels[i] || 'Zone'}</div>`);
+      planGrid.appendChild(cell);
+    }
+
+    // List of risks with form to add a new one
+    const listCard = el(`<div class="bg-white p-4 rounded-lg shadow grid gap-3 sm:grid-cols-2">
+      <div>
+        <h3 class="text-lg font-medium">Signalements</h3>
+        <ul id="riskList" class="mt-3 space-y-2 text-sm"></ul>
+      </div>
+      <form id="riskForm" class="space-y-2">
+        <h3 class="text-lg font-medium">Nouveau signalement</h3>
+        <label class="block"><span class="text-sm text-gray-600">Lieu</span><input name="location" required class="mt-1 block w-full rounded border-gray-200"></label>
+        <label class="block"><span class="text-sm text-gray-600">Niveau</span>
+          <select name="level" class="mt-1 block w-full rounded border-gray-200">
+            <option value="bas">Bas</option><option value="moyen">Moyen</option><option value="haut">Haut</option>
+          </select>
+        </label>
+        <label class="block"><span class="text-sm text-gray-600">Description</span><textarea name="desc" class="mt-1 block w-full rounded border-gray-200" rows="3"></textarea></label>
+        <div class="flex justify-end"><button class="px-3 py-2 bg-indigo-600 text-white rounded">Signaler</button></div>
+      </form>
+    </div>`);
+
+    container.appendChild(listCard);
+
+    // Populate risk list and handle form
+    function refreshRiskList() {
+      const ul = listCard.querySelector('#riskList');
+      ul.innerHTML = '';
+      dataStore.risks.forEach(r => {
+        const li = document.createElement('li');
+        li.className = 'p-3 bg-gray-50 rounded flex items-start justify-between';
+        li.innerHTML = `<div><div class="font-medium">${escapeHtml(r.location)}</div><div class="text-xs text-gray-500">${r.desc}</div></div>
+          <div class="text-sm text-right"><div>${r.level.toUpperCase()}</div><div class="mt-2"><button class="btn-resolve text-xs px-2 py-1 rounded border">Résolu</button></div></div>`;
+        li.querySelector('.btn-resolve').addEventListener('click', ()=>{
+          r.status = 'resolu';
+          saveData(dataStore);
+          refreshRiskList();
+        });
+        ul.appendChild(li);
+      });
+    }
+    refreshRiskList();
+
+    listCard.querySelector('#riskForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target).entries());
+      dataStore.risks.unshift({ id: uid(), location: f.location, level: f.level, desc: f.desc || '', reportedAt: formatDateInput(), status: 'ouvert' });
+      saveData(dataStore);
+      refreshRiskList();
+      renderRoute('risques'); // re-render to reflect plan
+    });
+
+    return container;
+  }
+
+  function renderReduction() {
+    const container = document.createElement('div');
+    container.className = 'space-y-6';
+
+    const checklistCard = el(`<div class="bg-white p-4 rounded-lg shadow">
+      <h3 class="text-lg font-medium">Checklist d'actions</h3>
+      <ul id="initiativeList" class="mt-3 space-y-2"></ul>
+      <form id="initiativeForm" class="mt-4 grid sm:grid-cols-3 gap-2">
+        <input name="title" required placeholder="Nouvelle initiative" class="col-span-2 rounded border-gray-200 p-2" />
+        <button class="px-3 py-2 bg-teal-600 text-white rounded">Ajouter</button>
+      </form>
+    </div>`);
+    container.appendChild(checklistCard);
+
+    function refreshInit() {
+      const ul = checklistCard.querySelector('#initiativeList');
+      ul.innerHTML = '';
+      dataStore.initiatives.forEach(it => {
+        const li = document.createElement('li');
+        li.className = 'p-3 bg-gray-50 rounded flex items-center justify-between';
+        li.innerHTML = `<div><div class="font-medium">${escapeHtml(it.title)}</div><div class="text-xs text-gray-500">Assigné: ${escapeHtml(it.owner || '—')} • Impact: ${it.impactPct}%</div></div>
+          <div class="flex gap-2"><button class="btn-toggle text-xs px-2 py-1 rounded border">${it.status}</button><button class="btn-del text-xs px-2 py-1 rounded border text-red-600">Suppr</button></div>`;
+        li.querySelector('.btn-toggle').addEventListener('click', ()=>{
+          it.status = (it.status==='ouvert'?'en cours':'resolu');
+          saveData(dataStore); refreshInit();
+        });
+        li.querySelector('.btn-del').addEventListener('click', ()=>{
+          if(confirm('Supprimer initiative ?')) {
+            const idx = dataStore.initiatives.findIndex(x=>x.id===it.id);
+            dataStore.initiatives.splice(idx,1); saveData(dataStore); refreshInit();
+          }
+        });
+        ul.appendChild(li);
+      });
+    }
+    refreshInit();
+
+    checklistCard.querySelector('#initiativeForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target).entries());
+      dataStore.initiatives.unshift({ id: uid(), title: f.title, owner: 'Admin', status: 'ouvert', impactPct: Math.round(Math.random()*10) });
+      saveData(dataStore); refreshInit();
+    });
+
+    // Export mock JSON
+    const exportCard = el(`<div class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+      <div><h3 class="text-lg font-medium">Exporter initiatives</h3><p class="text-sm text-gray-500">Export JSON mock</p></div>
+      <div><button id="exportBtn" class="px-3 py-2 bg-indigo-600 text-white rounded">Exporter</button></div>
+    </div>`);
+    container.appendChild(exportCard);
+    exportCard.querySelector('#exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(dataStore.initiatives, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'initiatives.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    return container;
+  }
+
+  /**************************************************************************
+   * Small helpers for drawing an energy graph on <canvas>
+   ***************************************************************************/
+  function drawEnergyGraph(canvasId, series) {
+    const canvas = document.getElementById(canvasId);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    // resize canvas to CSS width
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * devicePixelRatio;
+    canvas.height = 200 * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    // draw simple axes
+    const w = rect.width, h = 200;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,h-30); ctx.lineTo(w-10,h-30); ctx.stroke();
+
+    // values
+    const values = series.map(s=>s.kwh);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const paddingLeft = 50, paddingRight = 10, paddingTop = 10, paddingBottom = 40;
+    const plotW = w - paddingLeft - paddingRight;
+    const plotH = h - paddingTop - paddingBottom;
+
+    ctx.strokeStyle = '#0ea5a4';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    values.forEach((v,i)=>{
+      const x = paddingLeft + (i/(values.length-1 || 1))*plotW;
+      const y = paddingTop + (1 - (v - min)/(max - min || 1))*plotH;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      // point
+      ctx.fillStyle = '#0ea5a4'; ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI); ctx.fill();
+    });
+    ctx.stroke();
+
+    // X labels
+    ctx.fillStyle = '#6b7280'; ctx.font = '12px sans-serif';
+    series.forEach((s,i)=>{
+      const x = paddingLeft + (i/(series.length-1 || 1))*plotW;
+      if(i % Math.ceil(series.length/6) === 0) ctx.fillText(s.date.slice(5), x-10, h-10);
+    });
+  }
+
+  /**************************************************************************
+   * SPA & routing
+   ***************************************************************************/
+  const routes = {
+    'maintenance': { title:'Maintenance', subtitle: 'Créer et suivre les demandes', render: renderMaintenance },
+    'energie': { title:'Énergie', subtitle: 'Dashboard de consommation', render: renderEnergie },
+    'risques': { title:'Lieux à risques', subtitle: 'Signaler et suivre', render: renderRisques },
+    'reduction': { title:'Réduction conso', subtitle: 'Initiatives et actions', render: renderReduction }
+  };
+
+  function setActiveNav(route) {
+    document.querySelectorAll('.nav-link').forEach(a=>{
+      a.classList.toggle('font-semibold', a.dataset.route===route);
+    });
+    document.querySelectorAll('.nav-link-mobile').forEach(a=>{
+      a.classList.toggle('font-semibold', a.dataset.route===route);
+    });
+  }
+
+  function renderRoute(hash) {
+    const route = hash || 'maintenance';
+    const meta = routes[route];
+    if(!meta) return;
+    document.getElementById('pageTitle').textContent = meta.title;
+    document.getElementById('pageSubtitle').textContent = meta.subtitle;
+    setActiveNav(route);
+
+    const content = document.getElementById('content');
+    content.innerHTML = '';
+    const section = meta.render();
+    section.classList.add('fade-enter');
+    content.appendChild(section);
+    requestAnimationFrame(()=> section.classList.add('fade-enter-active'));
+  }
+
+  // On hash change
+  window.addEventListener('hashchange', ()=> {
+    const route = location.hash.replace('#','') || 'maintenance';
+    renderRoute(route);
+    // close mobile menu if open
+    document.getElementById('mobileMenu').classList.add('hidden');
+  });
+
+  // Init
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // initial route
+  const initRoute = location.hash.replace('#','') || 'maintenance';
+  renderRoute(initRoute);
+
+  /**************************************************************************
+   * Mobile menu toggle & accessible behaviour
+   ***************************************************************************/
+  const burgerBtn = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burgerBtn.addEventListener('click', ()=>{
+    mobileMenu.classList.toggle('hidden');
+    burgerBtn.setAttribute('aria-expanded', !mobileMenu.classList.contains('hidden'));
+  });
+
+  // Close mobile menu when clicking a link
+  document.querySelectorAll('.nav-link-mobile').forEach(a=>{
+    a.addEventListener('click', ()=> { mobileMenu.classList.add('hidden'); });
+  });
+
+  // Desktop nav link handling (SPA)
+  document.querySelectorAll('.nav-link').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const route = a.dataset.route;
+      location.hash = route;
+    });
+  });
+
+  // Accessibility: close mobile menu on Escape
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') mobileMenu.classList.add('hidden');
+  });
+
+  /**************************************************************************
+   * Utility: escape HTML in text content
+   ***************************************************************************/
+  function escapeHtml(str='') {
+    return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+  }
+
+  </script>
+</body>
+</html>
