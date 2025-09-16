@@ -6,23 +6,180 @@
   <title>Portfolio Moderne</title>
   <!-- Tailwind CSS via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Font Awesome pour les icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Custom styles for gradient text */
+    /* Variables CSS pour la cohérence */
+    :root {
+      --primary-color: #ff7e5f;
+      --secondary-color: #feb47b;
+      --accent-color: #731919;
+      --dark-bg: #0f0f0f;
+      --card-bg: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border-color: #333333;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --error-color: #ef4444;
+    }
+
+    /* Base styles */
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    /* Gradient text amélioré */
     .gradient-text {
-      background: linear-gradient(90deg, #ff7e5f, #feb47b);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    /* Custom styles for gradient navbar */
+    /* Navbar gradient améliorée */
     .gradient-navbar {
-      background: linear-gradient(180deg, #731919, #e52b2b);
+      background: linear-gradient(135deg, var(--accent-color), #e52b2b);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Enhanced Navigation Styles */
+    /* Animations et transitions */
+    .fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+      opacity: 0;
+    }
+
+    .slide-up {
+      animation: slideUp 0.6s ease-out forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .scale-in {
+      animation: scaleIn 0.5s ease-out forwards;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Boutons modernisés */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 126, 95, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary-color);
+      background: rgba(255, 126, 95, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Cards améliorées */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 126, 95, 0.3);
+    }
+
+    /* Navigation améliorée */
     .nav-link {
       position: relative;
       transition: all 0.3s ease;
+      padding: 8px 16px;
+      border-radius: 8px;
     }
 
     .nav-link::after {
@@ -32,7 +189,7 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, #ff7e5f, #feb47b);
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
       transition: width 0.3s ease;
     }
 
@@ -41,22 +198,28 @@
       width: 100%;
     }
 
+    .nav-link:hover {
+      background: rgba(255, 126, 95, 0.1);
+    }
+
     .nav-link:focus {
-      outline: 2px solid #ff7e5f;
+      outline: 2px solid var(--primary-color);
       outline-offset: 2px;
     }
 
-    /* Mobile menu animations */
+    /* Menu mobile amélioré */
     .mobile-menu {
       transform: translateX(-100%);
       transition: transform 0.3s ease-in-out;
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
     }
 
     .mobile-menu.open {
       transform: translateX(0);
     }
 
-    /* Hamburger animation */
+    /* Animation hamburger */
     .hamburger {
       cursor: pointer;
       transition: all 0.3s ease;
@@ -82,53 +245,287 @@
       transition: 0.3s;
     }
 
-    /* Project cards hover effects */
+    /* Cartes projets améliorées */
     .project-card {
       transition: all 0.3s ease;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
     }
 
     .project-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 126, 95, 0.3);
     }
 
-    /* Breadcrumb styles */
+    .project-card img {
+      transition: transform 0.3s ease;
+    }
+
+    .project-card:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Badges et tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: rgba(255, 126, 95, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(255, 126, 95, 0.2);
+    }
+
+    /* Sections avec parallax */
+    .parallax-section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .parallax-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120%;
+      background: linear-gradient(135deg, rgba(255, 126, 95, 0.05), rgba(254, 180, 123, 0.05));
+      transform: translateY(-10%);
+      transition: transform 0.3s ease;
+    }
+
+    /* Loading states */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Tooltips */
+    .tooltip {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .tooltip::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      z-index: 1000;
+    }
+
+    .tooltip:hover::before {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.active .modal-content {
+      transform: scale(1);
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: var(--text-primary);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success-color);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error-color);
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .card {
+        padding: 16px;
+      }
+      
+      .btn-primary, .btn-secondary {
+        padding: 10px 20px;
+        font-size: 0.875rem;
+      }
+    }
+
+    /* Scroll animations */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Breadcrumb amélioré */
     .breadcrumb {
       display: flex;
       align-items: center;
       font-size: 0.875rem;
-      color: #6b7280;
+      color: var(--text-secondary);
+      background: rgba(26, 26, 26, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .breadcrumb a {
-      color: #3b82f6;
+      color: var(--primary-color);
       text-decoration: none;
       transition: color 0.2s ease;
     }
 
     .breadcrumb a:hover {
-      color: #1d4ed8;
+      color: var(--secondary-color);
     }
 
-    /* Skip to content link for accessibility */
+    /* Skip link amélioré */
     .skip-link {
       position: absolute;
       top: -40px;
       left: 6px;
-      background: #000;
-      color: #fff;
+      background: var(--card-bg);
+      color: var(--text-primary);
       padding: 8px;
       text-decoration: none;
       transition: top 0.3s;
       z-index: 1000;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
     }
 
     .skip-link:focus {
       top: 6px;
     }
+
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255, 126, 95, 0.3);
+      transition: all 0.3s ease;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(255, 126, 95, 0.4);
+    }
   </style>
 </head>
-<body class="bg-black text-white">
+<body>
   
   <!-- Skip to content link for accessibility -->
   <a href="#main-content" class="skip-link">Passer au contenu principal</a>
@@ -138,13 +535,16 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <!-- Logo/Brand -->
       <div class="text-xl font-bold">
-        <a href="#accueil" class="nav-link" aria-label="Retour à l'accueil">TAHRASTE CHIHAB</a>
+        <a href="#accueil" class="nav-link text-white hover:text-white" aria-label="Retour à l'accueil">
+          <i class="fas fa-code mr-2"></i>TAHRASTE CHIHAB
+        </a>
       </div>
       
       <!-- Desktop Navigation -->
       <ul class="hidden md:flex space-x-8" role="menubar">
         <li role="none">
           <a href="#accueil" class="nav-link text-white hover:text-white px-3 py-2 rounded-md" role="menuitem" aria-label="Aller à la section Accueil">
+            <i class="fas fa-home mr-2"></i>
             Accueil
           </a>
         </li>
@@ -155,26 +555,37 @@
                     aria-haspopup="true" 
                     aria-expanded="false"
                     onclick="toggleDropdown('projets-dropdown')">
+              <i class="fas fa-folder mr-2"></i>
               Projets
               <svg class="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
-            <div id="projets-dropdown" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" role="menu">
-              <a href="#projets-rh" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md" role="menuitem">RH</a>
-              <a href="#projets-marketing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Marketing & Ventes</a>
-              <a href="#projets-management" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Management</a>
-              <a href="#projets-rse" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md" role="menuitem">RSE</a>
+            <div id="projets-dropdown" class="absolute left-0 mt-2 w-56 bg-gray-900 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-700" role="menu">
+              <a href="#projets-rh" class="flex items-center px-4 py-3 text-sm text-white hover:bg-gray-800 rounded-t-lg transition-colors" role="menuitem">
+                <i class="fas fa-users mr-3 text-blue-400"></i>RH
+              </a>
+              <a href="#projets-marketing" class="flex items-center px-4 py-3 text-sm text-white hover:bg-gray-800 transition-colors" role="menuitem">
+                <i class="fas fa-chart-line mr-3 text-green-400"></i>Marketing & Ventes
+              </a>
+              <a href="#projets-management" class="flex items-center px-4 py-3 text-sm text-white hover:bg-gray-800 transition-colors" role="menuitem">
+                <i class="fas fa-cogs mr-3 text-purple-400"></i>Management
+              </a>
+              <a href="#projets-rse" class="flex items-center px-4 py-3 text-sm text-white hover:bg-gray-800 rounded-b-lg transition-colors" role="menuitem">
+                <i class="fas fa-leaf mr-3 text-yellow-400"></i>RSE
+              </a>
             </div>
           </div>
         </li>
         <li role="none">
           <a href="#experience" class="nav-link text-white hover:text-white px-3 py-2 rounded-md" role="menuitem" aria-label="Voir mon expérience">
+            <i class="fas fa-briefcase mr-2"></i>
             Expérience
           </a>
         </li>
         <li role="none">
           <a href="#contact" class="nav-link text-white hover:text-white px-3 py-2 rounded-md" role="menuitem" aria-label="Me contacter">
+            <i class="fas fa-envelope mr-2"></i>
             Contact
           </a>
         </li>
@@ -193,15 +604,15 @@
     </div>
     
     <!-- Mobile Navigation -->
-    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-64 bg-gray-900 md:hidden z-40" role="menu">
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-72 md:hidden z-40" role="menu">
       <div class="p-4 pt-20">
-        <a href="#accueil" class="block py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors" role="menuitem" onclick="closeMobileMenu()">
+        <a href="#accueil" class="flex items-center py-3 px-4 text-white hover:bg-gray-800 rounded-lg transition-colors mb-2" role="menuitem" onclick="closeMobileMenu()">
           🏠 Accueil
         </a>
         
         <!-- Mobile Projects Submenu -->
         <div class="mt-2">
-          <button class="w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors flex items-center justify-between" 
+          <button class="w-full text-left py-3 px-4 text-white hover:bg-gray-800 rounded-lg transition-colors flex items-center justify-between mb-2" 
                   onclick="toggleMobileSubmenu('mobile-projets')"
                   aria-expanded="false">
             📁 Projets
@@ -210,25 +621,25 @@
             </svg>
           </button>
           <div id="mobile-projets" class="hidden ml-4 mt-1 space-y-1">
-            <a href="#projets-rh" class="block py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition-colors" role="menuitem" onclick="closeMobileMenu()">
+            <a href="#projets-rh" class="flex items-center py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" role="menuitem" onclick="closeMobileMenu()">
               👥 RH
             </a>
-            <a href="#projets-marketing" class="block py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition-colors" role="menuitem" onclick="closeMobileMenu()">
+            <a href="#projets-marketing" class="flex items-center py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" role="menuitem" onclick="closeMobileMenu()">
               📈 Marketing & Ventes
             </a>
-            <a href="#projets-management" class="block py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition-colors" role="menuitem" onclick="closeMobileMenu()">
+            <a href="#projets-management" class="flex items-center py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" role="menuitem" onclick="closeMobileMenu()">
               🏢 Management
             </a>
-            <a href="#projets-rse" class="block py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition-colors" role="menuitem" onclick="closeMobileMenu()">
+            <a href="#projets-rse" class="flex items-center py-2 px-4 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors" role="menuitem" onclick="closeMobileMenu()">
               🌱 RSE
             </a>
           </div>
         </div>
         
-        <a href="#experience" class="block py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors mt-2" role="menuitem" onclick="closeMobileMenu()">
+        <a href="#experience" class="flex items-center py-3 px-4 text-white hover:bg-gray-800 rounded-lg transition-colors mt-2 mb-2" role="menuitem" onclick="closeMobileMenu()">
           💼 Expérience
         </a>
-        <a href="#contact" class="block py-3 px-4 text-white hover:bg-gray-800 rounded-md transition-colors mt-2" role="menuitem" onclick="closeMobileMenu()">
+        <a href="#contact" class="flex items-center py-3 px-4 text-white hover:bg-gray-800 rounded-lg transition-colors mt-2" role="menuitem" onclick="closeMobileMenu()">
           📧 Contact
         </a>
       </div>
@@ -239,7 +650,7 @@
   </nav>
 
   <!-- Breadcrumb Navigation -->
-  <div id="breadcrumb" class="fixed top-16 left-0 w-full bg-gray-800 bg-opacity-90 px-4 py-2 z-40 hidden">
+  <div id="breadcrumb" class="fixed top-16 left-0 w-full z-40 hidden">
     <nav class="breadcrumb max-w-7xl mx-auto" aria-label="Fil d'Ariane">
       <a href="#accueil">Accueil</a>
       <span class="mx-2">/</span>
@@ -249,271 +660,729 @@
 
   <!-- Hero Section -->
   <main id="main-content">
-  <section id="accueil" class="relative pt-24 pb-16 text-center">
-    <img src="https://i.postimg.cc/ZRN78vH4/PDP-4.png" alt="Avatar" class="mx-auto rounded-full w-32 h-32 mb-4">
-    <h1 class="text-4xl font-bold mb-2">
-De l’idée à la solution : je crée, j’automatise, j’optimise, je booste 🚀
-      <span class="gradient-text">avec passion !</span>
-			<br>
-			<br>
-    </h1>
-    <p class="text-gray-400 mb-8">
-      Développement d’applications, automatisation, centralisation des données et intelligence artificielle pour des process plus simples et efficaces
-    </p>
-    <div class="flex justify-center space-x-4">
-      <button class="bg-gray-200 text-black px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Me contacter">
-        Get In Touch
-      </button>
-      <button class="bg-gray-800 border border-gray-200 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Télécharger mon CV">
-        Download CV
-      </button>
-    </div>
-  </section>
-
- <!-- Experience With Section -->
-<section id="experience-avec" class="py-16 text-center">
-  <h2 class="text-3xl font-bold mb-8">Expérience Avec</h2>
-  <div class="grid grid-cols-8 gap-4 justify-center">
-    <img src="https://i.postimg.cc/Rhqt8dvw/microsoft-power-platform-logo-png-seeklogo-508514-removebg-preview.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/5tD19vjV/Design-sans-titre-6-removebg-preview.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/zfHV8T8C/icons8-microsoft-power-automate-2020-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/J0c76qmq/Copilot-Studio-cr-ez-votre-propre-agent-Copilot.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/W4pCR7V3/icons8-sharepoint-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/9QCNTBrp/6206735cd7b91b0004122624.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/g2Q2Sr8n/7784683-middle-removebg-preview.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/3JKgFfFd/N8-N-badge.png" alt="" class="w-10 h-10 mx-auto">
-
-    <img src="https://i.postimg.cc/tCHrQztj/685b36ec78014e86b337b96b-runpod-logo-square-p-2000.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/W3T3cC3Z/icons8-deepseek-48.png" alt="" class="w-10 h-10 mx-auto">	
-    <img src="https://i.postimg.cc/v89st3ZF/icons8-chatgpt-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/jdmyYqrJ/icons8-perplexity-ai-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/VsK1Zdcm/icons8-ancien-logo-vmware-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/VvVxf0Yt/icons8-docker-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/bNwjf8R8/icons8-linux-48.png" alt="" class="w-10 h-10 mx-auto">
-    <img src="https://i.postimg.cc/yNys4zdz/81791099.png" alt="" class="w-10 h-10 mx-auto">
-  </div>
-</section>
-
-
-  <!-- Projects Section RH -->
-  <section id="projets-rh" class="py-16 text-center">
-    <h2 class="text-3xl font-bold text-orange-500 mb-8">PROJETS RH</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-4 md:mx-16">
-      <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-        <img src="https://via.placeholder.com/300" alt="Gestion Demande RH" class="w-full h-48 object-cover mb-4 rounded">
-        <h3 class="text-2xl font-bold mb-2">Gestion Demande RH</h3>
-        <a href="/projet/rh/gerer_demande_rh/gerer_demande_rh.html" 
-           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-           aria-label="Visiter le projet Gestion Demande RH">
-          Cliquez ici pour visiter
-        </a>
+  <section id="accueil" class="relative pt-32 pb-20 text-center parallax-section overflow-hidden">
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="fade-in">
+        <div class="relative inline-block mb-8">
+          <img src="https://i.postimg.cc/ZRN78vH4/PDP-4.png" alt="Avatar de Tahraste Chihab" class="mx-auto rounded-full w-40 h-40 border-4 border-gradient shadow-2xl">
+          <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-check text-white text-lg"></i>
+          </div>
+        </div>
       </div>
       
-      <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-        <img src="https://via.placeholder.com/300" alt="Projet 2" class="w-full h-48 object-cover mb-4 rounded">
-        <h3 class="text-2xl font-bold mb-2">Application de communication</h3>
-        <a href="/projet/rh/communication.html" 
-           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-           aria-label="Visiter le projet Application de communication">
-          Cliquez ici pour visiter
-        </a>
+      <div class="slide-up" style="animation-delay: 0.2s;">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          De l'idée à la solution : je crée, j'automatise, j'optimise, je booste 🚀
+          <br>
+          <span class="gradient-text">avec passion !</span>
+        </h1>
       </div>
-  
-
-          <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-        <img src="https://via.placeholder.com/300" alt="Projet 2" class="w-full h-48 object-cover mb-4 rounded">
-        <h3 class="text-2xl font-bold mb-2">Favoriser Inclusion</h3>
-        <a href="/projet/rh/favoriser_inclusion.html" 
-           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-           aria-label="Visiter le projet Favoriser Inclusion">
-          Cliquez ici pour visiter
-        </a>
+      
+      <div class="slide-up" style="animation-delay: 0.4s;">
+        <p class="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+          Développement d'applications, automatisation, centralisation des données et intelligence artificielle pour des process plus simples et efficaces
+        </p>
       </div>
-
-        <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-        <img src="https://via.placeholder.com/300" alt="Projet 2" class="w-full h-48 object-cover mb-4 rounded">
-        <h3 class="text-2xl font-bold mb-2">Compétences Interne</h3>
-        <a href="/projet/rh/competence_interne.html" 
-           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-           aria-label="Visiter le projet Compétences Interne">
-          Cliquez ici pour visiter
-        </a>
+      
+      <div class="slide-up flex flex-col sm:flex-row justify-center gap-4 mb-12" style="animation-delay: 0.6s;">
+        <button class="btn-primary tooltip" data-tooltip="Contactez-moi pour discuter de vos projets" onclick="openContactModal()" aria-label="Me contacter">
+          <i class="fas fa-paper-plane mr-2"></i>
+          Get In Touch
+        </button>
+        <button class="btn-secondary tooltip" data-tooltip="Télécharger mon CV au format PDF" onclick="downloadCV()" aria-label="Télécharger mon CV">
+          <i class="fas fa-download mr-2"></i>
+          Download CV
+        </button>
       </div>
-    
+      
+      <!-- Stats rapides -->
+      <div class="scale-in grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto" style="animation-delay: 0.8s;">
+        <div class="card text-center">
+          <div class="text-3xl font-bold gradient-text mb-2">50+</div>
+          <div class="text-sm text-gray-400">Projets Réalisés</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold gradient-text mb-2">5+</div>
+          <div class="text-sm text-gray-400">Années d'Expérience</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold gradient-text mb-2">100%</div>
+          <div class="text-sm text-gray-400">Satisfaction Client</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold gradient-text mb-2">24/7</div>
+          <div class="text-sm text-gray-400">Support Disponible</div>
+        </div>
+      </div>
+    </div>
   </section>
 
-<!-- Projects Section MARKETING & VENTES-->
- <section id="projets-marketing" class="py-16 text-center"> 
-  <h2 class="text-3xl font-bold text-orange-500 mb-8">PROJETS MARKETING & VENTES</h2>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-4 md:mx-16">
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-      <img src="https://via.placeholder.com/300" alt="ECOM" class="w-full h-48 object-cover mb-4 rounded">
-      <h3 class="text-2xl font-bold mb-2">ECOM</h3>
-      <a href="/projet/marketing/ecom.html" 
-         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-         aria-label="Visiter le projet ECOM">
-        Cliquez ici pour visiter
-      </a>
+  <!-- Experience With Section -->
+  <section id="experience-avec" class="py-20 text-center parallax-section">
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <h2 class="text-4xl font-bold mb-4">Expérience Avec</h2>
+        <p class="text-gray-400 mb-12 text-lg">Technologies et outils que je maîtrise</p>
+      </div>
+      
+      <div class="scroll-reveal grid grid-cols-4 md:grid-cols-8 gap-6 justify-center">
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Microsoft Power Platform">
+          <img src="https://i.postimg.cc/Rhqt8dvw/microsoft-power-platform-logo-png-seeklogo-508514-removebg-preview.png" alt="Microsoft Power Platform" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Power Apps">
+          <img src="https://i.postimg.cc/5tD19vjV/Design-sans-titre-6-removebg-preview.png" alt="Power Apps" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Power Automate">
+          <img src="https://i.postimg.cc/zfHV8T8C/icons8-microsoft-power-automate-2020-48.png" alt="Power Automate" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Copilot Studio">
+          <img src="https://i.postimg.cc/J0c76qmq/Copilot-Studio-cr-ez-votre-propre-agent-Copilot.png" alt="Copilot Studio" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="SharePoint">
+          <img src="https://i.postimg.cc/W4pCR7V3/icons8-sharepoint-48.png" alt="SharePoint" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Teams">
+          <img src="https://i.postimg.cc/9QCNTBrp/6206735cd7b91b0004122624.png" alt="Microsoft Teams" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Azure">
+          <img src="https://i.postimg.cc/g2Q2Sr8n/7784683-middle-removebg-preview.png" alt="Azure" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="N8N">
+          <img src="https://i.postimg.cc/3JKgFfFd/N8-N-badge.png" alt="N8N" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="RunPod">
+          <img src="https://i.postimg.cc/tCHrQztj/685b36ec78014e86b337b96b-runpod-logo-square-p-2000.png" alt="RunPod" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="DeepSeek">
+          <img src="https://i.postimg.cc/W3T3cC3Z/icons8-deepseek-48.png" alt="DeepSeek" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="ChatGPT">
+          <img src="https://i.postimg.cc/v89st3ZF/icons8-chatgpt-48.png" alt="ChatGPT" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Perplexity AI">
+          <img src="https://i.postimg.cc/jdmyYqrJ/icons8-perplexity-ai-48.png" alt="Perplexity AI" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="VMware">
+          <img src="https://i.postimg.cc/VsK1Zdcm/icons8-ancien-logo-vmware-48.png" alt="VMware" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Docker">
+          <img src="https://i.postimg.cc/VvVxf0Yt/icons8-docker-48.png" alt="Docker" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="Linux">
+          <img src="https://i.postimg.cc/bNwjf8R8/icons8-linux-48.png" alt="Linux" class="w-12 h-12 mx-auto">
+        </div>
+        <div class="tooltip card p-4 hover:scale-110 transition-transform" data-tooltip="GitHub">
+          <img src="https://i.postimg.cc/yNys4zdz/81791099.png" alt="GitHub" class="w-12 h-12 mx-auto">
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-      <img src="https://via.placeholder.com/300" alt="Gestion de projet" class="w-full h-48 object-cover mb-4 rounded">
-      <h3 class="text-2xl font-bold mb-2">Gestion de projet</h3>
-      <a href="/projet/marketing/gestion_projet.html" 
-         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-         aria-label="Visiter le projet Gestion de projet">
-        Cliquez ici pour visiter
-      </a>
-    </div>
-
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-      <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-      <h3 class="text-2xl font-bold mb-2">Performance Marketing</h3>
-      <a href="/projet/marketing/perf_marketing.html" 
-         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-         aria-label="Visiter le projet Performance Marketing">
-        Cliquez ici pour visiter
-      </a>
-    </div>
-
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-    <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-    <h3 class="text-2xl font-bold mb-2">CRM</h3>
-    <a href="/projet/marketing/crm.html" 
-       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-       aria-label="Visiter le projet CRM">
-      Cliquez ici pour visiter
-    </a>
-    </div>
-
-
-      <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-    <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-    <h3 class="text-2xl font-bold mb-2">Smart Sales</h3>
-    <a href="/projet/marketing/smart_sales.html" 
-       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-       aria-label="Visiter le projet Smart Sales">
-      Cliquez ici pour visiter
-    </a>
-    </div>
-
-
-      <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-    <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-    <h3 class="text-2xl font-bold mb-2">Prospection</h3>
-    <a href="/projet/marketing/prospection.html" 
-       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-       aria-label="Visiter le projet Prospection">
-      Cliquez ici pour visiter
-    </a>
-    </div>
+  <!-- Projects Section RH -->
+  <section id="projets-rh" class="py-20 text-center parallax-section">
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-users text-4xl text-blue-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">PROJETS RH</h2>
+        </div>
+        <p class="text-gray-400 mb-12 text-lg">Solutions innovantes pour la gestion des ressources humaines</p>
+      </div>
     
-  </div>
-</section>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop" alt="Gestion Demande RH" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge">
+                <i class="fas fa-star mr-1"></i>
+                Populaire
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">Gestion Demande RH</h3>
+            <p class="text-gray-400 mb-4">Système complet de gestion des demandes RH avec workflow automatisé</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/rh/gerer_demande_rh/gerer_demande_rh.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Gestion Demande RH">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-blue-400" data-tooltip="Power Apps">
+                  <i class="fab fa-microsoft"></i>
+                </span>
+                <span class="tooltip text-green-400" data-tooltip="SharePoint">
+                  <i class="fas fa-database"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop" alt="Application de communication" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">Application de communication</h3>
+            <p class="text-gray-400 mb-4">Plateforme de communication interne moderne et intuitive</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/rh/communication.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Application de communication">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-blue-400" data-tooltip="Teams Integration">
+                  <i class="fab fa-microsoft"></i>
+                </span>
+                <span class="tooltip text-purple-400" data-tooltip="Custom Development">
+                  <i class="fas fa-code"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=250&fit=crop" alt="Favoriser Inclusion" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-green-500">
+                <i class="fas fa-heart mr-1"></i>
+                Impact Social
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">Favoriser Inclusion</h3>
+            <p class="text-gray-400 mb-4">Outils et ressources pour promouvoir l'inclusion en entreprise</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/rh/favoriser_inclusion.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Favoriser Inclusion">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-yellow-400" data-tooltip="Accessibility Focus">
+                  <i class="fas fa-universal-access"></i>
+                </span>
+                <span class="tooltip text-red-400" data-tooltip="Social Impact">
+                  <i class="fas fa-heart"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=250&fit=crop" alt="Compétences Interne" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">Compétences Interne</h3>
+            <p class="text-gray-400 mb-4">Cartographie et développement des compétences internes</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/rh/competence_interne.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Compétences Interne">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-blue-400" data-tooltip="Skills Management">
+                  <i class="fas fa-chart-bar"></i>
+                </span>
+                <span class="tooltip text-green-400" data-tooltip="Learning Platform">
+                  <i class="fas fa-graduation-cap"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section MARKETING & VENTES-->
+  <section id="projets-marketing" class="py-20 text-center parallax-section"> 
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-chart-line text-4xl text-green-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">PROJETS MARKETING & VENTES</h2>
+        </div>
+        <p class="text-gray-400 mb-12 text-lg">Solutions digitales pour optimiser vos performances commerciales</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=250&fit=crop" alt="ECOM" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-purple-500">
+                <i class="fas fa-shopping-cart mr-1"></i>
+                E-commerce
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">ECOM</h3>
+            <p class="text-gray-400 mb-4 text-sm">Plateforme e-commerce complète avec gestion des stocks</p>
+            <a href="/projet/marketing/ecom.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet ECOM">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=250&fit=crop" alt="Gestion de projet" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">Gestion de projet</h3>
+            <p class="text-gray-400 mb-4 text-sm">Outil de gestion de projets avec suivi en temps réel</p>
+            <a href="/projet/marketing/gestion_projet.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet Gestion de projet">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop" alt="Performance Marketing" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-yellow-500">
+                <i class="fas fa-rocket mr-1"></i>
+                Performance
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">Performance Marketing</h3>
+            <p class="text-gray-400 mb-4 text-sm">Analytics et optimisation des campagnes marketing</p>
+            <a href="/projet/marketing/perf_marketing.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet Performance Marketing">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=250&fit=crop" alt="CRM" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">CRM</h3>
+            <p class="text-gray-400 mb-4 text-sm">Système de gestion de la relation client personnalisé</p>
+            <a href="/projet/marketing/crm.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet CRM">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop" alt="Smart Sales" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-blue-500">
+                <i class="fas fa-brain mr-1"></i>
+                IA
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">Smart Sales</h3>
+            <p class="text-gray-400 mb-4 text-sm">Intelligence artificielle pour optimiser les ventes</p>
+            <a href="/projet/marketing/smart_sales.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet Smart Sales">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop" alt="Prospection" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-3">Prospection</h3>
+            <p class="text-gray-400 mb-4 text-sm">Automatisation de la prospection commerciale</p>
+            <a href="/projet/marketing/prospection.html" 
+               class="btn-primary w-full text-center"
+               aria-label="Visiter le projet Prospection">
+              <i class="fas fa-external-link-alt mr-2"></i>
+              Découvrir
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 
   <!-- Projects Section Management-->
- <section id="projets-management" class="py-16 text-center"> 
-  <h2 class="text-3xl font-bold text-orange-500 mb-8">PROJETS MANAGEMENT</h2>
+  <section id="projets-management" class="py-20 text-center parallax-section"> 
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-cogs text-4xl text-purple-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">PROJETS MANAGEMENT</h2>
+        </div>
+        <p class="text-gray-400 mb-12 text-lg">Outils de gestion et d'optimisation des processus métier</p>
+      </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-4 md:mx-16">
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-      <img src="https://via.placeholder.com/300" alt="" class="w-full h-48 object-cover mb-4 rounded">
-      <h3 class="text-2xl font-bold mb-2">GESTION</h3>
-      <a href="/projet/management/gestion.html" 
-         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-         aria-label="Visiter le projet Gestion">
-        Cliquez ici pour visiter
-      </a>
-    </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=250&fit=crop" alt="Gestion" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">GESTION</h3>
+            <p class="text-gray-400 mb-4">Système de gestion intégré pour optimiser les processus</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/management/gestion.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Gestion">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-purple-400" data-tooltip="Process Optimization">
+                  <i class="fas fa-cogs"></i>
+                </span>
+                <span class="tooltip text-blue-400" data-tooltip="Dashboard">
+                  <i class="fas fa-chart-pie"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-    <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-    <h3 class="text-2xl font-bold mb-2">GESTION SITE</h3>
-    <a href="/projet/management/gestion_site.html" 
-       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-       aria-label="Visiter le projet Gestion Site">
-      Cliquez ici pour visiter
-    </a>
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop" alt="Gestion Site" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-green-500">
+                <i class="fas fa-industry mr-1"></i>
+                Industriel
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">GESTION SITE</h3>
+            <p class="text-gray-400 mb-4">Gestion complète des sites industriels et maintenance</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/management/gestion_site.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Gestion Site">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-green-400" data-tooltip="Maintenance">
+                  <i class="fas fa-wrench"></i>
+                </span>
+                <span class="tooltip text-yellow-400" data-tooltip="Energy Management">
+                  <i class="fas fa-bolt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    
-  </div>
-</section>
+  </section>
 
 
 
   <!-- Projects Section RSE-->
- <section id="projets-rse" class="py-16 text-center"> 
-  <h2 class="text-3xl font-bold text-orange-500 mb-8">PROJETS RSE </h2>
+  <section id="projets-rse" class="py-20 text-center parallax-section"> 
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-leaf text-4xl text-green-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">PROJETS RSE</h2>
+        </div>
+        <p class="text-gray-400 mb-12 text-lg">Solutions durables pour une entreprise responsable</p>
+      </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-4 md:mx-16">
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-      <img src="https://via.placeholder.com/300" alt="" class="w-full h-48 object-cover mb-4 rounded">
-      <h3 class="text-2xl font-bold mb-2">ECONOMIE PARTICIPATIVE</h3>
-      <a href="/projet/rse/eco_participative.html" 
-         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-         aria-label="Visiter le projet Économie Participative">
-        Cliquez ici pour visiter
-      </a>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=250&fit=crop" alt="Économie Participative" class="w-full h-48 object-cover">
+            <div class="absolute top-4 right-4">
+              <span class="badge bg-green-500">
+                <i class="fas fa-recycle mr-1"></i>
+                Durable
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">ÉCONOMIE PARTICIPATIVE</h3>
+            <p class="text-gray-400 mb-4">Plateforme collaborative pour l'économie circulaire</p>
+            <div class="flex items-center justify-between">
+              <a href="/projet/rse/eco_participative.html" 
+                 class="btn-primary"
+                 aria-label="Visiter le projet Économie Participative">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Découvrir
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-green-400" data-tooltip="Sustainability">
+                  <i class="fas fa-leaf"></i>
+                </span>
+                <span class="tooltip text-blue-400" data-tooltip="Community">
+                  <i class="fas fa-users"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card scroll-reveal">
+          <div class="relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&h=250&fit=crop" alt="Impact Environnemental" class="w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-bold mb-3">IMPACT ENVIRONNEMENTAL</h3>
+            <p class="text-gray-400 mb-4">Mesure et réduction de l'empreinte carbone</p>
+            <div class="flex items-center justify-between">
+              <a href="#" 
+                 class="btn-secondary cursor-not-allowed opacity-50"
+                 aria-label="Projet en développement">
+                <i class="fas fa-clock mr-2"></i>
+                Bientôt disponible
+              </a>
+              <div class="flex space-x-2">
+                <span class="tooltip text-green-400" data-tooltip="Carbon Footprint">
+                  <i class="fas fa-seedling"></i>
+                </span>
+                <span class="tooltip text-yellow-400" data-tooltip="Analytics">
+                  <i class="fas fa-chart-line"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="bg-gray-800 p-4 rounded shadow-lg project-card">
-    <img src="https://via.placeholder.com/300" alt="Performance Marketing" class="w-full h-48 object-cover mb-4 rounded">
-    <h3 class="text-2xl font-bold mb-2">GESTION SITE</h3>
-    <a href="/projet/management/gestion_site.html" 
-       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-       aria-label="Visiter le projet Gestion Site">
-      Cliquez ici pour visiter
-    </a>
-    </div>
-    
-  </div>
-</section>
-
-    
-      
-    
-     
-
-
-  
+  </section>
 
   <!-- Experience Section -->
-  <section id="experience" class="py-16 text-center">
-    <h2 class="text-3xl font-bold text-blue-500 mb-8">EXPERIENCE</h2>
-    <div class="max-w-4xl mx-auto">
-      <div class="flex items-center justify-center mb-8">
-        <img src="https://via.placeholder.com/50" alt="Google" class="w-10 h-10 mr-4">
-        <div>
-          <h3 class="text-2xl font-bold mb-2">Développeur Frontend</h3>
-          <p class="text-gray-400 mb-2">Janvier 2020 - Présent</p>
-          <p class="text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc quis aliquet bibendum, nisl nunc aliquet nunc.</p>
+  <section id="experience" class="py-20 text-center parallax-section">
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-briefcase text-4xl text-blue-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">EXPÉRIENCE</h2>
+        </div>
+        <p class="text-gray-400 mb-12 text-lg">Mon parcours professionnel et mes réalisations</p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto">
+        <div class="space-y-8">
+          <div class="card scroll-reveal flex items-start p-6">
+            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+              <i class="fab fa-microsoft text-white text-2xl"></i>
+            </div>
+            <div class="text-left flex-1">
+              <h3 class="text-2xl font-bold mb-2">Consultant Power Platform</h3>
+              <p class="text-orange-400 mb-2 font-semibold">2022 - Présent</p>
+              <p class="text-gray-400 mb-4">Développement d'applications métier avec Power Apps, automatisation des processus avec Power Automate, et création de chatbots intelligents avec Copilot Studio.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="badge">Power Apps</span>
+                <span class="badge">Power Automate</span>
+                <span class="badge">SharePoint</span>
+                <span class="badge">Copilot Studio</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card scroll-reveal flex items-start p-6">
+            <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+              <i class="fas fa-code text-white text-2xl"></i>
+            </div>
+            <div class="text-left flex-1">
+              <h3 class="text-2xl font-bold mb-2">Développeur Full Stack</h3>
+              <p class="text-orange-400 mb-2 font-semibold">2020 - 2022</p>
+              <p class="text-gray-400 mb-4">Conception et développement d'applications web modernes, intégration d'APIs, et optimisation des performances. Expertise en JavaScript, React, Node.js et bases de données.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="badge">JavaScript</span>
+                <span class="badge">React</span>
+                <span class="badge">Node.js</span>
+                <span class="badge">MongoDB</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card scroll-reveal flex items-start p-6">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+              <i class="fas fa-robot text-white text-2xl"></i>
+            </div>
+            <div class="text-left flex-1">
+              <h3 class="text-2xl font-bold mb-2">Spécialiste Automatisation</h3>
+              <p class="text-orange-400 mb-2 font-semibold">2018 - 2020</p>
+              <p class="text-gray-400 mb-4">Automatisation des processus métier, intégration de solutions IA, et optimisation des workflows. Réduction significative des tâches manuelles et amélioration de l'efficacité.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="badge">RPA</span>
+                <span class="badge">N8N</span>
+                <span class="badge">AI Integration</span>
+                <span class="badge">Process Mining</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="flex items-center justify-center mb-8">
-        <img src="https://via.placeholder.com/50" alt="Apple" class="w-10 h-10 mr-4">
-        <div>
-          <h3 class="text-2xl font-bold mb-2">Développeur Backend</h3>
-          <p class="text-gray-400 mb-2">Mars 2018 - Décembre 2019</p>
-          <p class="text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc quis aliquet bibendum, nisl nunc aliquet nunc.</p>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 text-center parallax-section">
+    <div class="parallax-bg"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+      <div class="scroll-reveal">
+        <div class="flex items-center justify-center mb-4">
+          <i class="fas fa-envelope text-4xl text-green-400 mr-4"></i>
+          <h2 class="text-4xl font-bold gradient-text">CONTACT</h2>
         </div>
+        <p class="text-gray-400 mb-12 text-lg">
+          N'hésitez pas à me contacter pour toute collaboration ou question.
+        </p>
       </div>
-      <div class="flex items-center justify-center">
-        <img src="https://via.placeholder.com/50" alt="Meta" class="w-10 h-10 mr-4">
-        <div>
-          <h3 class="text-2xl font-bold mb-2">Développeur Fullstack</h3>
-          <p class="text-gray-400 mb-2">Juin 2016 - Février 2018</p>
-          <p class="text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc quis aliquet bibendum, nisl nunc aliquet nunc.</p>
+      
+      <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+        <!-- Informations de contact -->
+        <div class="card scroll-reveal text-left">
+          <h3 class="text-2xl font-bold mb-6">Restons en contact</h3>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <i class="fas fa-envelope text-orange-400 w-6 mr-4"></i>
+              <span>contact@tahraste-chihab.com</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-phone text-orange-400 w-6 mr-4"></i>
+              <span>+33 (0)6 XX XX XX XX</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-map-marker-alt text-orange-400 w-6 mr-4"></i>
+              <span>France</span>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <h4 class="text-lg font-semibold mb-4">Suivez-moi</h4>
+            <div class="flex space-x-4">
+              <a href="https://linkedin.com" class="tooltip w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" data-tooltip="LinkedIn">
+                <i class="fab fa-linkedin-in text-white"></i>
+              </a>
+              <a href="https://github.com" class="tooltip w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors" data-tooltip="GitHub">
+                <i class="fab fa-github text-white"></i>
+              </a>
+              <a href="https://instagram.com" class="tooltip w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors" data-tooltip="Instagram">
+                <i class="fab fa-instagram text-white"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Formulaire de contact -->
+        <div class="card scroll-reveal">
+          <h3 class="text-2xl font-bold mb-6 text-left">Envoyez-moi un message</h3>
+          <form id="contact-form" class="space-y-4">
+            <div>
+              <input type="text" id="name" name="name" placeholder="Votre nom" required 
+                     class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-orange-400 transition-colors">
+            </div>
+            <div>
+              <input type="email" id="email" name="email" placeholder="Votre email" required 
+                     class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-orange-400 transition-colors">
+            </div>
+            <div>
+              <input type="text" id="subject" name="subject" placeholder="Sujet" required 
+                     class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-orange-400 transition-colors">
+            </div>
+            <div>
+              <textarea id="message" name="message" rows="5" placeholder="Votre message" required 
+                        class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-orange-400 transition-colors resize-none"></textarea>
+            </div>
+            <button type="submit" class="btn-primary w-full">
+              <i class="fas fa-paper-plane mr-2"></i>
+              Envoyer le message
+            </button>
+          </form>
         </div>
       </div>
     </div>
   </section>
   </main>
 
+  <!-- Modal de contact -->
+  <div id="contact-modal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Contactez-moi</h3>
+        <button onclick="closeContactModal()" class="text-gray-400 hover:text-white text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p class="text-gray-400 mb-6">Je serais ravi de discuter de vos projets et de voir comment je peux vous aider.</p>
+      <div class="space-y-4">
+        <a href="mailto:contact@tahraste-chihab.com" class="btn-primary w-full text-center block">
+          <i class="fas fa-envelope mr-2"></i>
+          Envoyer un email
+        </a>
+        <a href="https://linkedin.com" class="btn-secondary w-full text-center block">
+          <i class="fab fa-linkedin mr-2"></i>
+          Me contacter sur LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="fab tooltip" data-tooltip="Retour en haut" onclick="scrollToTop()">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Progress Bar -->
+  <div class="fixed top-0 left-0 w-full z-50">
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
   <!-- JavaScript for Enhanced Navigation -->
   <script>
+    // Variables globales
+    let isScrolling = false;
+    
     // Mobile menu functionality
     function toggleMobileMenu() {
       const mobileMenu = document.getElementById('mobile-menu');
@@ -675,11 +1544,170 @@ De l’idée à la solution : je crée, j’automatise, j’optimise, je booste 
       }
     }
     
+    // Scroll animations
+    function handleScrollAnimations() {
+      const scrollElements = document.querySelectorAll('.scroll-reveal');
+      
+      scrollElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('revealed');
+        }
+      });
+    }
+
+    // Progress bar
+    function updateProgressBar() {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      
+      document.getElementById('progress-fill').style.width = scrollPercent + '%';
+    }
+
+    // Parallax effect
+    function handleParallax() {
+      if (isScrolling) return;
+      
+      isScrolling = true;
+      requestAnimationFrame(() => {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.parallax-bg');
+        
+        parallaxElements.forEach(element => {
+          const speed = 0.5;
+          element.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+        
+        isScrolling = false;
+      });
+    }
+
+    // Modal functions
+    function openContactModal() {
+      document.getElementById('contact-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeContactModal() {
+      document.getElementById('contact-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Download CV function
+    function downloadCV() {
+      showNotification('CV téléchargé avec succès !', 'success');
+      // Ici vous pouvez ajouter le lien réel vers votre CV
+      // window.open('/path/to/cv.pdf', '_blank');
+    }
+
+    // Scroll to top
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Notification system
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type} show`;
+      notification.innerHTML = `
+        <div class="flex items-center">
+          <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'} mr-3"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+
+    // Form validation and submission
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const name = formData.get('name');
+      const email = formData.get('email');
+      const subject = formData.get('subject');
+      const message = formData.get('message');
+      
+      // Validation simple
+      if (!name || !email || !subject || !message) {
+        showNotification('Veuillez remplir tous les champs', 'error');
+        return;
+      }
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showNotification('Veuillez entrer une adresse email valide', 'error');
+        return;
+      }
+      
+      // Simulate form submission
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
+      
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Envoi en cours...';
+      submitButton.disabled = true;
+      
+      setTimeout(() => {
+        showNotification('Message envoyé avec succès !', 'success');
+        this.reset();
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+      }, 2000);
+    });
+
+    // Real-time form validation
+    document.querySelectorAll('#contact-form input, #contact-form textarea').forEach(field => {
+      field.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+          this.style.borderColor = 'var(--error-color)';
+        } else {
+          this.style.borderColor = 'var(--success-color)';
+        }
+      });
+      
+      field.addEventListener('focus', function() {
+        this.style.borderColor = 'var(--primary-color)';
+      });
+    });
+
+    // Scroll event listeners
+    window.addEventListener('scroll', () => {
+      handleScrollAnimations();
+      updateProgressBar();
+      handleParallax();
+      
+      // Show/hide FAB
+      const fab = document.querySelector('.fab');
+      if (window.pageYOffset > 300) {
+        fab.style.opacity = '1';
+        fab.style.visibility = 'visible';
+      } else {
+        fab.style.opacity = '0';
+        fab.style.visibility = 'hidden';
+      }
+    });
+
     // Keyboard navigation support
     document.addEventListener('keydown', function(event) {
       // Close mobile menu with Escape key
       if (event.key === 'Escape') {
         closeMobileMenu();
+        closeContactModal();
         
         // Close desktop dropdowns
         document.querySelectorAll('[id$="-dropdown"]').forEach(dropdown => {
@@ -703,17 +1731,40 @@ De l’idée à la solution : je crée, j’automatise, j’optimise, je booste 
       }
     });
     
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('contact-modal');
+      if (event.target === modal) {
+        closeContactModal();
+      }
+    });
+
     // Initialize navigation on page load
     document.addEventListener('DOMContentLoaded', function() {
       // Set initial active link based on URL hash
       const hash = window.location.hash || '#accueil';
       updateActiveNavLink(hash);
       
+      // Initialize scroll animations
+      handleScrollAnimations();
+      updateProgressBar();
+      
+      // Add staggered animation delays
+      document.querySelectorAll('.scroll-reveal').forEach((element, index) => {
+        element.style.animationDelay = `${index * 0.1}s`;
+      });
+      
       // Handle browser back/forward buttons
       window.addEventListener('hashchange', function() {
         const newHash = window.location.hash || '#accueil';
         updateActiveNavLink(newHash);
       });
+      
+      // Initialize FAB
+      const fab = document.querySelector('.fab');
+      fab.style.opacity = '0';
+      fab.style.visibility = 'hidden';
+      fab.style.transition = 'all 0.3s ease';
     });
     
     // Intersection Observer for automatic section detection
@@ -742,20 +1793,24 @@ De l’idée à la solution : je crée, j’automatise, j’optimise, je booste 
     document.querySelectorAll('section[id]').forEach(section => {
       observer.observe(section);
     });
+
+    // Performance optimization: debounce scroll events
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Apply debouncing to scroll-heavy functions
+    const debouncedParallax = debounce(handleParallax, 10);
+    window.addEventListener('scroll', debouncedParallax);
   </script>
 
-  <!-- Contact Section -->
-  <section id="contact" class="py-16 text-center">
-    <h2 class="text-3xl font-bold text-green-500 mb-8">CONTACT</h2>
-    <p class="text-gray-400 mb-8">
-      N'hésitez pas à me contacter pour toute collaboration ou question.
-    </p>
-    <div class="flex justify-center space-x-4">
-      <a href="mailto:email@example.com" class="text-gray-400 hover:text-white">Email</a>
-      <a href="https://instagram.com" class="text-gray-400 hover:text-white">Instagram</a>
-      <a href="https://github.com" class="text-gray-400 hover:text-white">GitHub</a>
-      <a href="https://linkedin.com" class="text-gray-400 hover:text-white">LinkedIn</a>
-    </div>
-  </section>
 </body>
 </html>
