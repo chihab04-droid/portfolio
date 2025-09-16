@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Économie Participative - RSE</title>
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Palette inspirée de l'image - tons verts et bleus */
+        .gradient-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Styles pour les badges de statut */
+        .status-active { background-color: #10b981; color: white; }
+        .status-pending { background-color: #f59e0b; color: white; }
+        .status-completed { background-color: #6b7280; color: white; }
+        
+        /* Animation pour les cartes */
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card-shine:hover::before {
+            left: 100%;
+        }
+        
+        /* Styles pour les icônes colorées */
+        .icon-covoiturage { color: #10b981; }
+        .icon-collecte { color: #3b82f6; }
+        .icon-revente { color: #f59e0b; }
+        .icon-solidarite { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="gradient-primary text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Titre -->
+                <div class="flex items-center">
+                    <i class="fas fa-leaf text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Économie Participative</h1>
+                </div>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showPage('covoiturage')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-car mr-2"></i>Covoiturage
+                    </button>
+                    <button onclick="showPage('collecte')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-recycle mr-2"></i>Collecte
+                    </button>
+                    <button onclick="showPage('revente')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-shopping-cart mr-2"></i>Revente
+                    </button>
+                    <button onclick="showPage('solidarite')" class="nav-link hover:text-green-200 transition-colors duration-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-heart mr-2"></i>Solidarité
+                    </button>
+                </div>
+                
+                <!-- Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-green-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Mobile Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="showPage('covoiturage')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
+                    <i class="fas fa-car mr-2"></i>Covoiturage
+                </button>
+                <button onclick="showPage('collecte')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
+                    <i class="fas fa-recycle mr-2"></i>Collecte
+                </button>
+                <button onclick="showPage('revente')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
+                    <i class="fas fa-shopping-cart mr-2"></i>Revente
+                </button>
+                <button onclick="showPage('solidarite')" class="block w-full text-left px-3 py-2 hover:bg-green-700 rounded-md">
+                    <i class="fas fa-heart mr-2"></i>Solidarité
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Covoiturage -->
+        <div id="covoiturage-page" class="page-content">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-primary rounded-full flex items-center justify-center">
+                    <i class="fas fa-car text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Covoiturage d'Entreprise</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Partagez vos trajets avec vos collègues pour réduire votre empreinte carbone et créer du lien social.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de proposition de trajet -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle icon-covoiturage mr-3"></i>
+                        Proposer un Trajet
+                    </h3>
+                    <form id="covoiturage-form" onsubmit="addCovoiturage(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Point de départ</label>
+                            <input type="text" id="covoiturage-depart" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Adresse de départ">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+                            <input type="text" id="covoiturage-destination" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Adresse d'arrivée">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="covoiturage-date" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Heure</label>
+                                <input type="time" id="covoiturage-heure" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Places disponibles</label>
+                            <select id="covoiturage-places" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="1">1 place</option>
+                                <option value="2">2 places</option>
+                                <option value="3">3 places</option>
+                                <option value="4">4 places</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Commentaires (optionnel)</label>
+                            <textarea id="covoiturage-commentaire" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Informations supplémentaires..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full gradient-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-plus mr-2"></i>Proposer le Trajet
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Recherche de trajets -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-search icon-covoiturage mr-3"></i>
+                        Rechercher un Trajet
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Recherche par destination</label>
+                            <input type="text" id="search-destination" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Où voulez-vous aller ?">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date souhaitée</label>
+                            <input type="date" id="search-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <button onclick="searchTrajets()" class="w-full gradient-secondary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-search mr-2"></i>Rechercher
+                        </button>
+                    </div>
+                    
+                    <!-- Statistiques rapides -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="text-lg font-semibold mb-4">Statistiques</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-green-50 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600" id="stat-trajets">0</div>
+                                <div class="text-sm text-gray-600">Trajets proposés</div>
+                            </div>
+                            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-600" id="stat-participants">0</div>
+                                <div class="text-sm text-gray-600">Participants</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des trajets -->
+            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-list icon-covoiturage mr-3"></i>
+                    Trajets Disponibles
+                </h3>
+                <div id="trajets-list" class="space-y-4">
+                    <!-- Les trajets seront ajoutés ici dynamiquement -->
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-car text-4xl mb-4 opacity-50"></i>
+                        <p>Aucun trajet proposé pour le moment.</p>
+                        <p class="text-sm">Soyez le premier à proposer un covoiturage !</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Collecte -->
+        <div id="collecte-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 gradient-secondary rounded-full flex items-center justify-center">
+                    <i class="fas fa-recycle text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Collectes Solidaires</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Organisez et participez à des collectes pour donner une seconde vie aux objets et aider les associations.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de création d'événement -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle icon-collecte mr-3"></i>
+                        Organiser une Collecte
+                    </h3>
+                    <form id="collecte-form" onsubmit="addCollecte(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Titre de la collecte</label>
+                            <input type="text" id="collecte-titre" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Collecte de vêtements d'hiver">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type de collecte</label>
+                            <select id="collecte-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="vetements">Vêtements</option>
+                                <option value="jouets">Jouets</option>
+                                <option value="livres">Livres</option>
+                                <option value="materiel-informatique">Matériel informatique</option>
+                                <option value="fournitures-scolaires">Fournitures scolaires</option>
+                                <option value="alimentaire">Produits alimentaires</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
+                                <input type="date" id="collecte-debut" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
+                                <input type="date" id="collecte-fin" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lieu de collecte</label>
+                            <input type="text" id="collecte-lieu" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Hall d'accueil, Bureau 205...">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Association bénéficiaire</label>
+                            <input type="text" id="collecte-association" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nom de l'association">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="collecte-description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Détails sur les objets recherchés, conditions, etc."></textarea>
+                        </div>
+                        <button type="submit" class="w-full gradient-secondary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-plus mr-2"></i>Créer la Collecte
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Informations et conseils -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-info-circle icon-collecte mr-3"></i>
+                        Conseils pour une Collecte Réussie
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold">Communication claire</h4>
+                                <p class="text-sm text-gray-600">Précisez exactement quels objets sont acceptés et leur état requis.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold">Durée adaptée</h4>
+                                <p class="text-sm text-gray-600">Prévoyez une période suffisante (1-2 semaines) pour permettre la participation.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold">Lieu accessible</h4>
+                                <p class="text-sm text-gray-600">Choisissez un point de collecte facilement accessible à tous.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold">Suivi régulier</h4>
+                                <p class="text-sm text-gray-600">Informez régulièrement sur l'avancement de la collecte.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Associations partenaires -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="text-lg font-semibold mb-4">Associations Partenaires</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Emmaüs</span>
+                                <span class="text-gray-500">Vêtements, mobilier</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Secours Populaire</span>
+                                <span class="text-gray-500">Alimentaire, jouets</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Bibliothèques Sans Frontières</span>
+                                <span class="text-gray-500">Livres, matériel éducatif</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des collectes -->
+            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-calendar icon-collecte mr-3"></i>
+                    Collectes en Cours et à Venir
+                </h3>
+                <div id="collectes-list" class="space-y-4">
+                    <!-- Les collectes seront ajoutées ici dynamiquement -->
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-recycle text-4xl mb-4 opacity-50"></i>
+                        <p>Aucune collecte organisée pour le moment.</p>
+                        <p class="text-sm">Lancez la première collecte solidaire de votre entreprise !</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Revente -->
+        <div id="revente-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shopping-cart text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Marché Interne</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Vendez et achetez des objets entre collègues pour favoriser l'économie circulaire au sein de l'entreprise.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Formulaire d'ajout de produit -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle icon-revente mr-3"></i>
+                        Vendre un Objet
+                    </h3>
+                    <form id="revente-form" onsubmit="addProduit(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom du produit</label>
+                            <input type="text" id="produit-nom" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Ex: iPhone 12, Vélo de route...">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                            <select id="produit-categorie" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="electronique">Électronique</option>
+                                <option value="mobilier">Mobilier</option>
+                                <option value="vetements">Vêtements</option>
+                                <option value="sport">Sport & Loisirs</option>
+                                <option value="livres">Livres</option>
+                                <option value="vehicule">Véhicule</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prix (€)</label>
+                            <input type="number" id="produit-prix" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="0.00">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">État</label>
+                            <select id="produit-etat" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="neuf">Neuf</option>
+                                <option value="tres-bon">Très bon état</option>
+                                <option value="bon">Bon état</option>
+                                <option value="correct">État correct</option>
+                                <option value="usage">Usagé</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="produit-description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Décrivez votre objet, son histoire, ses caractéristiques..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-plus mr-2"></i>Mettre en Vente
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Liste des produits -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-store icon-revente mr-3"></i>
+                            Produits Disponibles
+                        </h3>
+                        <div class="flex space-x-2">
+                            <select id="filter-categorie" onchange="filterProduits()" class="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                                <option value="">Toutes catégories</option>
+                                <option value="electronique">Électronique</option>
+                                <option value="mobilier">Mobilier</option>
+                                <option value="vetements">Vêtements</option>
+                                <option value="sport">Sport & Loisirs</option>
+                                <option value="livres">Livres</option>
+                                <option value="vehicule">Véhicule</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                            <select id="filter-prix" onchange="filterProduits()" class="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                                <option value="">Tous prix</option>
+                                <option value="0-50">0 - 50€</option>
+                                <option value="50-100">50 - 100€</option>
+                                <option value="100-500">100 - 500€</option>
+                                <option value="500+">500€+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="produits-list" class="grid gap-4">
+                        <!-- Les produits seront ajoutés ici dynamiquement -->
+                        <div class="text-center text-gray-500 py-8 col-span-full">
+                            <i class="fas fa-shopping-cart text-4xl mb-4 opacity-50"></i>
+                            <p>Aucun produit en vente pour le moment.</p>
+                            <p class="text-sm">Soyez le premier à proposer un objet !</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Solidarité -->
+        <div id="solidarite-page" class="page-content hidden">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-heart text-3xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Jours de Solidarité</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Gérez vos jours de solidarité et contribuez aux actions caritatives de l'entreprise.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Formulaire de contribution -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover card-shine">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-hand-holding-heart icon-solidarite mr-3"></i>
+                        Contribuer à la Solidarité
+                    </h3>
+                    <form id="solidarite-form" onsubmit="addContribution(event)">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type de contribution</label>
+                            <select id="contribution-type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="jour-solidarite">Jour de solidarité (7h)</option>
+                                <option value="don-monetaire">Don monétaire</option>
+                                <option value="benevolat">Bénévolat (hors temps de travail)</option>
+                                <option value="competences">Don de compétences</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" id="montant-section" style="display: none;">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Montant (€)</label>
+                            <input type="number" id="contribution-montant" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="0.00">
+                        </div>
+                        <div class="mb-4" id="heures-section" style="display: none;">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre d'heures</label>
+                            <input type="number" id="contribution-heures" min="0" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="0">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Association/Cause bénéficiaire</label>
+                            <select id="contribution-cause" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">Sélectionner...</option>
+                                <option value="restos-du-coeur">Restos du Cœur</option>
+                                <option value="croix-rouge">Croix-Rouge</option>
+                                <option value="unicef">UNICEF</option>
+                                <option value="medecins-sans-frontieres">Médecins Sans Frontières</option>
+                                <option value="secours-populaire">Secours Populaire</option>
+                                <option value="autre">Autre association</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" id="autre-cause-section" style="display: none;">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom de l'association</label>
+                            <input type="text" id="contribution-autre-cause" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Nom de l'association">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description de l'action</label>
+                            <textarea id="contribution-description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Décrivez votre action solidaire..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-200">
+                            <i class="fas fa-heart mr-2"></i>Enregistrer ma Contribution
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Tableau de bord personnel -->
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-line icon-solidarite mr-3"></i>
+                        Mon Tableau de Bord
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-4 bg-red-50 rounded-lg">
+                            <div>
+                                <div class="text-sm text-gray-600">Heures de solidarité</div>
+                                <div class="text-2xl font-bold text-red-600" id="stat-heures-solidarite">0h</div>
+                            </div>
+                            <i class="fas fa-clock text-red-400 text-2xl"></i>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                            <div>
+                                <div class="text-sm text-gray-600">Dons monétaires</div>
+                                <div class="text-2xl font-bold text-green-600" id="stat-dons-monetaires">0€</div>
+                            </div>
+                            <i class="fas fa-euro-sign text-green-400 text-2xl"></i>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                            <div>
+                                <div class="text-sm text-gray-600">Actions bénévoles</div>
+                                <div class="text-2xl font-bold text-blue-600" id="stat-actions-benevoles">0</div>
+                            </div>
+                            <i class="fas fa-hands-helping text-blue-400 text-2xl"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Objectifs de l'entreprise -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="text-lg font-semibold mb-4">Objectifs Entreprise 2024</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Heures de solidarité</span>
+                                    <span>1,250h / 2,000h</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 62.5%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Participation employés</span>
+                                    <span>45% / 80%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 56.25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historique des contributions -->
+            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-history icon-solidarite mr-3"></i>
+                    Mes Contributions
+                </h3>
+                <div id="contributions-list" class="space-y-4">
+                    <!-- Les contributions seront ajoutées ici dynamiquement -->
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-heart text-4xl mb-4 opacity-50"></i>
+                        <p>Aucune contribution enregistrée pour le moment.</p>
+                        <p class="text-sm">Commencez dès maintenant votre engagement solidaire !</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales pour la gestion des données
+        let currentPage = 'covoiturage';
+        
+        // Données stockées localement
+        const appData = {
+            trajets: [],
+            collectes: [],
+            produits: [],
+            contributions: []
+        };
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            showPage('covoiturage');
+            updateStats();
+            
+            // Gestion des champs conditionnels dans le formulaire de solidarité
+            document.getElementById('contribution-type').addEventListener('change', function() {
+                const type = this.value;
+                const montantSection = document.getElementById('montant-section');
+                const heuresSection = document.getElementById('heures-section');
+                
+                // Masquer tous les champs conditionnels
+                montantSection.style.display = 'none';
+                heuresSection.style.display = 'none';
+                
+                // Afficher les champs appropriés
+                if (type === 'don-monetaire') {
+                    montantSection.style.display = 'block';
+                } else if (type === 'benevolat' || type === 'competences') {
+                    heuresSection.style.display = 'block';
+                }
+            });
+            
+            // Gestion du champ "autre association"
+            document.getElementById('contribution-cause').addEventListener('change', function() {
+                const autreCauseSection = document.getElementById('autre-cause-section');
+                if (this.value === 'autre') {
+                    autreCauseSection.style.display = 'block';
+                } else {
+                    autreCauseSection.style.display = 'none';
+                }
+            });
+        });
+
+        // Gestion de la navigation
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            // Afficher la page sélectionnée
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            // Mettre à jour la navigation active
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('bg-green-700'));
+            
+            currentPage = pageId;
+            
+            // Charger le contenu de la page
+            switch(pageId) {
+                case 'covoiturage':
+                    loadTrajets();
+                    break;
+                case 'collecte':
+                    loadCollectes();
+                    break;
+                case 'revente':
+                    loadProduits();
+                    break;
+                case 'solidarite':
+                    loadContributions();
+                    break;
+            }
+            
+            // Fermer le menu mobile
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Toggle menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Gestion du localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('ecoParticipativeData', JSON.stringify(appData));
+        }
+
+        function loadDataFromStorage() {
+            const savedData = localStorage.getItem('ecoParticipativeData');
+            if (savedData) {
+                Object.assign(appData, JSON.parse(savedData));
+            }
+        }
+
+        // COVOITURAGE
+        function addCovoiturage(event) {
+            event.preventDefault();
+            
+            const depart = document.getElementById('covoiturage-depart').value;
+            const destination = document.getElementById('covoiturage-destination').value;
+            const date = document.getElementById('covoiturage-date').value;
+            const heure = document.getElementById('covoiturage-heure').value;
+            const places = document.getElementById('covoiturage-places').value;
+            const commentaire = document.getElementById('covoiturage-commentaire').value;
+            
+            const newTrajet = {
+                id: Date.now(),
+                depart: depart,
+                destination: destination,
+                date: date,
+                heure: heure,
+                places: parseInt(places),
+                placesRestantes: parseInt(places),
+                commentaire: commentaire,
+                conducteur: "Vous", // Utilisateur actuel
+                participants: [],
+                statut: 'active'
+            };
+            
+            appData.trajets.push(newTrajet);
+            saveDataToStorage();
+            loadTrajets();
+            updateStats();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('covoiturage-form').reset();
+            
+            // Message de confirmation
+            showNotification('Trajet proposé avec succès !', 'success');
+        }
+
+        function loadTrajets() {
+            const container = document.getElementById('trajets-list');
+            container.innerHTML = '';
+            
+            if (appData.trajets.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-car text-4xl mb-4 opacity-50"></i>
+                        <p>Aucun trajet proposé pour le moment.</p>
+                        <p class="text-sm">Soyez le premier à proposer un covoiturage !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appData.trajets.forEach(trajet => {
+                const trajetDiv = document.createElement('div');
+                trajetDiv.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
+                trajetDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-lg text-gray-900">
+                                <i class="fas fa-map-marker-alt text-green-500 mr-2"></i>
+                                ${trajet.depart} → ${trajet.destination}
+                            </h4>
+                            <div class="flex items-center text-sm text-gray-600 mt-1">
+                                <i class="fas fa-calendar mr-2"></i>
+                                ${new Date(trajet.date).toLocaleDateString('fr-FR')} à ${trajet.heure}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${trajet.statut === 'active' ? 'status-active' : 'status-completed'}">
+                                ${trajet.placesRestantes} place(s) disponible(s)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-600">
+                            <i class="fas fa-user mr-1"></i>
+                            Conducteur: ${trajet.conducteur}
+                        </div>
+                        <div class="flex space-x-2">
+                            ${trajet.placesRestantes > 0 ? `
+                                <button onclick="rejoindreTrajet(${trajet.id})" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors duration-200">
+                                    <i class="fas fa-plus mr-1"></i>Rejoindre
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteTrajet(${trajet.id})" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors duration-200">
+                                <i class="fas fa-trash mr-1"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
+                    ${trajet.commentaire ? `<p class="text-sm text-gray-600 mt-2 italic">"${trajet.commentaire}"</p>` : ''}
+                `;
+                container.appendChild(trajetDiv);
+            });
+        }
+
+        function rejoindreTrajet(id) {
+            const trajet = appData.trajets.find(t => t.id === id);
+            if (trajet && trajet.placesRestantes > 0) {
+                trajet.placesRestantes--;
+                trajet.participants.push("Utilisateur"); // Nom de l'utilisateur actuel
+                saveDataToStorage();
+                loadTrajets();
+                updateStats();
+                showNotification('Vous avez rejoint le trajet !', 'success');
+            }
+        }
+
+        function deleteTrajet(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce trajet ?')) {
+                appData.trajets = appData.trajets.filter(t => t.id !== id);
+                saveDataToStorage();
+                loadTrajets();
+                updateStats();
+                showNotification('Trajet supprimé', 'info');
+            }
+        }
+
+        function searchTrajets() {
+            const destination = document.getElementById('search-destination').value.toLowerCase();
+            const date = document.getElementById('search-date').value;
+            
+            // Filtrer les trajets selon les critères
+            const trajetsFiltres = appData.trajets.filter(trajet => {
+                const matchDestination = !destination || trajet.destination.toLowerCase().includes(destination);
+                const matchDate = !date || trajet.date === date;
+                return matchDestination && matchDate;
+            });
+            
+            // Afficher les résultats (simulation)
+            if (trajetsFiltres.length > 0) {
+                showNotification(`${trajetsFiltres.length} trajet(s) trouvé(s) !`, 'success');
+            } else {
+                showNotification('Aucun trajet trouvé pour ces critères', 'info');
+            }
+        }
+
+        // COLLECTE
+        function addCollecte(event) {
+            event.preventDefault();
+            
+            const titre = document.getElementById('collecte-titre').value;
+            const type = document.getElementById('collecte-type').value;
+            const debut = document.getElementById('collecte-debut').value;
+            const fin = document.getElementById('collecte-fin').value;
+            const lieu = document.getElementById('collecte-lieu').value;
+            const association = document.getElementById('collecte-association').value;
+            const description = document.getElementById('collecte-description').value;
+            
+            const newCollecte = {
+                id: Date.now(),
+                titre: titre,
+                type: type,
+                debut: debut,
+                fin: fin,
+                lieu: lieu,
+                association: association,
+                description: description,
+                organisateur: "Vous",
+                statut: 'active',
+                participants: 0
+            };
+            
+            appData.collectes.push(newCollecte);
+            saveDataToStorage();
+            loadCollectes();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('collecte-form').reset();
+            
+            showNotification('Collecte créée avec succès !', 'success');
+        }
+
+        function loadCollectes() {
+            const container = document.getElementById('collectes-list');
+            container.innerHTML = '';
+            
+            if (appData.collectes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-recycle text-4xl mb-4 opacity-50"></i>
+                        <p>Aucune collecte organisée pour le moment.</p>
+                        <p class="text-sm">Lancez la première collecte solidaire de votre entreprise !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appData.collectes.forEach(collecte => {
+                const collecteDiv = document.createElement('div');
+                collecteDiv.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
+                
+                const typeColors = {
+                    'vetements': 'bg-purple-100 text-purple-800',
+                    'jouets': 'bg-pink-100 text-pink-800',
+                    'livres': 'bg-blue-100 text-blue-800',
+                    'materiel-informatique': 'bg-gray-100 text-gray-800',
+                    'fournitures-scolaires': 'bg-yellow-100 text-yellow-800',
+                    'alimentaire': 'bg-green-100 text-green-800',
+                    'autre': 'bg-gray-100 text-gray-800'
+                };
+                
+                collecteDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-lg text-gray-900">${collecte.titre}</h4>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${typeColors[collecte.type]} mt-1 inline-block">
+                                ${collecte.type.replace('-', ' ').charAt(0).toUpperCase() + collecte.type.replace('-', ' ').slice(1)}
+                            </span>
+                        </div>
+                        <button onclick="deleteCollecte(${collecte.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-600 mb-3">${collecte.description}</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
+                        <div>
+                            <i class="fas fa-calendar mr-1"></i>
+                            ${new Date(collecte.debut).toLocaleDateString('fr-FR')} - ${new Date(collecte.fin).toLocaleDateString('fr-FR')}
+                        </div>
+                        <div>
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            ${collecte.lieu}
+                        </div>
+                        <div>
+                            <i class="fas fa-heart mr-1"></i>
+                            ${collecte.association}
+                        </div>
+                        <div>
+                            <i class="fas fa-user mr-1"></i>
+                            Organisé par ${collecte.organisateur}
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${collecte.participants} participant(s)</span>
+                        <button onclick="participerCollecte(${collecte.id})" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors duration-200">
+                            <i class="fas fa-hand-holding mr-1"></i>Participer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(collecteDiv);
+            });
+        }
+
+        function participerCollecte(id) {
+            const collecte = appData.collectes.find(c => c.id === id);
+            if (collecte) {
+                collecte.participants++;
+                saveDataToStorage();
+                loadCollectes();
+                showNotification('Merci pour votre participation !', 'success');
+            }
+        }
+
+        function deleteCollecte(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette collecte ?')) {
+                appData.collectes = appData.collectes.filter(c => c.id !== id);
+                saveDataToStorage();
+                loadCollectes();
+                showNotification('Collecte supprimée', 'info');
+            }
+        }
+
+        // REVENTE
+        function addProduit(event) {
+            event.preventDefault();
+            
+            const nom = document.getElementById('produit-nom').value;
+            const categorie = document.getElementById('produit-categorie').value;
+            const prix = parseFloat(document.getElementById('produit-prix').value);
+            const etat = document.getElementById('produit-etat').value;
+            const description = document.getElementById('produit-description').value;
+            
+            const newProduit = {
+                id: Date.now(),
+                nom: nom,
+                categorie: categorie,
+                prix: prix,
+                etat: etat,
+                description: description,
+                vendeur: "Vous",
+                dateAjout: new Date().toISOString().split('T')[0],
+                statut: 'disponible'
+            };
+            
+            appData.produits.push(newProduit);
+            saveDataToStorage();
+            loadProduits();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('revente-form').reset();
+            
+            showNotification('Produit mis en vente !', 'success');
+        }
+
+        function loadProduits() {
+            const container = document.getElementById('produits-list');
+            container.innerHTML = '';
+            
+            if (appData.produits.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8 col-span-full">
+                        <i class="fas fa-shopping-cart text-4xl mb-4 opacity-50"></i>
+                        <p>Aucun produit en vente pour le moment.</p>
+                        <p class="text-sm">Soyez le premier à proposer un objet !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Appliquer les filtres
+            const filtreCategorie = document.getElementById('filter-categorie').value;
+            const filtrePrix = document.getElementById('filter-prix').value;
+            
+            let produitsFiltres = appData.produits.filter(produit => {
+                const matchCategorie = !filtreCategorie || produit.categorie === filtreCategorie;
+                let matchPrix = true;
+                
+                if (filtrePrix) {
+                    const prix = produit.prix;
+                    switch(filtrePrix) {
+                        case '0-50':
+                            matchPrix = prix >= 0 && prix <= 50;
+                            break;
+                        case '50-100':
+                            matchPrix = prix > 50 && prix <= 100;
+                            break;
+                        case '100-500':
+                            matchPrix = prix > 100 && prix <= 500;
+                            break;
+                        case '500+':
+                            matchPrix = prix > 500;
+                            break;
+                    }
+                }
+                
+                return matchCategorie && matchPrix;
+            });
+            
+            container.className = 'grid gap-4 md:grid-cols-2';
+            
+            produitsFiltres.forEach(produit => {
+                const produitDiv = document.createElement('div');
+                produitDiv.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
+                
+                const etatColors = {
+                    'neuf': 'bg-green-100 text-green-800',
+                    'tres-bon': 'bg-blue-100 text-blue-800',
+                    'bon': 'bg-yellow-100 text-yellow-800',
+                    'correct': 'bg-orange-100 text-orange-800',
+                    'usage': 'bg-gray-100 text-gray-800'
+                };
+                
+                produitDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-lg text-gray-900">${produit.nom}</h4>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    ${produit.categorie.charAt(0).toUpperCase() + produit.categorie.slice(1)}
+                                </span>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${etatColors[produit.etat]}">
+                                    ${produit.etat.replace('-', ' ').charAt(0).toUpperCase() + produit.etat.replace('-', ' ').slice(1)}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-orange-600">${produit.prix}€</div>
+                            <button onclick="deleteProduit(${produit.id})" class="text-red-500 hover:text-red-700 mt-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-3">${produit.description}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>
+                            <i class="fas fa-user mr-1"></i>
+                            Vendu par ${produit.vendeur}
+                        </span>
+                        <span>
+                            <i class="fas fa-calendar mr-1"></i>
+                            ${new Date(produit.dateAjout).toLocaleDateString('fr-FR')}
+                        </span>
+                    </div>
+                    <div class="mt-3">
+                        <button onclick="contacterVendeur(${produit.id})" class="w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors duration-200">
+                            <i class="fas fa-envelope mr-2"></i>Contacter le vendeur
+                        </button>
+                    </div>
+                `;
+                container.appendChild(produitDiv);
+            });
+        }
+
+        function filterProduits() {
+            loadProduits();
+        }
+
+        function contacterVendeur(id) {
+            const produit = appData.produits.find(p => p.id === id);
+            if (produit) {
+                showNotification(`Message envoyé au vendeur de "${produit.nom}"`, 'success');
+            }
+        }
+
+        function deleteProduit(id) {
+            if (confirm('Êtes-vous sûr de vouloir retirer ce produit de la vente ?')) {
+                appData.produits = appData.produits.filter(p => p.id !== id);
+                saveDataToStorage();
+                loadProduits();
+                showNotification('Produit retiré de la vente', 'info');
+            }
+        }
+
+        // SOLIDARITÉ
+        function addContribution(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('contribution-type').value;
+            const montant = document.getElementById('contribution-montant').value;
+            const heures = document.getElementById('contribution-heures').value;
+            const cause = document.getElementById('contribution-cause').value;
+            const autreCause = document.getElementById('contribution-autre-cause').value;
+            const description = document.getElementById('contribution-description').value;
+            
+            const newContribution = {
+                id: Date.now(),
+                type: type,
+                montant: montant ? parseFloat(montant) : 0,
+                heures: heures ? parseFloat(heures) : (type === 'jour-solidarite' ? 7 : 0),
+                cause: cause === 'autre' ? autreCause : cause,
+                description: description,
+                date: new Date().toISOString().split('T')[0],
+                statut: 'validee'
+            };
+            
+            appData.contributions.push(newContribution);
+            saveDataToStorage();
+            loadContributions();
+            updateSolidariteStats();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('solidarite-form').reset();
+            document.getElementById('montant-section').style.display = 'none';
+            document.getElementById('heures-section').style.display = 'none';
+            document.getElementById('autre-cause-section').style.display = 'none';
+            
+            showNotification('Contribution enregistrée avec succès !', 'success');
+        }
+
+        function loadContributions() {
+            const container = document.getElementById('contributions-list');
+            container.innerHTML = '';
+            
+            if (appData.contributions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-heart text-4xl mb-4 opacity-50"></i>
+                        <p>Aucune contribution enregistrée pour le moment.</p>
+                        <p class="text-sm">Commencez dès maintenant votre engagement solidaire !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appData.contributions.forEach(contribution => {
+                const contributionDiv = document.createElement('div');
+                contributionDiv.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200';
+                
+                const typeLabels = {
+                    'jour-solidarite': 'Jour de solidarité',
+                    'don-monetaire': 'Don monétaire',
+                    'benevolat': 'Bénévolat',
+                    'competences': 'Don de compétences'
+                };
+                
+                let valeurContribution = '';
+                if (contribution.type === 'don-monetaire') {
+                    valeurContribution = `${contribution.montant}€`;
+                } else if (contribution.heures > 0) {
+                    valeurContribution = `${contribution.heures}h`;
+                }
+                
+                contributionDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-lg text-gray-900">${typeLabels[contribution.type]}</h4>
+                            <div class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-heart mr-1"></i>
+                                ${contribution.cause}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-red-600">${valeurContribution}</div>
+                            <button onclick="deleteContribution(${contribution.id})" class="text-red-500 hover:text-red-700 mt-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-3">${contribution.description}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">
+                            ${contribution.statut.charAt(0).toUpperCase() + contribution.statut.slice(1)}
+                        </span>
+                        <span>
+                            <i class="fas fa-calendar mr-1"></i>
+                            ${new Date(contribution.date).toLocaleDateString('fr-FR')}
+                        </span>
+                    </div>
+                `;
+                container.appendChild(contributionDiv);
+            });
+        }
+
+        function deleteContribution(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette contribution ?')) {
+                appData.contributions = appData.contributions.filter(c => c.id !== id);
+                saveDataToStorage();
+                loadContributions();
+                updateSolidariteStats();
+                showNotification('Contribution supprimée', 'info');
+            }
+        }
+
+        function updateSolidariteStats() {
+            let totalHeures = 0;
+            let totalDons = 0;
+            let totalActions = 0;
+            
+            appData.contributions.forEach(contribution => {
+                if (contribution.type === 'don-monetaire') {
+                    totalDons += contribution.montant;
+                } else {
+                    totalHeures += contribution.heures;
+                }
+                totalActions++;
+            });
+            
+            document.getElementById('stat-heures-solidarite').textContent = totalHeures + 'h';
+            document.getElementById('stat-dons-monetaires').textContent = totalDons + '€';
+            document.getElementById('stat-actions-benevoles').textContent = totalActions;
+        }
+
+        // Mise à jour des statistiques générales
+        function updateStats() {
+            // Statistiques covoiturage
+            const totalTrajets = appData.trajets.length;
+            const totalParticipants = appData.trajets.reduce((sum, trajet) => sum + trajet.participants.length, 0);
+            
+            document.getElementById('stat-trajets').textContent = totalTrajets;
+            document.getElementById('stat-participants').textContent = totalParticipants;
+            
+            // Mettre à jour les stats de solidarité si on est sur cette page
+            if (currentPage === 'solidarite') {
+                updateSolidariteStats();
+            }
+        }
+
+        // Système de notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-x-full`;
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'info':
+                default:
+                    notification.classList.add('bg-blue-500');
+                    break;
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-2"></i>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animation d'entrée
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Animation de sortie et suppression
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
