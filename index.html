@@ -1080,46 +1080,127 @@
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+                        <!-- Formulaire Contact Form 7 WordPress -->
+                        <div class="contact-form-7-wrapper">
+                            <style>
+                                /* Styles personnalisés pour Contact Form 7 */
+                                .contact-form-7-wrapper .wpcf7-form label {
+                                    display: block;
+                                    font-size: 0.875rem;
+                                    font-weight: 500;
+                                    color: #374151;
+                                    margin-bottom: 0.5rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form input[type="text"],
+                                .contact-form-7-wrapper .wpcf7-form input[type="email"],
+                                .contact-form-7-wrapper .wpcf7-form textarea {
+                                    width: 100%;
+                                    padding: 0.75rem 1rem;
+                                    border: 1px solid #d1d5db;
+                                    border-radius: 0.5rem;
+                                    font-size: 1rem;
+                                    transition: all 0.2s ease;
+                                    margin-bottom: 1rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form input[type="text"]:focus,
+                                .contact-form-7-wrapper .wpcf7-form input[type="email"]:focus,
+                                .contact-form-7-wrapper .wpcf7-form textarea:focus {
+                                    outline: none;
+                                    border-color: transparent;
+                                    box-shadow: 0 0 0 2px #3b82f6;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form input[type="submit"] {
+                                    width: 100%;
+                                    background: linear-gradient(to right, #2563eb, #7c3aed);
+                                    color: white;
+                                    padding: 0.75rem 1.5rem;
+                                    border: none;
+                                    border-radius: 0.5rem;
+                                    font-weight: 500;
+                                    font-size: 1rem;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form input[type="submit"]:hover {
+                                    background: linear-gradient(to right, #1d4ed8, #6d28d9);
+                                    transform: translateY(-1px);
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-validation-errors,
+                                .contact-form-7-wrapper .wpcf7-acceptance-missing {
+                                    background-color: #fee2e2;
+                                    border: 1px solid #fecaca;
+                                    color: #dc2626;
+                                    padding: 0.75rem;
+                                    border-radius: 0.5rem;
+                                    margin-bottom: 1rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-mail-sent-ok {
+                                    background-color: #d1fae5;
+                                    border: 1px solid #a7f3d0;
+                                    color: #065f46;
+                                    padding: 0.75rem;
+                                    border-radius: 0.5rem;
+                                    margin-bottom: 1rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-response-output {
+                                    margin: 0;
+                                    padding: 0.75rem;
+                                    border-radius: 0.5rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-not-valid-tip {
+                                    color: #dc2626;
+                                    font-size: 0.875rem;
+                                    margin-top: 0.25rem;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form-control-wrap {
+                                    position: relative;
+                                    display: block;
+                                }
+                                
+                                /* Animation de chargement */
+                                .contact-form-7-wrapper .wpcf7-form.submitting input[type="submit"] {
+                                    opacity: 0.7;
+                                    cursor: not-allowed;
+                                }
+                                
+                                .contact-form-7-wrapper .wpcf7-form.submitting input[type="submit"]:after {
+                                    content: " ⏳";
+                                }
+                            </style>
+                            
+                            <!-- Remplacez ce commentaire par votre shortcode Contact Form 7 -->
+                            <!-- Exemple: [contact-form-7 id="123" title="Contact form 1"] -->
+                            
+                            <!-- Version de démonstration avec le code fourni -->
+                            <form class="wpcf7-form demo-form">
+                                <label> Your name
+                                    <input type="text" name="your-name" autocomplete="name" required class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"> 
+                                </label>
 
-        <div class="project-card scroll-reveal">
-          <div class="relative overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop" alt="Gestion Site" class="w-full h-48 object-cover">
-            <div class="absolute top-4 right-4">
-              <span class="badge bg-green-500">
-                <i class="fas fa-industry mr-1"></i>
-                Industriel
-              </span>
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-2xl font-bold mb-3">GESTION SITE</h3>
-            <p class="text-gray-400 mb-4">Gestion complète des sites industriels et maintenance</p>
-            <div class="flex items-center justify-between">
-              <a href="/projet/management/gestion_site.html" 
-                 class="btn-primary"
-                 aria-label="Visiter le projet Gestion Site">
-                <i class="fas fa-external-link-alt mr-2"></i>
-                Découvrir
-              </a>
-              <div class="flex space-x-2">
-                <span class="tooltip text-green-400" data-tooltip="Maintenance">
-                  <i class="fas fa-wrench"></i>
-                </span>
-                <span class="tooltip text-yellow-400" data-tooltip="Energy Management">
-                  <i class="fas fa-bolt"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+                                <label> Your email
+                                    <input type="email" name="your-email" autocomplete="email" required class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"> 
+                                </label>
 
+                                <label> Subject
+                                    <input type="text" name="your-subject" required class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"> 
+                                </label>
 
+                                <label> Your message (optional)
+                                    <textarea name="your-message" class="wpcf7-form-control wpcf7-textarea" rows="4"></textarea> 
+                                </label>
 
+                                <input type="submit" value="Submit" class="wpcf7-form-control wpcf7-submit">
+                            </form>
+                        </div>
   <!-- Projects Section RSE-->
   <section id="projets-rse" class="py-20 text-center parallax-section"> 
     <div class="parallax-bg"></div>
